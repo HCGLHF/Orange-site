@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { InquiryProvider } from "@/components/InquiryProvider";
+import { LocaleProvider } from "@/components/LocaleProvider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -20,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={`${spaceGrotesk.variable} antialiased`}>
-        {children}
+        <LocaleProvider>
+          <InquiryProvider>{children}</InquiryProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

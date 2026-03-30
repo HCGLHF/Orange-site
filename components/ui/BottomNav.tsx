@@ -1,55 +1,111 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ComponentType } from "react";
-import { Heart, Home, Search, User } from "lucide-react";
+import { Home, Layers3, MessageCircle, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/components/LocaleProvider";
+import { useInquiry } from "@/components/InquiryProvider";
+
+type TabId = "home" | "fabrics" | "inquiry" | "contact";
 
 type Tab = {
-  id: string;
-  label: string;
-  href: string;
+  id: TabId;
+  href?: string;
   icon: ComponentType<{ className?: string }>;
+  action?: "inquiry";
 };
 
-const tabs: Tab[] = [
-  { id: "home", label: "首页", href: "#home", icon: Home },
-  { id: "explore", label: "探索", href: "#fabrics", icon: Search },
-  { id: "favorite", label: "收藏", href: "#story", icon: Heart },
-  { id: "profile", label: "我的", href: "#contact", icon: User },
+const tabDefs: Tab[] = [
+  { id: "home", href: "#home", icon: Home },
+  { id: "fabrics", href: "#fabrics", icon: Layers3 },
+  { id: "inquiry", icon: MessageCircle, action: "inquiry" },
+  { id: "contact", href: "#contact", icon: Phone },
 ];
 
+function hashToTab(hash: string): TabId | null {
+  if (hash === "#home" || hash === "" || hash === "#") return "home";
+  if (hash === "#fabrics") return "fabrics";
+  if (hash === "#contact") return "contact";
+  return null;
+}
+
 export function BottomNav() {
-  const [activeTab, setActiveTab] = useState("home");
+  const { openInquiry } = useInquiry();
+  const { t } = useLocale();
+  const [activeTab, setActiveTab] = useState<TabId>("home");
+
+  const labels = useMemo(
+    () => ({
+      home: t("navHome"),
+      fabrics: t("navFabrics"),
+      inquiry: t("navInquiry"),
+      contact: t("navContact"),
+    }),
+    [t]
+  );
+
+  useEffect(() => {
+    const syncFromHash = () => {
+      const tab = hashToTab(window.location.hash);
+      if (tab) setActiveTab(tab);
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 bg-white shadow-lg md:hidden">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-100 bg-white pb-[env(safe-area-inset-bottom)] shadow-lg md:hidden"
+      aria-label={t("navAria")}
+    >
       <ul className="grid grid-cols-4">
-        {tabs.map((tab) => {
+        {tabDefs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
+          const label = labels[tab.id];
+
+          if (tab.action === "inquiry") {
+            return (
+              <li key={tab.id}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("inquiry");
+                    openInquiry();
+                  }}
+                  className="flex w-full flex-col items-center justify-center gap-1 py-3 text-xs text-brand-charcoal/70"
+                >
+                  <Icon
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      isActive ? "text-brand-orange" : "text-brand-charcoal/70"
+                    )}
+                    aria-hidden
+                  />
+                  <span>{label}</span>
+                </button>
+              </li>
+            );
+          }
 
           return (
             <li key={tab.id}>
               <Link
-                href={tab.href}
+                href={tab.href!}
                 onClick={() => setActiveTab(tab.id)}
-                className="relative flex flex-col items-center justify-center gap-1 py-2 text-xs text-brand-charcoal/70"
+                className="flex flex-col items-center justify-center gap-1 py-3 text-xs text-brand-charcoal/70"
               >
-                <span
-                  className={cn(
-                    "absolute inset-x-4 top-0 h-0.5 rounded-full bg-transparent transition-colors",
-                    isActive && "bg-brand-orange"
-                  )}
-                />
                 <Icon
                   className={cn(
-                    "h-4 w-4 transition-colors",
+                    "h-5 w-5 transition-colors",
                     isActive ? "text-brand-orange" : "text-brand-charcoal/70"
                   )}
+                  aria-hidden
                 />
-                <span>{tab.label}</span>
+                <span>{label}</span>
               </Link>
             </li>
           );

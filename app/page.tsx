@@ -1,11 +1,19 @@
-import { Button } from "@/components/ui/Button";
+"use client";
+
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { SampleRequestCta } from "@/components/SampleRequestCta";
+import { useLocale } from "@/components/LocaleProvider";
+import { BottomNav } from "@/components/ui/BottomNav";
 import { FabricCard } from "@/components/ui/FabricCard";
 import { Navbar } from "@/components/ui/Navbar";
 import { fabrics } from "@/lib/data";
 
 export default function Home() {
+  const { t } = useLocale();
+
   return (
     <div className="bg-brand-cream text-brand-charcoal">
+      <LanguageToggle />
       <Navbar />
 
       <main>
@@ -14,21 +22,21 @@ export default function Home() {
           className="mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 text-center"
         >
           <p className="mb-4 rounded-full bg-brand-soft px-4 py-1 text-sm text-brand-charcoal/80">
-            Shaoxing Textile Trading
+            {t("heroBadge")}
           </p>
           <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">
-            O&apos;range 诗橙
+            {t("heroTitle")}
           </h1>
           <p className="mt-5 text-lg text-brand-charcoal/80 md:text-xl">
-            Soft Touch from Shaoxing
+            {t("heroSubtitle")}
           </p>
-          <Button className="mt-10">免费索取样品</Button>
+          <SampleRequestCta />
         </section>
 
         <section id="fabrics" className="mx-auto max-w-6xl px-6 py-16">
           <div className="mb-8 flex items-end justify-between">
-            <h2 className="text-3xl font-semibold">Featured Fabrics</h2>
-            <p className="text-sm text-brand-charcoal/70">精选针织面料</p>
+            <h2 className="text-3xl font-semibold">{t("fabricsTitle")}</h2>
+            <p className="text-sm text-brand-charcoal/70">{t("fabricsSubtitle")}</p>
           </div>
           <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2">
             {fabrics.map((fabric) => (
@@ -42,20 +50,21 @@ export default function Home() {
         <section id="story" className="mx-auto max-w-6xl px-6 py-20">
           <div className="rounded-3xl bg-white p-8 shadow-sm md:p-12">
             <p className="mb-3 text-sm uppercase tracking-[0.18em] text-brand-orange">
-              Brand Story
+              {t("storyLabel")}
             </p>
-            <h3 className="text-3xl font-semibold md:text-4xl">触感如诗，橙色温度</h3>
+            <h3 className="text-3xl font-semibold md:text-4xl">{t("storyTitle")}</h3>
             <p className="mt-4 max-w-3xl leading-relaxed text-brand-charcoal/80">
-              我们扎根绍兴，以稳定织造、细腻手感和快速响应服务全球客户。
-              O&apos;range 诗橙坚持把每一匹面料做到可感知的温度，让设计灵感从触感开始。
+              {t("storyBody")}
             </p>
           </div>
         </section>
       </main>
 
       <footer id="contact" className="px-6 pb-24 pt-6 text-center text-sm text-brand-charcoal/70">
-        绍兴诗橙纺织品贸易公司 · 欢迎洽询合作
+        {t("footer")}
       </footer>
+
+      <BottomNav />
     </div>
   );
 }

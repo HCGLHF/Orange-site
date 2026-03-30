@@ -10,6 +10,11 @@ export type Fabric = {
   description: string;
 };
 
+const TEXTURE_PLACEHOLDER =
+  "https://placehold.co/600x600/FAF9F6/E07A5F?text=面料纹理+待上传";
+const SCENE_PLACEHOLDER =
+  "https://placehold.co/600x600/F4E4DC/3D405B?text=成衣效果+待展示";
+
 export const fabrics: Fabric[] = [
   {
     id: 1,
@@ -18,10 +23,8 @@ export const fabrics: Fabric[] = [
     weight: 180,
     width: 170,
     tags: ["现货", "T恤首选", "柔软弹力"],
-    textureImage:
-      "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80",
-    sceneImage:
-      "https://images.unsplash.com/photo-1521572163474-6864f6cf17ab?w=800&q=80",
+    textureImage: TEXTURE_PLACEHOLDER,
+    sceneImage: SCENE_PLACEHOLDER,
     description: "手感像洗过的旧T恤，回弹好，适合做修身款",
   },
   {
@@ -31,10 +34,8 @@ export const fabrics: Fabric[] = [
     weight: 160,
     width: 175,
     tags: ["基础款", "透气", "本白现货"],
-    textureImage:
-      "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80",
-    sceneImage:
-      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800&q=80",
+    textureImage: TEXTURE_PLACEHOLDER,
+    sceneImage: SCENE_PLACEHOLDER,
     description: "轻薄透气，夏日白T的最佳选择",
   },
   {
@@ -44,10 +45,8 @@ export const fabrics: Fabric[] = [
     weight: 260,
     width: 165,
     tags: ["挺括", "卫衣面料", "保暖"],
-    textureImage:
-      "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80",
-    sceneImage:
-      "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=800&q=80",
-    description: "空气层结构，挺括有型，做卫衣卫裤显质感",
+    textureImage: TEXTURE_PLACEHOLDER,
+    sceneImage: SCENE_PLACEHOLDER,
+    description: "空气层结构，挺括有型，做卫衣显质感",
   },
 ];
