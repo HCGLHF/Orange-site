@@ -58,13 +58,23 @@ export type Messages = {
   heroBadge: string;
   heroTitle: string;
   heroSubtitle: string;
-  heroCta: string;
+  heroTagline: string;
+  ctaButton: string;
+  trustBadges: readonly [string, string, string];
   fabricsTitle: string;
   fabricsSubtitle: string;
+  whyTitle: string;
+  whyFactoryTitle: string;
+  whyFactoryDesc: string;
+  whySpeedTitle: string;
+  whySpeedDesc: string;
+  whyExportTitle: string;
+  whyExportDesc: string;
   storyLabel: string;
   storyTitle: string;
   storyBody: string;
   footer: string;
+  footerContact: string;
   fabricAltTexture: string;
   fabricAltScene: string;
   fabricShooting: string;
@@ -102,6 +112,8 @@ export type Messages = {
   langToggleAria: string;
 };
 
+export type MessageStringKey = Exclude<keyof Messages, "trustBadges">;
+
 export const messages: Record<Locale, Messages> = {
   zh: {
     navAria: "主导航",
@@ -109,17 +121,27 @@ export const messages: Record<Locale, Messages> = {
     navFabrics: "面料",
     navInquiry: "询价",
     navContact: "联系",
-    heroBadge: "Shaoxing Textile Trading",
+    heroBadge: "绍兴柯桥 · 精梳针织",
     heroTitle: "O'range 诗橙",
-    heroSubtitle: "Soft Touch from Shaoxing",
-    heroCta: "免费索取样品",
+    heroSubtitle: "来自绍兴柯桥的精梳针织面料",
+    heroTagline: "触感如诗，橙色温度 —— 服务全球服装品牌",
+    ctaButton: "免费索取样品",
+    trustBadges: ["✓ 48小时打样", "✓ 3000米起订", "✓ OEKO-TEX认证"],
     fabricsTitle: "Featured Fabrics",
     fabricsSubtitle: "精选针织面料",
+    whyTitle: "为什么选择诗橙？",
+    whyFactoryTitle: "自有工厂",
+    whyFactoryDesc: "20000㎡现代化车间",
+    whySpeedTitle: "快速响应",
+    whySpeedDesc: "现货24小时发货",
+    whyExportTitle: "外贸经验",
+    whyExportDesc: "服务欧美/中东/东南亚",
     storyLabel: "Brand Story",
     storyTitle: "触感如诗，橙色温度",
     storyBody:
       "我们扎根绍兴，以稳定织造、细腻手感和快速响应服务全球客户。O'range 诗橙坚持把每一匹面料做到可感知的温度，让设计灵感从触感开始。",
     footer: "绍兴诗橙纺织品贸易公司 · 欢迎洽询合作",
+    footerContact: "WhatsApp: +86 138-xxxx-xxxx",
     fabricAltTexture: "面料纹理占位",
     fabricAltScene: "成衣效果占位",
     fabricShooting: "📷 拍摄中",
@@ -163,17 +185,31 @@ export const messages: Record<Locale, Messages> = {
     navFabrics: "Fabrics",
     navInquiry: "Inquiry",
     navContact: "Contact",
-    heroBadge: "Shaoxing Textile Trading",
-    heroTitle: "O'range",
-    heroSubtitle: "Soft Touch from Shaoxing",
-    heroCta: "Request free samples",
+    heroBadge: "Keqiao, Shaoxing · Premium knits",
+    heroTitle: "O'range Textile",
+    heroSubtitle: "Premium Knit Fabrics from Shaoxing",
+    heroTagline: "Soft Touch, Strong Quality —— Trusted by 500+ Brands",
+    ctaButton: "Request Free Sample",
+    trustBadges: [
+      "✓ 48hr Sampling",
+      "✓ 3000m MOQ",
+      "✓ OEKO-TEX Certified",
+    ],
     fabricsTitle: "Featured fabrics",
     fabricsSubtitle: "Selected knits",
+    whyTitle: "Why O'range?",
+    whyFactoryTitle: "In-house mill",
+    whyFactoryDesc: "20,000 m² modern production floor",
+    whySpeedTitle: "Fast response",
+    whySpeedDesc: "In-stock orders ship within 24 hours",
+    whyExportTitle: "Export expertise",
+    whyExportDesc: "Serving Europe, the Americas, Middle East & Southeast Asia",
     storyLabel: "Brand story",
     storyTitle: "Poetry in touch, warmth in orange",
     storyBody:
       "Based in Shaoxing, we serve global clients with stable weaving, refined hand-feel, and responsive service. O'range brings perceptible warmth to every roll—so your ideas start from touch.",
     footer: "Shaoxing Shicheng Textile Trading · Inquiries welcome",
+    footerContact: "WhatsApp: +86 138-xxxx-xxxx",
     fabricAltTexture: "Fabric texture placeholder",
     fabricAltScene: "Garment photo placeholder",
     fabricShooting: "📷 Shoot in progress",

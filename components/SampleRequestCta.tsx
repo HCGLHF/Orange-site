@@ -10,7 +10,7 @@ export function SampleRequestCta() {
 
   return (
     <Button type="button" className="mt-10" onClick={openInquiry}>
-      {t("heroCta")}
+      {t("ctaButton")}
     </Button>
   );
 }

@@ -13,13 +13,14 @@ import {
   LOCALE_STORAGE_KEY,
   type Locale,
   messages,
-  type Messages,
+  type MessageStringKey,
 } from "@/lib/i18n";
 
 type LocaleContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: keyof Messages) => string;
+  t: (key: MessageStringKey) => string;
+  trustBadges: readonly [string, string, string];
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -54,13 +55,15 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: keyof Messages) => messages[locale][key],
+    (key: MessageStringKey) => messages[locale][key] as string,
     [locale]
   );
 
+  const trustBadges = messages[locale].trustBadges;
+
   const value = useMemo(
-    () => ({ locale, setLocale, t }),
-    [locale, setLocale, t]
+    () => ({ locale, setLocale, t, trustBadges }),
+    [locale, setLocale, t, trustBadges]
   );
 
   return (
