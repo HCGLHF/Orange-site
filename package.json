@@ -1,18 +1,27 @@
 {
   "name": "orange-textile",
+  "description": "绍兴诗橙纺织品有限公司官网（O'range Textile）",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:poll": "WATCHPACK_POLLING=1 next dev",
+    "dev:clean": "rm -rf .next node_modules/.cache && WATCHPACK_POLLING=1 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "notion:test": "node scripts/test-notion.js",
+    "notion:test-direct": "node scripts/test-notion-direct.js"
   },
   "dependencies": {
+    "@notionhq/client": "^5.16.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.38.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.7.0",
     "next": "14.2.33",
     "react": "^18",

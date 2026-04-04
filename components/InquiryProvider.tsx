@@ -8,6 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import StickyInquiryBar from "@/components/StickyInquiryBar";
+import { InquiryCartProvider } from "@/components/InquiryCartProvider";
 import { InquiryModal } from "@/components/ui/InquiryModal";
 
 type InquiryContextValue = {
@@ -29,8 +31,11 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
 
   return (
     <InquiryContext.Provider value={value}>
-      {children}
-      <InquiryModal open={open} onClose={closeInquiry} />
+      <InquiryCartProvider>
+        {children}
+        <StickyInquiryBar />
+        <InquiryModal open={open} onClose={closeInquiry} />
+      </InquiryCartProvider>
     </InquiryContext.Provider>
   );
 }

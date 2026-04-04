@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { ComponentType } from "react";
 import { Home, Layers3, MessageCircle, Phone } from "lucide-react";
@@ -18,10 +19,10 @@ type Tab = {
 };
 
 const tabDefs: Tab[] = [
-  { id: "home", href: "#home", icon: Home },
-  { id: "fabrics", href: "#fabrics", icon: Layers3 },
+  { id: "home", href: "/", icon: Home },
+  { id: "fabrics", href: "/fabrics", icon: Layers3 },
   { id: "inquiry", icon: MessageCircle, action: "inquiry" },
-  { id: "contact", href: "#contact", icon: Phone },
+  { id: "contact", href: "/#contact", icon: Phone },
 ];
 
 function hashToTab(hash: string): TabId | null {
@@ -32,6 +33,7 @@ function hashToTab(hash: string): TabId | null {
 }
 
 export function BottomNav() {
+  const pathname = usePathname();
   const { openInquiry } = useInquiry();
   const { t } = useLocale();
   const [activeTab, setActiveTab] = useState<TabId>("home");
@@ -47,14 +49,21 @@ export function BottomNav() {
   );
 
   useEffect(() => {
-    const syncFromHash = () => {
-      const tab = hashToTab(window.location.hash);
-      if (tab) setActiveTab(tab);
+    const sync = () => {
+      if (pathname === "/fabrics") {
+        setActiveTab("fabrics");
+        return;
+      }
+      if (pathname === "/") {
+        const tab = hashToTab(window.location.hash);
+        if (tab) setActiveTab(tab);
+        else setActiveTab("home");
+      }
     };
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => window.removeEventListener("hashchange", syncFromHash);
-  }, []);
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, [pathname]);
 
   return (
     <nav

@@ -8,7 +8,7 @@ export function LanguageToggle() {
 
   return (
     <div
-      className="fixed right-4 top-4 z-[60] flex items-center gap-0 rounded-full border border-brand-soft bg-white/95 p-1 text-xs font-medium shadow-sm backdrop-blur md:right-6 md:top-6"
+      className="fixed right-4 top-[4.75rem] z-[60] flex items-center gap-0 rounded-full border border-brand-soft bg-white/95 p-1 text-xs font-medium shadow-sm backdrop-blur md:right-6 md:top-[4.75rem]"
       role="group"
       aria-label={t("langToggleAria")}
     >

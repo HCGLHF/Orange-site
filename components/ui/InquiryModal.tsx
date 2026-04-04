@@ -1,61 +1,24 @@
 "use client";
 
 import { useEffect, useId, useState, type FormEvent } from "react";
-import { X } from "lucide-react";
+import { CheckCircle2, X } from "lucide-react";
 import { fabrics } from "@/lib/data";
+import {
+  appendInquiryRecord,
+  FORMSPREE_INQUIRY_ENDPOINT,
+  type InquiryRecord,
+} from "@/lib/inquiry-storage";
 import { cn } from "@/lib/utils";
-import { getFabricCopy, messages, type Locale } from "@/lib/i18n";
+import { getFabricCopy } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/LocaleProvider";
 
-const STORAGE_KEY = "orange-textile-inquiries";
-
-export type InquiryRecord = {
-  name: string;
-  email: string;
-  company: string;
-  fabric: string;
-  quantity: string;
-  createdAt: string;
-};
+export type { InquiryRecord };
 
 type InquiryModalProps = {
   open: boolean;
   onClose: () => void;
 };
-
-function saveToLocalStorage(entry: Omit<InquiryRecord, "createdAt">): InquiryRecord {
-  const full: InquiryRecord = {
-    ...entry,
-    createdAt: new Date().toISOString(),
-  };
-  const raw =
-    typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-  const list: InquiryRecord[] = raw ? JSON.parse(raw) : [];
-  list.push(full);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  return full;
-}
-
-function openMailto(entry: InquiryRecord, locale: Locale): void {
-  const to = process.env.NEXT_PUBLIC_INQUIRY_EMAIL?.trim();
-  if (!to) return;
-
-  const m = messages[locale];
-  const subject = encodeURIComponent(m.inquiryMailSubject);
-  const body = encodeURIComponent(
-    [
-      `${m.inquiryMailName}: ${entry.name}`,
-      `${m.inquiryMailEmail}: ${entry.email}`,
-      `${m.inquiryMailCompany}: ${entry.company}`,
-      `${m.inquiryMailFabric}: ${entry.fabric}`,
-      `${m.inquiryMailQty}: ${entry.quantity}`,
-      "",
-      `${m.inquiryMailTime}: ${entry.createdAt}`,
-    ].join("\n")
-  );
-  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-}
 
 export function InquiryModal({ open, onClose }: InquiryModalProps) {
   const { locale, t } = useLocale();
@@ -63,9 +26,10 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
-  const [fabricId, setFabricId] = useState(fabrics[0]?.id ?? 1);
+  const [fabricId, setFabricId] = useState(fabrics[0]?.id ?? "1");
   const [quantity, setQuantity] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? fabrics[0];
@@ -93,7 +57,7 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
 
   if (!open) return null;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -110,7 +74,7 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
       return;
     }
 
-    const entry = saveToLocalStorage({
+    const entry = appendInquiryRecord({
       name: name.trim(),
       email: email.trim(),
       company: company.trim(),
@@ -118,11 +82,36 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
       quantity: quantity.trim(),
     });
 
-    if (process.env.NEXT_PUBLIC_INQUIRY_EMAIL) {
-      openMailto(entry, locale);
-    }
+    try {
+      setSubmitting(true);
+      const response = await fetch(FORMSPREE_INQUIRY_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: entry.name,
+          email: entry.email,
+          company: entry.company,
+          fabric: entry.fabric,
+          message: entry.quantity,
+          _subject: `【官网询盘】${entry.company || entry.name} - ${entry.fabric}`,
+        }),
+      });
 
-    setSubmitted(true);
+      if (response.ok) {
+        alert("✅ 提交成功！我们会尽快联系您。");
+        handleClose();
+      } else {
+        alert("❌ 提交失败，请直接邮件联系");
+      }
+    } catch (submitError) {
+      console.error(submitError);
+      alert("❌ 网络错误，请稍后重试");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -130,7 +119,7 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
     setName("");
     setEmail("");
     setCompany("");
-    setFabricId(fabrics[0]?.id ?? 1);
+    setFabricId(fabrics[0]?.id ?? "1");
     setQuantity("");
     onClose();
   };
@@ -174,6 +163,9 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
 
         {submitted ? (
           <div className="py-6 text-center">
+            <div className="mb-3 flex justify-center">
+              <CheckCircle2 className="h-8 w-8 text-green-500" />
+            </div>
             <p className="text-base font-medium text-brand-charcoal">{t("inquirySuccess")}</p>
             <Button type="button" className="mt-6 w-full" onClick={handleClose}>
               {t("inquiryOk")}
@@ -186,46 +178,64 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
             )}
 
             <div>
-              <label htmlFor="inquiry-name" className="mb-1 block text-sm text-brand-charcoal">
-                {t("inquiryName")} <span className="text-brand-orange">*</span>
-              </label>
-              <input
-                id="inquiry-name"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none ring-brand-orange/30 transition-shadow focus:ring-2"
-              />
+              <div className="relative">
+                <input
+                  id="inquiry-name"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                  placeholder=" "
+                  className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
+                />
+                <label
+                  htmlFor="inquiry-name"
+                  className="pointer-events-none absolute left-4 top-2 text-xs text-brand-charcoal/70 transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-brand-orange"
+                >
+                  {t("inquiryName")} <span className="text-brand-orange">*</span>
+                </label>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="inquiry-email" className="mb-1 block text-sm text-brand-charcoal">
-                {t("inquiryEmail")} <span className="text-brand-orange">*</span>
-              </label>
-              <input
-                id="inquiry-email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none ring-brand-orange/30 transition-shadow focus:ring-2"
-              />
+              <div className="relative">
+                <input
+                  id="inquiry-email"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder=" "
+                  className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
+                />
+                <label
+                  htmlFor="inquiry-email"
+                  className="pointer-events-none absolute left-4 top-2 text-xs text-brand-charcoal/70 transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-brand-orange"
+                >
+                  {t("inquiryEmail")} <span className="text-brand-orange">*</span>
+                </label>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="inquiry-company" className="mb-1 block text-sm text-brand-charcoal">
-                {t("inquiryCompany")}
-              </label>
-              <input
-                id="inquiry-company"
-                name="company"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                autoComplete="organization"
-                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none ring-brand-orange/30 transition-shadow focus:ring-2"
-              />
+              <div className="relative">
+                <input
+                  id="inquiry-company"
+                  name="company"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  autoComplete="organization"
+                  placeholder=" "
+                  className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
+                />
+                <label
+                  htmlFor="inquiry-company"
+                  className="pointer-events-none absolute left-4 top-2 text-xs text-brand-charcoal/70 transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-brand-orange"
+                >
+                  {t("inquiryCompany")}
+                </label>
+              </div>
             </div>
 
             <div>
@@ -236,8 +246,8 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
                 id="inquiry-fabric"
                 name="fabric"
                 value={fabricId}
-                onChange={(e) => setFabricId(Number(e.target.value))}
-                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none ring-brand-orange/30 transition-shadow focus:ring-2"
+                onChange={(e) => setFabricId(e.target.value)}
+                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
               >
                 {fabrics.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -248,24 +258,30 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
             </div>
 
             <div>
-              <label htmlFor="inquiry-qty" className="mb-1 block text-sm text-brand-charcoal">
-                {t("inquiryQuantity")} <span className="text-brand-orange">*</span>
-              </label>
-              <input
-                id="inquiry-qty"
-                name="quantity"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                placeholder={t("inquiryQtyPlaceholder")}
-                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none ring-brand-orange/30 transition-shadow focus:ring-2"
-              />
+              <div className="relative">
+                <input
+                  id="inquiry-qty"
+                  name="quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder=" "
+                  className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
+                />
+                <label
+                  htmlFor="inquiry-qty"
+                  className="pointer-events-none absolute left-4 top-2 text-xs text-brand-charcoal/70 transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-brand-orange"
+                >
+                  {t("inquiryQuantity")} <span className="text-brand-orange">*</span>
+                </label>
+              </div>
+              <p className="mt-1 pl-1 text-xs text-brand-charcoal/55">{t("inquiryQtyPlaceholder")}</p>
             </div>
 
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="secondary" className="flex-1" onClick={handleClose}>
                 {t("inquiryCancel")}
               </Button>
-              <Button type="submit" className="flex-1">
+              <Button type="submit" className="flex-1" disabled={submitting}>
                 {t("inquirySubmit")}
               </Button>
             </div>
