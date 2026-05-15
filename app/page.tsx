@@ -1,16 +1,8 @@
 import { GeoHomePage } from "@/components/geo/GeoHomePage";
-import { toEnglishFabrics } from "@/lib/english-fabrics";
-import { resolveFabricsFromNotion } from "@/lib/fabrics";
+import { getPublicFabrics } from "@/lib/public-catalog";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = "force-static";
 
 export default async function Home() {
-  const { fabrics, notionEmpty } = await resolveFabricsFromNotion();
-  return (
-    <GeoHomePage
-      initialFabrics={toEnglishFabrics(fabrics)}
-      notionEmpty={notionEmpty}
-    />
-  );
+  return <GeoHomePage initialFabrics={getPublicFabrics()} />;
 }

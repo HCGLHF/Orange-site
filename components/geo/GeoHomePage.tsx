@@ -101,6 +101,12 @@ export function GeoHomePage({
             {fabricCategories.map((category) => (
               <InfoCard key={category.name} title={category.name}>
                 <p>{category.description}</p>
+                <Link
+                  href={`/fabrics/${category.slug}`}
+                  className="mt-4 inline-flex text-sm font-semibold text-brand-orange hover:underline"
+                >
+                  View {category.shortName}
+                </Link>
               </InfoCard>
             ))}
           </div>
@@ -203,7 +209,7 @@ export function GeoHomePage({
 
       <footer className="px-6 pb-24 pt-2 text-center text-sm text-brand-charcoal/60 max-md:pb-40">
         <p>
-          O&apos;range Textile · Shaoxing Shicheng Textile Products Co., Ltd. ·
+          O&apos;range Textile | Shaoxing Shicheng Textile Products Co., Ltd. |
           Knit fabric inquiries welcome
         </p>
       </footer>

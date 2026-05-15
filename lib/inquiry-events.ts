@@ -1,4 +1,3 @@
-/** 打开 InquiryBar 内批量询价弹窗 */
 export const OPEN_BATCH_INQUIRY_EVENT = "orange-textile:open-batch-inquiry";
 
 export function dispatchOpenBatchInquiry(): void {

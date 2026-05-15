@@ -4,22 +4,21 @@ import { FabricsCatalog } from "@/components/FabricsCatalog";
 import { FabricsInquiryAnchor } from "@/components/FabricsInquiryAnchor";
 import { FabricsPageIntro } from "@/components/FabricsPageIntro";
 import { BottomNav } from "@/components/ui/BottomNav";
-import { toEnglishFabrics } from "@/lib/english-fabrics";
-import { resolveFabricsFromNotion } from "@/lib/fabrics";
+import { getPublicFabrics } from "@/lib/public-catalog";
 
 export const metadata: Metadata = {
   title: "Knit Fabric Library",
   description:
     "Browse cotton jersey, cotton spandex jersey, rib, fleece, terry and air-layer knit fabrics from O'range Textile.",
+  alternates: {
+    canonical: "/fabrics",
+  },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = "force-static";
 
 export default async function FabricsPage() {
-  const { fabrics, notionEmpty: emptyFromNotion } =
-    await resolveFabricsFromNotion();
-  const englishFabrics = toEnglishFabrics(fabrics);
+  const fabrics = getPublicFabrics();
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -31,24 +30,18 @@ export default async function FabricsPage() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          {emptyFromNotion ? (
-            <p className="text-brand-charcoal/60">
-              Fabric data is being updated.
-            </p>
-          ) : (
-            <Suspense
-              fallback={
-                <div className="py-16 text-center text-sm text-brand-charcoal/60">
-                  Loading fabrics...
-                </div>
-              }
-            >
-              <FabricsCatalog fabrics={englishFabrics} />
-            </Suspense>
-          )}
+          <Suspense
+            fallback={
+              <div className="py-16 text-center text-sm text-brand-charcoal/60">
+                Loading fabrics...
+              </div>
+            }
+          >
+            <FabricsCatalog fabrics={fabrics} />
+          </Suspense>
         </div>
 
-        {!emptyFromNotion ? <FabricsInquiryAnchor /> : null}
+        <FabricsInquiryAnchor />
       </div>
 
       <BottomNav />

@@ -1,3 +1,5 @@
+import { publicFabricCategories } from "@/lib/public-catalog";
+
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://orangetextiles.com";
@@ -56,38 +58,7 @@ export const entityFacts = [
   ["Export markets", companyProfile.exportMarkets.join(", ")],
 ] as const;
 
-export const fabricCategories = [
-  {
-    name: "Cotton jersey fabrics",
-    description:
-      "Soft, breathable knitted fabrics for T-shirts, base layers and everyday apparel programs.",
-  },
-  {
-    name: "Cotton spandex jersey fabrics",
-    description:
-      "Stretch cotton knits with recovery for fitted tees, childrenswear, loungewear and sports-inspired apparel.",
-  },
-  {
-    name: "Rib knit fabrics",
-    description:
-      "Elastic rib structures for cuffs, collars, tanks, fitted tops and trim applications.",
-  },
-  {
-    name: "Fleece and French terry fabrics",
-    description:
-      "Comfort-focused sweatshirt and hoodie fabrics for casualwear, streetwear and private-label collections.",
-  },
-  {
-    name: "Scuba and air-layer knit fabrics",
-    description:
-      "Structured knitted fabrics for hoodies, jackets and garments that need body and shape retention.",
-  },
-  {
-    name: "Custom knitted fabrics",
-    description:
-      "Sourcing and development support for custom composition, hand-feel, weight, color and finishing requirements.",
-  },
-] as const;
+export const fabricCategories = publicFabricCategories;
 
 export const capabilityCards = [
   {
