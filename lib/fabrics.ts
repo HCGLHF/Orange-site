@@ -15,7 +15,6 @@ export function notionRowsToFabrics(notionRows: NotionFabric[]): Fabric[] {
     weight: fabric.weight,
     width: fabric.width,
     description: fabric.description,
-    craftStory: fabric.craftStory,
     tags:
       fabric.tags.length > 0
         ? fabric.tags

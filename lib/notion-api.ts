@@ -18,8 +18,6 @@ export type NotionFabric = {
   /** Notion「应用场景」Multi-select */
   scenarios: string[];
   status: string;
-  /** Notion「工艺故事」Rich text */
-  craftStory: string;
 };
 
 type NotionTextItem = { plain_text?: string };
@@ -31,6 +29,8 @@ type NotionProperty = {
   url?: string;
   multi_select?: NotionSelectItem[];
   select?: NotionSelectItem;
+  /** Notion「状态」列若为 Status 类型（非 Select），取此字段 */
+  status?: { name?: string };
   files?: Array<{
     file?: { url?: string };
     external?: { url?: string };
@@ -83,6 +83,34 @@ function readNumericField(
   return 0;
 }
 
+const STOCK_PROPERTY_KEYS = ["状态", "库存状态", "库存", "Status", "Stock"] as const;
+
+function normalizeNotionStockName(name: string): string {
+  const t = name.trim();
+  const lower = t.toLowerCase();
+  if (lower === "out of stock" || lower === "sold out") return "缺货";
+  const map: Record<string, string> = {
+    缺貨: "缺货",
+    无货: "缺货",
+    售完: "缺货",
+    售罄: "缺货",
+  };
+  return map[t] ?? t;
+}
+
+/** 兼容 Select 与 Notion Status 列类型，并尝试多个常见列名 */
+function readStockStatus(properties: Record<string, NotionProperty>): string {
+  for (const key of STOCK_PROPERTY_KEYS) {
+    const p = properties[key];
+    if (!p) continue;
+    const fromSelect = p.select?.name?.trim();
+    if (fromSelect) return normalizeNotionStockName(fromSelect);
+    const fromStatus = p.status?.name?.trim();
+    if (fromStatus) return normalizeNotionStockName(fromStatus);
+  }
+  return "现货";
+}
+
 function mapPageToFabric(page: NotionPage): NotionFabric {
   const properties = page.properties ?? {};
 
@@ -91,9 +119,8 @@ function mapPageToFabric(page: NotionPage): NotionFabric {
       ?.map((file) => file.file?.url ?? file.external?.url ?? "")
       .filter(Boolean) ?? [];
   const imageUrl = properties["图片URL"]?.url ?? images[0] ?? "";
-  const statusSelect = properties["状态"]?.select?.name ?? "现货";
-  const stockStatus = statusSelect;
-  const status = statusSelect;
+  const stockStatus = readStockStatus(properties);
+  const status = stockStatus;
   /** Notion 列「应用场景」multi_select */
   const scenarios =
     properties["应用场景"]?.multi_select?.map((s) => s.name ?? "").filter(Boolean) ??
@@ -114,9 +141,7 @@ function mapPageToFabric(page: NotionPage): NotionFabric {
     ]),
     /** 门幅：优先「门幅」，兼容 Width / 幅宽 */
     width: readNumericField(properties, ["门幅", "Width", "幅宽", "门幅 cm", "门幅(cm)"]),
-    description: properties["描述"]?.rich_text?.[0]?.plain_text ?? "",
-    craftStory:
-      properties["工艺故事"]?.rich_text?.[0]?.plain_text?.trim() ?? "",
+    description: joinRichPlainText(properties["描述"]),
     imageUrl,
     images,
     stockStatus,

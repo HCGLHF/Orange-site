@@ -9,8 +9,6 @@ export type Fabric = {
   textureImage: string;
   sceneImage: string;
   description: string;
-  /** Notion「工艺故事」；本地示例可省略 */
-  craftStory?: string;
   stockStatus?: string;
   scenarios?: string[];
   images?: string[];
@@ -47,6 +45,7 @@ export const fabrics: Fabric[] = [
     composition: "65%涤纶 35%棉",
     weight: 260,
     width: 165,
+    stockStatus: "缺货",
     tags: ["挺括", "卫衣面料", "保暖"],
     textureImage: "",
     sceneImage: "",
