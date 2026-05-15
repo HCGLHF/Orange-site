@@ -33,23 +33,28 @@ export default function ContactCard() {
     >
       <div className="mx-auto max-w-4xl">
         <motion.div variants={reduceMotion ? undefined : fadeUp} className="mb-10 text-center">
-          <h2 className="mb-2 text-3xl font-bold text-brand-charcoal">联系我们 / Contact</h2>
-          <p className="text-gray-600">绍兴诗橙纺织品有限公司 · 无论您有任何面料需求，我们随时为您服务</p>
+          <h2 className="mb-2 text-3xl font-bold text-brand-charcoal">
+            Request Knit Fabric Samples
+          </h2>
+          <p className="text-gray-600">
+            Shaoxing Shicheng Textile Products Co., Ltd. supports overseas
+            buyers with sample requests, fabric selection and RFQ follow-up.
+          </p>
         </motion.div>
 
         <motion.div variants={reduceMotion ? undefined : staggerContainer} className="grid gap-6 md:grid-cols-2">
           <motion.a
             variants={reduceMotion ? undefined : fadeUp}
-            href="mailto:folenchen0401@outlook.com?subject=面料询盘&body=您好，我对贵司面料感兴趣..."
+            href="mailto:folenchen0401@outlook.com?subject=Knit%20fabric%20sample%20request&body=Hello%20O'range%20Textile%2C%0A%0AI%20am%20interested%20in%20your%20knit%20fabrics."
             className="group flex items-center space-x-4 rounded-3xl bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-md"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange/10 transition-colors group-hover:bg-brand-orange group-hover:text-white">
               <Mail className="h-6 w-6 text-brand-orange group-hover:text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-brand-charcoal">发送邮件</h3>
+              <h3 className="font-semibold text-brand-charcoal">Email</h3>
               <p className="font-medium text-brand-orange">folenchen0401@outlook.com</p>
-              <p className="mt-1 text-sm text-gray-500">点击直接发送邮件</p>
+              <p className="mt-1 text-sm text-gray-500">Send a fabric sample request</p>
             </div>
           </motion.a>
 
@@ -66,7 +71,7 @@ export default function ContactCard() {
             <div>
               <h3 className="font-semibold text-brand-charcoal">WhatsApp</h3>
               <p className="font-medium text-green-600">+86 13867557317</p>
-              <p className="mt-1 text-sm text-gray-500">点击直接对话</p>
+              <p className="mt-1 text-sm text-gray-500">Chat with the sourcing team</p>
             </div>
           </motion.a>
 
@@ -79,11 +84,11 @@ export default function ContactCard() {
               <Phone className="h-6 w-6 text-blue-600 group-hover:text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-brand-charcoal">电话咨询</h3>
+              <h3 className="font-semibold text-brand-charcoal">Phone</h3>
               <p className="font-medium text-blue-600">
                 +86 13867550307 / +86 13867557317 / +86 13989587635
               </p>
-              <p className="mt-1 text-sm text-gray-500">工作日 9:00-18:00</p>
+              <p className="mt-1 text-sm text-gray-500">Business hours in China time</p>
             </div>
           </motion.a>
 
@@ -95,9 +100,9 @@ export default function ContactCard() {
               <MapPin className="h-6 w-6 text-purple-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-brand-charcoal">公司地址</h3>
-              <p className="font-medium text-gray-700">浙江绍兴</p>
-              <p className="mt-1 text-sm text-gray-500">中国</p>
+              <h3 className="font-semibold text-brand-charcoal">Location</h3>
+              <p className="font-medium text-gray-700">Shaoxing Keqiao, Zhejiang</p>
+              <p className="mt-1 text-sm text-gray-500">China</p>
             </div>
           </motion.div>
         </motion.div>
@@ -106,7 +111,10 @@ export default function ContactCard() {
           variants={reduceMotion ? undefined : fadeUp}
           className="mt-8 rounded-2xl bg-white/50 p-4 text-center text-sm text-gray-500"
         >
-          <p>💡 提示：如果表单提交失败，请直接点击上方邮箱或WhatsApp联系我们</p>
+          <p>
+            If the inquiry form is unavailable, contact O&apos;range Textile
+            directly by email or WhatsApp.
+          </p>
         </motion.div>
       </div>
     </motion.section>
