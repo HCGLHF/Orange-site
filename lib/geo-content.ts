@@ -1,6 +1,6 @@
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "https://orange-site.vercel.app";
+  "https://orangetextiles.com";
 
 export const companyProfile = {
   brandName: "O'range Textile",
