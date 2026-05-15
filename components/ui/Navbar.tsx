@@ -27,19 +27,19 @@ function NavbarContent() {
 
   const navItems = [
     {
-      href: "/fabrics?stock=现货",
+      href: "/fabrics?stock=in-stock",
       label: t("navStockFast"),
       icon: Package,
       badge: t("navBadge24h"),
       color: "text-emerald-600",
-      isActive: onFabrics && stockParam === "现货",
+      isActive: onFabrics && stockParam === "in-stock",
     },
     {
-      href: "/fabrics?stock=预定",
+      href: "/fabrics?stock=preorder",
       label: t("navStockPreorder"),
       icon: Shirt,
       color: "text-amber-600",
-      isActive: onFabrics && stockParam === "预定",
+      isActive: onFabrics && stockParam === "preorder",
     },
     {
       href: "/fabrics",

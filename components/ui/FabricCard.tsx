@@ -7,9 +7,7 @@ import {
   CheckCircle2,
   Clock,
   Download,
-  RotateCcw,
   ShoppingCart,
-  Sparkles,
   XCircle,
 } from "lucide-react";
 import type { Fabric } from "@/lib/data";
@@ -79,6 +77,15 @@ function resolveStockKey(
 ): keyof typeof STOCK_CONFIG {
   const s = raw?.trim() ?? "现货";
   if (s === "预订") return "预定";
+  const alias: Record<string, keyof typeof STOCK_CONFIG> = {
+    缺貨: "缺货",
+    无货: "缺货",
+    售完: "缺货",
+    售罄: "缺货",
+  };
+  if (s in alias) return alias[s]!;
+  const lower = s.toLowerCase();
+  if (lower === "out of stock" || lower === "sold out") return "缺货";
   if (s in STOCK_CONFIG) return s as keyof typeof STOCK_CONFIG;
   return "现货";
 }
@@ -88,27 +95,7 @@ export function FabricCard({ fabric }: FabricCardProps) {
   const { openInquiry } = useInquiry();
   const { isSelected, addItem, removeItem } = useInquiryCart();
   const copy = useMemo(() => getFabricCopy(fabric, locale), [fabric, locale]);
-  const [isHovered, setIsHovered] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [coarsePointer, setCoarsePointer] = useState(false);
-
-  useEffect(() => {
-    const reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const coarseMq = window.matchMedia("(pointer: coarse)");
-    const sync = () => {
-      setPrefersReducedMotion(reduceMq.matches);
-      setCoarsePointer(coarseMq.matches);
-    };
-    sync();
-    reduceMq.addEventListener("change", sync);
-    coarseMq.addEventListener("change", sync);
-    return () => {
-      reduceMq.removeEventListener("change", sync);
-      coarseMq.removeEventListener("change", sync);
-    };
-  }, []);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
@@ -130,9 +117,6 @@ export function FabricCard({ fabric }: FabricCardProps) {
   const coverFromImages = fabric.images?.[0]?.trim();
   const coverFromTexture = fabric.textureImage?.trim();
   const showRasterCover = Boolean(coverFromImages || coverFromTexture);
-  const craftStoryText = fabric.craftStory?.trim() ?? "";
-  const hasStory = craftStoryText.length > 10;
-  const showFlip = hasStory && !prefersReducedMotion;
 
   const toggleCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -177,40 +161,8 @@ export function FabricCard({ fabric }: FabricCardProps) {
     openInquiry();
   };
 
-  const imageHoverFlipHandlers =
-    showFlip && !coarsePointer
-      ? {
-          onMouseEnter: () => setIsFlipped(true),
-          onMouseLeave: () => setIsFlipped(false),
-        }
-      : {};
-
-  const craftChip = showFlip ? (
-    coarsePointer ? (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsFlipped(true);
-        }}
-        className="absolute bottom-3 left-3 z-[15] flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm transition-colors hover:bg-black/70"
-      >
-        <Sparkles className="h-3 w-3 shrink-0" aria-hidden />
-        {t("fabricCraftStoryOpen")}
-      </button>
-    ) : (
-      <div className="pointer-events-none absolute bottom-3 left-3 z-[15] flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm">
-        <Sparkles className="h-3 w-3 shrink-0" aria-hidden />
-        {t("fabricCraftStoryHoverHint")}
-      </div>
-    )
-  ) : null;
-
   const imageSection = (
-    <div
-      className="relative aspect-[4/3] shrink-0 overflow-hidden bg-gray-100"
-      {...imageHoverFlipHandlers}
-    >
+    <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-gray-100">
       {showRasterCover ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- fabric.images?.[0] 优先，否则 textureImage */}
@@ -222,21 +174,18 @@ export function FabricCard({ fabric }: FabricCardProps) {
         </>
       ) : (
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 [font-family:system-ui,-apple-system,'PingFang_SC','Hiragino_Sans_GB','Microsoft_YaHei',sans-serif]"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 px-3 [font-family:system-ui,-apple-system,'PingFang_SC','Hiragino_Sans_GB','Microsoft_YaHei',sans-serif]"
           aria-hidden
+          suppressHydrationWarning
         >
-          <span className="mb-2 text-6xl font-bold text-orange-300">
-            {fabric.name.trim().charAt(0) || "—"}
-          </span>
-          <span className="text-xs text-orange-400">
-            {fabric.name.trim().length > 4
-              ? `${fabric.name.trim().slice(0, 4)}...`
-              : fabric.name.trim() || "—"}
+          <span
+            className="line-clamp-3 text-center text-base font-semibold leading-snug text-orange-500"
+            suppressHydrationWarning
+          >
+            {fabric.name.trim() || "—"}
           </span>
         </div>
       )}
-
-      {craftChip}
 
       <button
         type="button"
@@ -269,32 +218,30 @@ export function FabricCard({ fabric }: FabricCardProps) {
       </div>
 
       {selected && (
-        <div className="absolute inset-0 z-[5] flex items-center justify-center bg-brand-orange/10">
+        <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center bg-brand-orange/10">
           <div className="flex items-center gap-2 rounded-full bg-brand-orange px-4 py-2 text-sm font-semibold text-white shadow-md">
             <Check className="h-4 w-4 shrink-0" aria-hidden />
             {t("fabricInquiryCartOverlay")}
           </div>
         </div>
       )}
-
-      <div
-        className={`absolute inset-0 z-[4] flex items-center justify-center bg-black/40 transition-opacity duration-300 ${
-          isHovered && !selected && !isFlipped ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <span className="rounded-full bg-white px-6 py-2 text-sm font-medium text-gray-900">
-          {locale === "en" ? "View Details" : "查看详情"}
-        </span>
-      </div>
     </div>
   );
 
   const bodySection = (
-    <div className="flex min-h-0 flex-1 flex-col p-5">
-      <h3 className="mb-1 truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-brand-orange">
+    <div className="flex flex-col p-5">
+      <h3 className="mb-1 line-clamp-2 break-words text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-brand-orange">
         {copy.name}
       </h3>
-      <p className="mb-3 truncate text-sm text-gray-600">{copy.composition}</p>
+      <p className="mb-3 line-clamp-3 break-words text-sm leading-relaxed text-gray-600">
+        {copy.composition}
+      </p>
+
+      {copy.description?.trim() ? (
+        <p className="mb-4 line-clamp-4 text-sm leading-relaxed text-gray-500">
+          {copy.description.trim()}
+        </p>
+      ) : null}
 
       <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-gray-500">
         <span
@@ -319,7 +266,7 @@ export function FabricCard({ fabric }: FabricCardProps) {
 
       {fabric.scenarios && fabric.scenarios.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-1">
-          {fabric.scenarios.slice(0, 2).map((s, i) => (
+          {fabric.scenarios.map((s, i) => (
             <span
               key={`${s}-${i}`}
               className="rounded bg-orange-50 px-2 py-0.5 text-xs text-orange-600"
@@ -327,11 +274,6 @@ export function FabricCard({ fabric }: FabricCardProps) {
               {s}
             </span>
           ))}
-          {fabric.scenarios.length > 2 && (
-            <span className="px-1 text-xs text-gray-400">
-              +{fabric.scenarios.length - 2}
-            </span>
-          )}
         </div>
       )}
 
@@ -339,18 +281,7 @@ export function FabricCard({ fabric }: FabricCardProps) {
         {locale === "en" ? config.etaEn : config.etaZh}
       </p>
 
-      {hasStory && prefersReducedMotion && (
-        <details className="mb-4 rounded-xl border border-brand-soft bg-brand-cream/50 p-3 text-left">
-          <summary className="cursor-pointer text-sm font-semibold text-brand-charcoal">
-            {t("fabricCraftStorySummary")}
-          </summary>
-          <p className="mt-2 text-sm leading-relaxed text-brand-charcoal/80">
-            {craftStoryText}
-          </p>
-        </details>
-      )}
-
-      <div className="mt-auto flex gap-2">
+      <div className="flex gap-2">
         <button
           type="button"
           onClick={handleDownloadPDF}
@@ -390,88 +321,11 @@ export function FabricCard({ fabric }: FabricCardProps) {
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
     ) : null;
 
-  const frontFace = (
-    <div
-      className={`absolute inset-0 flex h-full min-h-[480px] flex-col overflow-hidden rounded-2xl border-2 bg-white backface-hidden ${
-        selected ? "border-brand-orange shadow-lg" : "border-gray-200"
-      }`}
-    >
-      {imageSection}
-      {bodySection}
-      {stockAccent}
-    </div>
-  );
-
-  const backFace = (
-    <div
-      className="absolute inset-0 flex h-full min-h-[480px] flex-col justify-between overflow-hidden rounded-2xl border-2 border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 p-6 text-white backface-hidden rotate-y-180"
-    >
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mb-4 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 shrink-0 text-brand-orange" aria-hidden />
-          <span className="text-sm font-medium text-brand-orange">
-            {t("fabricCraftStoryTitle")}
-          </span>
-        </div>
-        <h4 className="mb-3 text-xl font-bold">{copy.name}</h4>
-        <p className="mb-4 text-sm leading-relaxed text-gray-300">{craftStoryText}</p>
-        <div className="space-y-2">
-          <div className="flex items-start gap-2 text-sm">
-            <span className="mt-0.5 text-emerald-400" aria-hidden>
-              ✓
-            </span>
-            <span className="text-gray-300">
-              {locale === "en" ? config.etaEn : config.etaZh}
-            </span>
-          </div>
-          <div className="flex items-start gap-2 text-sm">
-            <span className="mt-0.5 text-emerald-400" aria-hidden>
-              ✓
-            </span>
-            <span className="text-gray-300">{t("fabricCraftBulletSample")}</span>
-          </div>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsFlipped(false);
-        }}
-        className="mt-4 flex w-full items-center justify-center gap-1 text-xs text-gray-400 transition-colors hover:text-white"
-      >
-        <RotateCcw className="h-3 w-3 shrink-0" aria-hidden />
-        {t("fabricCraftStoryBack")}
-      </button>
-    </div>
-  );
-
-  if (showFlip) {
-    return (
-      <article
-        className="group relative min-h-[480px] perspective-1000 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div
-          className={`relative min-h-[480px] w-full transform-gpu transition-transform duration-500 transform-style-3d ${
-            isFlipped ? "rotate-y-180" : ""
-          }`}
-        >
-          {frontFace}
-          {backFace}
-        </div>
-      </article>
-    );
-  }
-
   return (
     <article
       className={`group relative overflow-hidden rounded-2xl border-2 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
         selected ? "border-brand-orange shadow-lg" : "border-gray-200"
       }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {imageSection}
       {bodySection}

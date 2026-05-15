@@ -101,12 +101,6 @@ export type Messages = {
   fabricInquiryCartAdded: string;
   fabricInquiryCartOverlay: string;
   fabricInquiryCartToggleAria: string;
-  fabricCraftStoryHoverHint: string;
-  fabricCraftStoryOpen: string;
-  fabricCraftStoryTitle: string;
-  fabricCraftStoryBack: string;
-  fabricCraftBulletSample: string;
-  fabricCraftStorySummary: string;
   inquiryTitle: string;
   inquirySubtitle: string;
   inquirySuccess: string;
@@ -240,12 +234,6 @@ export const messages: Record<Locale, Messages> = {
     fabricInquiryCartAdded: "已添加",
     fabricInquiryCartOverlay: "已加入询价单",
     fabricInquiryCartToggleAria: "加入或移出询价单",
-    fabricCraftStoryHoverHint: "悬停看工艺",
-    fabricCraftStoryOpen: "查看工艺故事",
-    fabricCraftStoryTitle: "工艺故事",
-    fabricCraftStoryBack: "返回查看参数",
-    fabricCraftBulletSample: "支持免费寄样（A4 大小）",
-    fabricCraftStorySummary: "工艺故事",
     inquiryTitle: "免费索取样品",
     inquirySubtitle: "填写信息后，我们会尽快与您联系。",
     inquirySuccess: "我们的面料专家将在24小时内联系您",
@@ -329,11 +317,11 @@ export const messages: Record<Locale, Messages> = {
     navFabrics: "Fabrics",
     navInquiry: "Inquiry",
     navContact: "Contact",
-    navStockFast: "In-stock",
-    navStockPreorder: "Pre-order",
-    navFabricsAll: "All fabrics",
+    navStockFast: "In-stock fabrics",
+    navStockPreorder: "Preorder fabrics",
+    navFabricsAll: "All knit fabrics",
     navBadge24h: "24h",
-    navCtaInquiry: "Inquire now",
+    navCtaInquiry: "Request samples",
     navCartAria: "Inquiry cart",
     heroBadge: "Keqiao, Shaoxing · Premium knits",
     heroTitle: "O'range Textile",
@@ -381,12 +369,6 @@ export const messages: Record<Locale, Messages> = {
     fabricInquiryCartAdded: "Added",
     fabricInquiryCartOverlay: "Added to inquiry list",
     fabricInquiryCartToggleAria: "Add or remove from inquiry list",
-    fabricCraftStoryHoverHint: "Hover for craft story",
-    fabricCraftStoryOpen: "View craft story",
-    fabricCraftStoryTitle: "Craft story",
-    fabricCraftStoryBack: "Back to specs",
-    fabricCraftBulletSample: "Complimentary A4 swatches available",
-    fabricCraftStorySummary: "Craft story",
     inquiryTitle: "Request free samples",
     inquirySubtitle: "We’ll get back to you shortly after you submit.",
     inquirySuccess: "Our fabric specialist will contact you within 24 hours",
@@ -416,9 +398,9 @@ export const messages: Record<Locale, Messages> = {
     langZh: "中文",
     langEn: "English",
     langToggleAria: "Switch language",
-    fabricsLibraryTitle: "Fabric library",
+    fabricsLibraryTitle: "Knit fabric library",
     fabricsLibrarySubtitle:
-      "Add multiple fabrics to your inquiry for better quotes. Filter by composition, weight, or stock.",
+      "Browse cotton jersey, cotton spandex jersey, rib, fleece, terry and air-layer knit fabrics. Add fabrics to your RFQ or request samples from O'range Textile.",
     filterTitle: "Filters",
     filterStockStatus: "Stock status",
     filterComposition: "Composition",

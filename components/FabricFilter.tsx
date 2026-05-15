@@ -24,7 +24,19 @@ export type FabricFilterProps = {
 function normalizeStock(raw: string | undefined): string {
   const s = raw?.trim() || "现货";
   if (s === "预订") return "预定";
+  if (s === "in-stock") return "现货";
+  if (s === "preorder") return "预定";
+  if (s === "out-of-stock") return "缺货";
   return s;
+}
+
+function stockQueryToFilter(raw: string | null): StockFilter | null {
+  if (!raw) return null;
+  const normalized = normalizeStock(raw);
+  if (normalized === "现货" || normalized === "预定" || normalized === "缺货") {
+    return normalized;
+  }
+  return null;
 }
 
 function getWeightCategory(weight: number): WeightFilter {
@@ -67,8 +79,8 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(INITIAL);
 
   useEffect(() => {
-    const s = searchParams.get("stock");
-    if (s === "现货" || s === "预定" || s === "缺货") {
+    const s = stockQueryToFilter(searchParams.get("stock"));
+    if (s) {
       setActiveFilters((prev) =>
         prev.stock === s ? prev : { ...prev, stock: s }
       );
