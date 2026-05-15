@@ -16,9 +16,7 @@ export type CartItem = {
   composition: string;
   weight: number;
   stockStatus: string;
-  /** 询价数量（米） */
   quantity: number;
-  /** Notion 面料页 id，非 Notion 来源时为空 */
   notionPageId?: string;
 };
 
@@ -42,7 +40,7 @@ function fabricToCartItem(fabric: Fabric): CartItem {
     name: fabric.name,
     composition: fabric.composition,
     weight: fabric.weight,
-    stockStatus: fabric.stockStatus?.trim() || "现货",
+    stockStatus: fabric.stockStatus?.trim() || "In stock",
     quantity: DEFAULT_METERS,
     notionPageId: fabric.notionPageId,
   };

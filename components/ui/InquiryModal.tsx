@@ -96,19 +96,19 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
           company: entry.company,
           fabric: entry.fabric,
           message: entry.quantity,
-          _subject: `【官网询盘】${entry.company || entry.name} - ${entry.fabric}`,
+          _subject: `[Website inquiry] ${entry.company || entry.name} - ${entry.fabric}`,
         }),
       });
 
       if (response.ok) {
-        alert("✅ 提交成功！我们会尽快联系您。");
+        alert("Submitted successfully. We will contact you shortly.");
         handleClose();
       } else {
-        alert("❌ 提交失败，请直接邮件联系");
+        alert("Submission failed. Please email us directly.");
       }
     } catch (submitError) {
       console.error(submitError);
-      alert("❌ 网络错误，请稍后重试");
+      alert("Network error. Please try again later.");
     } finally {
       setSubmitting(false);
     }

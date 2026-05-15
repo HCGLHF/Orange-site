@@ -1,4 +1,3 @@
-/** 品牌橙子图标，可作站点角标；配色与 tailwind `brand-orange` 一致。 */
 export function OrangeMark({ className }: { className?: string }) {
   return (
     <svg

@@ -1,5 +1,4 @@
 export type Fabric = {
-  /** 展示/购物车主键：本地示例为 "1"…；Notion 来源为页面 UUID */
   id: string;
   name: string;
   composition: string;
@@ -12,43 +11,44 @@ export type Fabric = {
   stockStatus?: string;
   scenarios?: string[];
   images?: string[];
-  /** Notion 面料页 id（与 `id` 在 Notion 数据上相同；本地示例无） */
   notionPageId?: string;
 };
 
 export const fabrics: Fabric[] = [
   {
     id: "1",
-    name: "32S精梳棉氨纶",
-    composition: "95%棉 5%氨纶",
+    name: "32S combed cotton spandex jersey",
+    composition: "95% cotton / 5% spandex",
     weight: 180,
     width: 170,
-    tags: ["现货", "T恤首选", "柔软弹力"],
+    stockStatus: "In stock",
+    tags: ["In stock", "T-shirt favorite", "Soft stretch"],
     textureImage: "",
     sceneImage: "",
-    description: "手感像洗过的旧T恤，回弹好，适合做修身款",
+    description: "Soft worn-in hand feel with reliable recovery for fitted tees.",
   },
   {
     id: "2",
-    name: "40S纯棉汗布",
-    composition: "100%精梳棉",
+    name: "40S pure cotton single jersey",
+    composition: "100% combed cotton",
     weight: 160,
     width: 175,
-    tags: ["基础款", "透气", "本白现货"],
+    stockStatus: "In stock",
+    tags: ["Basics", "Breathable", "Natural white in stock"],
     textureImage: "",
     sceneImage: "",
-    description: "轻薄透气，夏日白T的最佳选择",
+    description: "Light, breathable and clean for summer white tee programs.",
   },
   {
     id: "3",
-    name: "涤棉空气层",
-    composition: "65%涤纶 35%棉",
+    name: "Poly-cotton scuba air-layer knit",
+    composition: "65% polyester / 35% cotton",
     weight: 260,
     width: 165,
-    stockStatus: "缺货",
-    tags: ["挺括", "卫衣面料", "保暖"],
+    stockStatus: "Out of stock",
+    tags: ["Structured", "Sweatshirt fabric", "Warm"],
     textureImage: "",
     sceneImage: "",
-    description: "空气层结构，挺括有型，做卫衣显质感",
+    description: "Structured air-layer knit with a stable body for hoodies.",
   },
 ];

@@ -75,9 +75,9 @@ export default function StickyInquiryBar() {
           </div>
 
           <div className="flex flex-col items-start">
-            <span className="text-xs text-white/60">已选面料</span>
+            <span className="text-xs text-white/60">Selected fabrics</span>
             <span className="text-sm font-semibold">
-              {totalCount} 款待询价
+              {totalCount} pending inquiry
             </span>
           </div>
 
@@ -94,7 +94,7 @@ export default function StickyInquiryBar() {
             className={`absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${
               isExpanded ? "opacity-100" : "opacity-0"
             }`}
-            aria-label="关闭面板"
+            aria-label="Close panel"
             onClick={closePanel}
           />
 
@@ -109,9 +109,9 @@ export default function StickyInquiryBar() {
                   <Package className="h-5 w-5 text-brand-orange" aria-hidden />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">询价清单</h3>
+                  <h3 className="font-bold text-gray-900">Inquiry list</h3>
                   <p className="text-sm text-gray-500">
-                    {totalCount} 款面料待提交
+                    {totalCount} fabrics waiting to submit
                   </p>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function StickyInquiryBar() {
                 type="button"
                 onClick={closePanel}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
-                aria-label="关闭"
+                aria-label="Close"
               >
                 <X className="h-5 w-5 text-gray-500" aria-hidden />
               </button>
@@ -143,11 +143,11 @@ export default function StickyInquiryBar() {
                       {item.composition}
                     </p>
                     <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
-                      <span>{item.weight}g/m²</span>
-                      <span>·</span>
+                      <span>{item.weight} g/m2</span>
+                      <span>|</span>
                       <span
                         className={
-                          item.stockStatus === "现货"
+                          item.stockStatus.toLowerCase() === "in stock"
                             ? "font-medium text-emerald-600"
                             : "text-amber-600"
                         }
@@ -161,7 +161,7 @@ export default function StickyInquiryBar() {
                     type="button"
                     onClick={() => removeItem(item.id)}
                     className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
-                    aria-label="移除此款"
+                    aria-label="Remove item"
                   >
                     <X className="h-4 w-4" aria-hidden />
                   </button>
@@ -169,10 +169,10 @@ export default function StickyInquiryBar() {
               ))}
             </div>
 
-            <div className="border-t border-gray-100 bg-white p-6 space-y-3">
+            <div className="space-y-3 border-t border-gray-100 bg-white p-6">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">共 {totalCount} 款面料</span>
-                <span className="text-xs text-gray-400">预计 24h 内回复</span>
+                <span className="text-gray-500">{totalCount} fabrics total</span>
+                <span className="text-xs text-gray-400">Reply within 24h</span>
               </div>
 
               <button
@@ -180,7 +180,7 @@ export default function StickyInquiryBar() {
                 onClick={goToInquiryForm}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange py-4 font-semibold text-white shadow-lg shadow-brand-orange/25 transition-colors hover:bg-brand-orange/90"
               >
-                <span>立即填写询价单</span>
+                <span>Fill inquiry form</span>
                 <ChevronRight className="h-5 w-5" aria-hidden />
               </button>
 
@@ -189,7 +189,7 @@ export default function StickyInquiryBar() {
                 onClick={closePanel}
                 className="w-full py-2 text-sm text-gray-500 transition-colors hover:text-gray-700"
               >
-                继续选购面料
+                Continue browsing fabrics
               </button>
             </div>
           </div>

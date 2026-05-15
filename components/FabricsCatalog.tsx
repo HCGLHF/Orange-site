@@ -13,7 +13,6 @@ export function FabricsCatalog({ fabrics }: { fabrics: Fabric[] }) {
   const searchParams = useSearchParams();
   const filterUrlKey = searchParams.toString();
   const [visible, setVisible] = useState<Fabric[]>(fabrics);
-  /** 递增以强制重挂 FabricFilter，等价于重置全部筛选（无需整页 reload） */
   const [filterKey, setFilterKey] = useState(0);
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
 
@@ -21,8 +20,8 @@ export function FabricsCatalog({ fabrics }: { fabrics: Fabric[] }) {
     const scenarioSet = new Set<string>();
     fabrics.forEach((fabric) => {
       fabric.scenarios?.forEach((s) => {
-        const t = s.trim();
-        if (t) scenarioSet.add(t);
+        const scenario = s.trim();
+        if (scenario) scenarioSet.add(scenario);
       });
     });
     return Array.from(scenarioSet);
@@ -43,7 +42,6 @@ export function FabricsCatalog({ fabrics }: { fabrics: Fabric[] }) {
   const fabricsForFilters = useMemo(() => {
     return fabrics.filter((f) => {
       if (!activeScenario) return true;
-      // scenarios 可能为 undefined，勿直接 .includes
       return (
         f.scenarios?.some((s) => s.trim() === activeScenario) ?? false
       );

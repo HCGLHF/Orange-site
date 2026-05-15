@@ -18,7 +18,6 @@ export function InquiryBar() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  /** 弹窗每次打开重置未受控表单 */
   const [formKey, setFormKey] = useState(0);
   const titleId = useId();
 
@@ -80,10 +79,10 @@ export function InquiryBar() {
 
     const lines = items.map(
       (i) =>
-        `${i.name} · ${i.quantity}m · ${i.composition} · ${i.weight}g · ${i.stockStatus}`
+        `${i.name} | ${i.quantity}m | ${i.composition} | ${i.weight}g | ${i.stockStatus}`
     );
-    const fabricField = `【批量 ${items.length}款】\n${lines.join("\n")}`;
-    const quantityField = `电话: ${phone}${notes ? `\n备注: ${notes}` : ""}`;
+    const fabricField = `Batch inquiry: ${items.length} fabrics\n${lines.join("\n")}`;
+    const quantityField = `Phone: ${phone}${notes ? `\nNotes: ${notes}` : ""}`;
 
     appendInquiryRecord({
       name: customer,
@@ -99,7 +98,6 @@ export function InquiryBar() {
       phone,
       email,
       notes,
-      /** 用 items 传 Notion 页 id + 米数；勿用 cart 的 1、2、3 作为 fabricIds */
       items: items.map((i) => ({
         notionPageId: i.notionPageId ?? null,
         name: i.name,
@@ -116,7 +114,7 @@ export function InquiryBar() {
       company,
       fabric: fabricField,
       message: quantityField,
-      _subject: `【官网批量询盘】${company || customer} · ${items.length}款`,
+      _subject: `[Website batch inquiry] ${company || customer} | ${items.length} fabrics`,
     };
 
     try {
@@ -254,7 +252,7 @@ export function InquiryBar() {
                       <div className="min-w-0">
                         <p className="font-medium text-gray-900">{item.name}</p>
                         <p className="text-xs text-gray-500">
-                          {item.composition} · {item.weight}g
+                          {item.composition} | {item.weight}g
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

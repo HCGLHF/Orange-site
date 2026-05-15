@@ -12,22 +12,24 @@ import {
   Wind,
 } from "lucide-react";
 
-/** 场景关键词 → 图标 key / 颜色 key（与 ScenarioNav、FabricCard 共用） */
 export const SCENARIO_KEYWORDS: Record<string, { icon: string; color: string }> =
   {
-    T恤: { icon: "shirt", color: "blue" },
-    卫衣: { icon: "layers", color: "purple" },
-    运动: { icon: "wind", color: "cyan" },
-    秋冬: { icon: "snowflake", color: "amber" },
-    童装: { icon: "baby", color: "pink" },
-    家居: { icon: "home", color: "green" },
-    商务: { icon: "briefcase", color: "gray" },
-    POLO: { icon: "shirt", color: "indigo" },
-    连衣裙: { icon: "sparkles", color: "rose" },
-    外套: { icon: "layers", color: "orange" },
-    夹克: { icon: "layers", color: "red" },
-    内衣: { icon: "scissors", color: "teal" },
-    休闲: { icon: "circle", color: "slate" },
+    "T-shirt": { icon: "shirt", color: "blue" },
+    Tee: { icon: "shirt", color: "blue" },
+    Hoodie: { icon: "layers", color: "purple" },
+    Sweatshirt: { icon: "layers", color: "purple" },
+    Sportswear: { icon: "wind", color: "cyan" },
+    Activewear: { icon: "wind", color: "cyan" },
+    Winter: { icon: "snowflake", color: "amber" },
+    Childrenswear: { icon: "baby", color: "pink" },
+    Homewear: { icon: "home", color: "green" },
+    Business: { icon: "briefcase", color: "gray" },
+    Polo: { icon: "shirt", color: "indigo" },
+    Dress: { icon: "sparkles", color: "rose" },
+    Outerwear: { icon: "layers", color: "orange" },
+    Jacket: { icon: "layers", color: "red" },
+    Underwear: { icon: "scissors", color: "teal" },
+    Casual: { icon: "circle", color: "slate" },
   };
 
 export type ScenarioColorConfig = {
@@ -124,8 +126,9 @@ export function detectScenario(scenarioName: string): {
   icon: string;
   color: string;
 } {
+  const lowerName = scenarioName.toLowerCase();
   for (const [keyword, config] of Object.entries(SCENARIO_KEYWORDS)) {
-    if (scenarioName.includes(keyword)) {
+    if (lowerName.includes(keyword.toLowerCase())) {
       return config;
     }
   }
@@ -137,7 +140,6 @@ export function detectScenario(scenarioName: string): {
   return { icon: "sparkles", color };
 }
 
-/** 导航条里的 `bg` 常带 `hover:*`，卡片标签只保留底色 */
 export function scenarioChipBackground(navBg: string): string {
   return navBg.split(/\s+/).filter((c) => !c.startsWith("hover:")).join(" ");
 }

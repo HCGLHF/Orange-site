@@ -22,7 +22,7 @@ function toLineItems(body: LegacyBody): InquiryLineItem[] | null {
   if (Array.isArray(body.items) && body.items.length > 0) {
     return body.items.map((it) => ({
       notionPageId: it.notionPageId,
-      name: String(it.name ?? "").trim() || "未命名面料",
+      name: String(it.name ?? "").trim() || "Unnamed fabric",
       quantityMeters:
         typeof it.quantityMeters === "number" && Number.isFinite(it.quantityMeters)
           ? Math.max(1, it.quantityMeters)
@@ -39,7 +39,7 @@ function toLineItems(body: LegacyBody): InquiryLineItem[] | null {
   const quantities = body.quantities ?? {};
   return fabricIds.map((id, index) => ({
     notionPageId: id,
-    name: `面料${index + 1}`,
+    name: `Fabric ${index + 1}`,
     quantityMeters:
       typeof quantities[id] === "number" && Number.isFinite(quantities[id])
         ? Math.max(1, quantities[id]!)
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         skipped: true,
-        message: "Notion 询价库未配置，已跳过同步",
+        message: "Notion inquiry database is not configured; sync was skipped.",
       });
     }
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       body = (await request.json()) as LegacyBody;
     } catch {
       return NextResponse.json(
-        { success: false, error: "无效的 JSON 请求体" },
+        { success: false, error: "Invalid JSON request body." },
         { status: 400 }
       );
     }
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
 
     if (!customer || !phone) {
       return NextResponse.json(
-        { success: false, error: "请填写客户姓名与联系电话" },
+        { success: false, error: "Please enter customer name and phone number." },
         { status: 400 }
       );
     }
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: "请至少选择一款面料，或使用 items / fabricIds 提交清单",
+          error: "Please select at least one fabric or submit items / fabricIds.",
         },
         { status: 400 }
       );
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
 
     if (!result.ok) {
       console.error(
-        "Notion 询价创建失败:",
+        "Notion inquiry creation failed:",
         result.notionCode ?? "?",
         result.message,
         result.notionError
@@ -117,14 +117,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "询价单已同步到 Notion",
+      message: "Inquiry synced to Notion.",
       inquiryId: result.pageId,
       inquiryUrl: result.pageUrl,
     });
   } catch (error) {
     console.error("POST /api/inquiry:", error);
     return NextResponse.json(
-      { success: false, error: "服务器错误，请稍后重试" },
+      { success: false, error: "Server error. Please try again later." },
       { status: 500 }
     );
   }

@@ -6,7 +6,7 @@ import { CheckCircle2, Droplets, Scale } from "lucide-react";
 import { useLocale } from "@/components/LocaleProvider";
 import type { Fabric } from "@/lib/data";
 
-type StockFilter = "all" | "现货" | "预定" | "缺货";
+type StockFilter = "all" | "in-stock" | "preorder" | "out-of-stock";
 type CompositionFilter = "all" | "cotton" | "spandex" | "polyester";
 type WeightFilter = "all" | "light" | "medium" | "heavy";
 
@@ -21,22 +21,22 @@ export type FabricFilterProps = {
   onFilterChange: (filtered: Fabric[]) => void;
 };
 
-function normalizeStock(raw: string | undefined): string {
-  const s = raw?.trim() || "现货";
-  if (s === "预订") return "预定";
-  if (s === "in-stock") return "现货";
-  if (s === "preorder") return "预定";
-  if (s === "out-of-stock") return "缺货";
-  return s;
+function normalizeStock(raw: string | undefined): StockFilter {
+  const lower = (raw?.trim() || "In stock").toLowerCase();
+  if (lower === "in-stock" || lower === "in stock") return "in-stock";
+  if (lower === "preorder" || lower === "pre-order" || lower === "made to order") {
+    return "preorder";
+  }
+  if (lower === "out-of-stock" || lower === "out of stock" || lower === "sold out") {
+    return "out-of-stock";
+  }
+  return "in-stock";
 }
 
 function stockQueryToFilter(raw: string | null): StockFilter | null {
   if (!raw) return null;
   const normalized = normalizeStock(raw);
-  if (normalized === "现货" || normalized === "预定" || normalized === "缺货") {
-    return normalized;
-  }
-  return null;
+  return normalized === "all" ? null : normalized;
 }
 
 function getWeightCategory(weight: number): WeightFilter {
@@ -52,10 +52,10 @@ function applyFilters(fabrics: Fabric[], active: ActiveFilters): Fabric[] {
     }
 
     if (active.composition !== "all") {
-      const c = fabric.composition;
-      if (active.composition === "cotton" && !c.includes("棉")) return false;
-      if (active.composition === "spandex" && !c.includes("氨纶")) return false;
-      if (active.composition === "polyester" && !c.includes("涤")) return false;
+      const c = fabric.composition.toLowerCase();
+      if (active.composition === "cotton" && !c.includes("cotton")) return false;
+      if (active.composition === "spandex" && !c.includes("spandex")) return false;
+      if (active.composition === "polyester" && !c.includes("polyester")) return false;
     }
 
     if (active.weight !== "all") {
@@ -102,9 +102,9 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
 
   const counts = useMemo(
     () => ({
-      现货: fabrics.filter((f) => normalizeStock(f.stockStatus) === "现货").length,
-      预定: fabrics.filter((f) => normalizeStock(f.stockStatus) === "预定").length,
-      缺货: fabrics.filter((f) => normalizeStock(f.stockStatus) === "缺货").length,
+      "in-stock": fabrics.filter((f) => normalizeStock(f.stockStatus) === "in-stock").length,
+      preorder: fabrics.filter((f) => normalizeStock(f.stockStatus) === "preorder").length,
+      "out-of-stock": fabrics.filter((f) => normalizeStock(f.stockStatus) === "out-of-stock").length,
     }),
     [fabrics]
   );
@@ -114,8 +114,8 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
   const summaryExtra = useMemo(() => {
     const bits: string[] = [];
     if (activeFilters.stock !== "all") {
-      if (activeFilters.stock === "现货") bits.push(t("filterInStock"));
-      else if (activeFilters.stock === "预定") bits.push(t("filterPreorder"));
+      if (activeFilters.stock === "in-stock") bits.push(t("filterInStock"));
+      else if (activeFilters.stock === "preorder") bits.push(t("filterPreorder"));
       else bits.push(t("filterOutOfStock"));
     }
     if (activeFilters.composition !== "all") {
@@ -128,7 +128,7 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
       else if (activeFilters.weight === "medium") bits.push(t("filterMedium"));
       else bits.push(t("filterHeavy"));
     }
-    return bits.length ? ` · ${bits.join(" · ")}` : "";
+    return bits.length ? ` | ${bits.join(" | ")}` : "";
   }, [activeFilters, t]);
 
   return (
@@ -154,37 +154,37 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
             </button>
             <button
               type="button"
-              onClick={() => updateFilter("stock", "现货")}
+              onClick={() => updateFilter("stock", "in-stock")}
               className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.stock === "现货"
+                activeFilters.stock === "in-stock"
                   ? "bg-emerald-500 text-white shadow-md shadow-emerald-200"
                   : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
               }`}
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
-              {t("filterInStock")} ({counts["现货"]})
+              {t("filterInStock")} ({counts["in-stock"]})
             </button>
             <button
               type="button"
-              onClick={() => updateFilter("stock", "预定")}
+              onClick={() => updateFilter("stock", "preorder")}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.stock === "预定"
+                activeFilters.stock === "preorder"
                   ? "bg-amber-500 text-white shadow-md shadow-amber-200"
                   : "bg-amber-50 text-amber-700 hover:bg-amber-100"
               }`}
             >
-              {t("filterPreorder")} ({counts["预定"]})
+              {t("filterPreorder")} ({counts.preorder})
             </button>
             <button
               type="button"
-              onClick={() => updateFilter("stock", "缺货")}
+              onClick={() => updateFilter("stock", "out-of-stock")}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.stock === "缺货"
+                activeFilters.stock === "out-of-stock"
                   ? "bg-rose-500 text-white shadow-md shadow-rose-200"
                   : "bg-rose-50 text-rose-700 hover:bg-rose-100"
               }`}
             >
-              {t("filterOutOfStock")} ({counts["缺货"]})
+              {t("filterOutOfStock")} ({counts["out-of-stock"]})
             </button>
           </div>
         </div>
@@ -195,50 +195,26 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
             {t("filterComposition")}
           </h3>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => updateFilter("composition", "all")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.composition === "all"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {t("filterAll")}
-            </button>
-            <button
-              type="button"
-              onClick={() => updateFilter("composition", "cotton")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.composition === "cotton"
-                  ? "bg-blue-500 text-white shadow-md"
-                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-              }`}
-            >
-              {t("filterCotton")}
-            </button>
-            <button
-              type="button"
-              onClick={() => updateFilter("composition", "spandex")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.composition === "spandex"
-                  ? "bg-purple-500 text-white shadow-md"
-                  : "bg-purple-50 text-purple-700 hover:bg-purple-100"
-              }`}
-            >
-              {t("filterSpandex")}
-            </button>
-            <button
-              type="button"
-              onClick={() => updateFilter("composition", "polyester")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.composition === "polyester"
-                  ? "bg-indigo-500 text-white shadow-md"
-                  : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-              }`}
-            >
-              {t("filterPolyester")}
-            </button>
+            {(["all", "cotton", "spandex", "polyester"] as CompositionFilter[]).map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => updateFilter("composition", filter)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  activeFilters.composition === filter
+                    ? "bg-blue-500 text-white shadow-md"
+                    : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                }`}
+              >
+                {filter === "all"
+                  ? t("filterAll")
+                  : filter === "cotton"
+                    ? t("filterCotton")
+                    : filter === "spandex"
+                      ? t("filterSpandex")
+                      : t("filterPolyester")}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -248,50 +224,26 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
             {t("filterWeight")}
           </h3>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => updateFilter("weight", "all")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.weight === "all"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {t("filterAll")}
-            </button>
-            <button
-              type="button"
-              onClick={() => updateFilter("weight", "light")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.weight === "light"
-                  ? "bg-cyan-500 text-white shadow-md"
-                  : "bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
-              }`}
-            >
-              {t("filterLight")}
-            </button>
-            <button
-              type="button"
-              onClick={() => updateFilter("weight", "medium")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.weight === "medium"
-                  ? "bg-orange-500 text-white shadow-md"
-                  : "bg-orange-50 text-orange-700 hover:bg-orange-100"
-              }`}
-            >
-              {t("filterMedium")}
-            </button>
-            <button
-              type="button"
-              onClick={() => updateFilter("weight", "heavy")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeFilters.weight === "heavy"
-                  ? "bg-violet-500 text-white shadow-md"
-                  : "bg-violet-50 text-violet-700 hover:bg-violet-100"
-              }`}
-            >
-              {t("filterHeavy")}
-            </button>
+            {(["all", "light", "medium", "heavy"] as WeightFilter[]).map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => updateFilter("weight", filter)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  activeFilters.weight === filter
+                    ? "bg-orange-500 text-white shadow-md"
+                    : "bg-orange-50 text-orange-700 hover:bg-orange-100"
+                }`}
+              >
+                {filter === "all"
+                  ? t("filterAll")
+                  : filter === "light"
+                    ? t("filterLight")
+                    : filter === "medium"
+                      ? t("filterMedium")
+                      : t("filterHeavy")}
+              </button>
+            ))}
           </div>
         </div>
       </div>

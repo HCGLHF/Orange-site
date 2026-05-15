@@ -4,6 +4,7 @@ import { FabricsCatalog } from "@/components/FabricsCatalog";
 import { FabricsInquiryAnchor } from "@/components/FabricsInquiryAnchor";
 import { FabricsPageIntro } from "@/components/FabricsPageIntro";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { toEnglishFabrics } from "@/lib/english-fabrics";
 import { resolveFabricsFromNotion } from "@/lib/fabrics";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export const revalidate = 0;
 export default async function FabricsPage() {
   const { fabrics, notionEmpty: emptyFromNotion } =
     await resolveFabricsFromNotion();
+  const englishFabrics = toEnglishFabrics(fabrics);
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -41,7 +43,7 @@ export default async function FabricsPage() {
                 </div>
               }
             >
-              <FabricsCatalog fabrics={fabrics} />
+              <FabricsCatalog fabrics={englishFabrics} />
             </Suspense>
           )}
         </div>

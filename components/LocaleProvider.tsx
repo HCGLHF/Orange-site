@@ -42,11 +42,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!mounted) return;
-    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
+    document.documentElement.lang = "en";
     document.title =
-      locale === "zh"
-        ? "O'range Textile | Shaoxing Shicheng Textile Products Co., Ltd."
-        : "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao";
+      "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao";
   }, [locale, mounted]);
 
   const setLocale = useCallback((next: Locale) => {

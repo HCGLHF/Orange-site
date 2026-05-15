@@ -13,10 +13,10 @@ type StatItem = {
 };
 
 const stats: StatItem[] = [
-  { icon: Factory, target: 20000, unit: "㎡", label: "现代化生产车间" },
-  { icon: Package, target: 3000, unit: "米/天", label: "日产能" },
-  { icon: Globe, target: 50, plus: true, unit: "个国家", label: "服务全球客户" },
-  { icon: Clock, target: 48, unit: "小时", label: "快速打样" },
+  { icon: Factory, target: 20000, unit: "m2", label: "Modern production floor" },
+  { icon: Package, target: 3000, unit: "m/day", label: "Daily capacity" },
+  { icon: Globe, target: 50, plus: true, unit: " countries", label: "Global clients served" },
+  { icon: Clock, target: 48, unit: "h", label: "Sampling turnaround" },
 ];
 
 function CountUpNumber({
@@ -49,7 +49,6 @@ function CountUpNumber({
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       const nextValue = Math.floor(target * eased);
-      // Skip duplicate state updates to reduce re-render pressure.
       if (nextValue !== lastRendered) {
         lastRendered = nextValue;
         setValue(nextValue);
