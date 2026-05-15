@@ -26,13 +26,13 @@ type LocaleContextValue = {
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 function readStoredLocale(): Locale {
-  if (typeof window === "undefined") return "zh";
+  if (typeof window === "undefined") return "en";
   const raw = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-  return raw === "en" ? "en" : "zh";
+  return raw === "zh" ? "zh" : "en";
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("zh");
+  const [locale, setLocaleState] = useState<Locale>("en");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,8 +45,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
     document.title =
       locale === "zh"
-        ? "O'range Textile | 绍兴诗橙纺织品有限公司"
-        : "O'range Textile | Shaoxing Shicheng Textile Products Co., Ltd.";
+        ? "O'range Textile | Shaoxing Shicheng Textile Products Co., Ltd."
+        : "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao";
   }, [locale, mounted]);
 
   const setLocale = useCallback((next: Locale) => {

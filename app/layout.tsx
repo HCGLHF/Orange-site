@@ -4,6 +4,7 @@ import Script from "next/script";
 import { AppShell } from "@/components/AppShell";
 import { InquiryProvider } from "@/components/InquiryProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
+import { companyProfile, heroContent, siteUrl } from "@/lib/geo-content";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -13,8 +14,25 @@ const spaceGrotesk = Space_Grotesk({
 const GA_ID = "G-LXGZLVJXNP";
 
 export const metadata: Metadata = {
-  title: "O'range Textile | 绍兴诗橙纺织品有限公司",
-  description: "绍兴诗橙纺织品有限公司 | Soft Touch from Shaoxing",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default:
+      "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao",
+    template: "%s | O'range Textile",
+  },
+  description: heroContent.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title:
+      "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao",
+    description: heroContent.description,
+    url: siteUrl,
+    siteName: companyProfile.brandName,
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body className={`${spaceGrotesk.variable} antialiased bg-gray-50`}>
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
