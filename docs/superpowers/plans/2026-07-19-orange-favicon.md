@@ -102,12 +102,11 @@ Expected: exit code 0; Next.js completes the production build and accepts `app/i
 
 Run: `git diff --check` and `git status -sb`
 
-Expected: no whitespace errors; only the plan, favicon test, new SVG, and deletion of the old ICO are included.
+Expected: no whitespace errors; only the favicon test, new SVG, and deletion of the old ICO are included. The plan is already present in the branch base.
 
 ### Task 4: Commit and publish
 
 **Files:**
-- Stage: `docs/superpowers/plans/2026-07-19-orange-favicon.md`
 - Stage: `tests/favicon.test.mjs`
 - Stage: `app/icon.svg`
 - Stage deletion: `app/favicon.ico`
@@ -115,17 +114,30 @@ Expected: no whitespace errors; only the plan, favicon test, new SVG, and deleti
 - [ ] **Step 1: Commit the verified implementation**
 
 ```bash
-git add docs/superpowers/plans/2026-07-19-orange-favicon.md tests/favicon.test.mjs app/icon.svg app/favicon.ico
+git add -- tests/favicon.test.mjs app/icon.svg
+git add -u -- app/favicon.ico
 git commit -m "feat: add branded favicon"
 ```
 
-Expected: one implementation commit containing only the planned files.
+Expected: one implementation commit containing only the favicon test, new SVG, and deletion of the old ICO. The plan is already committed in the branch base at `2ba853f` and is not staged again.
 
-- [ ] **Step 2: Push production branch**
+- [ ] **Step 2: Fast-forward the production branch and push it**
 
-Run: `git push origin main`
+Return to the main checkout, verify that both checkouts are clean and that the reviewed feature branch is ahead, then fast-forward `main` before pushing:
 
-Expected: `origin/main` advances to the favicon implementation commit and Vercel begins its configured production deployment.
+```bash
+cd D:/GEO-ALPHA/orange-textile/orange-site
+git status -sb
+git -C .worktrees/branded-favicon status -sb
+git rev-parse main
+git rev-parse agent/branded-favicon
+git merge --ff-only agent/branded-favicon
+git rev-parse HEAD
+git rev-parse agent/branded-favicon
+git push origin main
+```
+
+Expected: both checkouts are clean before integration; the fast-forward succeeds; local `main` and `agent/branded-favicon` resolve to the same reviewed favicon head before the push; then `origin/main` advances to that head and Vercel begins its configured production deployment.
 
 - [ ] **Step 3: Verify the deployed favicon after Vercel completes**
 
