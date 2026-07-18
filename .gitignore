@@ -37,6 +37,7 @@ dev-server.pid
 
 # local brainstorming artifacts
 .superpowers/
+.worktrees/
 
 # typescript
 *.tsbuildinfo
