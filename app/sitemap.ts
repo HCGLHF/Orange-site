@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getFinishedFabricPages } from "@/lib/finished-fabric-content";
 import { siteUrl } from "@/lib/geo-content";
 import { getPublicFabricCategories } from "@/lib/public-catalog";
 
@@ -29,5 +30,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
   );
 
-  return [...corePages, ...categoryPages];
+  const finishedFabricPages: MetadataRoute.Sitemap = getFinishedFabricPages().map(
+    (page) => ({
+      url: `${siteUrl}${page.url}`,
+      lastModified: page.updated ? new Date(page.updated) : now,
+      changeFrequency: page.kind === "article" ? "monthly" : "weekly",
+      priority:
+        page.kind === "hub" ? 0.9 : page.kind === "product" ? 0.8 : 0.7,
+    })
+  );
+
+  const pagesByUrl = new Map(
+    [...corePages, ...categoryPages, ...finishedFabricPages].map((page) => [
+      page.url,
+      page,
+    ])
+  );
+
+  return Array.from(pagesByUrl.values());
 }

@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { FinishedFabricPage } from "@/components/finished-fabric/FinishedFabricPage";
 import { FabricsCatalog } from "@/components/FabricsCatalog";
 import { FabricsInquiryAnchor } from "@/components/FabricsInquiryAnchor";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { StructuredData } from "@/components/geo/StructuredData";
+import {
+  getFinishedFabricPage,
+  getFinishedProductPages,
+  getFinishedFabricSlug,
+} from "@/lib/finished-fabric-content";
 import {
   getFabricsForCategory,
   getPublicFabricCategories,
@@ -21,12 +27,33 @@ type CategoryPageProps = {
 export const dynamic = "force-static";
 
 export function generateStaticParams() {
-  return getPublicFabricCategories().map((category) => ({
-    slug: category.slug,
-  }));
+  const slugs = [
+    ...getPublicFabricCategories().map((category) => category.slug),
+    ...getFinishedProductPages().map((page) => getFinishedFabricSlug(page.url)),
+  ];
+
+  return Array.from(new Set(slugs)).map((slug) => ({ slug }));
 }
 
 export function generateMetadata({ params }: CategoryPageProps): Metadata {
+  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  if (finishedPage?.kind === "product") {
+    return {
+      title: { absolute: finishedPage.title },
+      description: finishedPage.description,
+      alternates: { canonical: finishedPage.url },
+      openGraph: {
+        title: finishedPage.title,
+        description: finishedPage.description,
+        url: `${siteUrl}${finishedPage.url}`,
+        siteName: companyProfile.brandName,
+        locale: "en_US",
+        type: "website",
+        images: [{ url: finishedPage.hero.src, alt: finishedPage.hero.alt }],
+      },
+    };
+  }
+
   const category = getPublicFabricCategory(params.slug);
   if (!category) return {};
 
@@ -83,6 +110,11 @@ function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricC
 }
 
 export default function FabricCategoryPage({ params }: CategoryPageProps) {
+  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  if (finishedPage?.kind === "product") {
+    return <FinishedFabricPage page={finishedPage} />;
+  }
+
   const category = getPublicFabricCategory(params.slug);
   if (!category) notFound();
 
