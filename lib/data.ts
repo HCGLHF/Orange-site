@@ -52,3 +52,13 @@ export const fabrics: Fabric[] = [
     description: "Structured air-layer knit with a stable body for hoodies.",
   },
 ];
+
+export const finishedFabricInquiryOptions = [
+  { id: "finished-range", name: "Finished double knit fabric range" },
+  { id: "finished-interlock", name: "Interlock finished fabric" },
+  { id: "finished-ponte", name: "Ponte Roma finished fabric" },
+  { id: "finished-scuba", name: "Scuba and air-layer finished fabric" },
+  { id: "finished-jacquard", name: "Jacquard knit finished fabric" },
+  { id: "finished-wool-blend", name: "Wool-blend finished knit fabric" },
+  { id: "finished-rib", name: "Rib knit finished fabric" },
+] as const;

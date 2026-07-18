@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { CheckCircle2, X } from "lucide-react";
-import { fabrics } from "@/lib/data";
+import { fabrics, finishedFabricInquiryOptions } from "@/lib/data";
 import {
   appendInquiryRecord,
   FORMSPREE_INQUIRY_ENDPOINT,
@@ -23,17 +23,25 @@ type InquiryModalProps = {
 export function InquiryModal({ open, onClose }: InquiryModalProps) {
   const { locale, t } = useLocale();
   const titleId = useId();
+  const inquiryOptions = [
+    ...fabrics.map((fabric) => ({
+      id: `catalog-${fabric.id}`,
+      name: getFabricCopy(fabric, locale).name,
+    })),
+    ...finishedFabricInquiryOptions,
+  ];
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
-  const [fabricId, setFabricId] = useState(fabrics[0]?.id ?? "1");
+  const [fabricId, setFabricId] = useState("catalog-1");
   const [quantity, setQuantity] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? fabrics[0];
-  const fabricLabel = getFabricCopy(selectedFabric, locale).name;
+  const selectedFabric =
+    inquiryOptions.find((option) => option.id === fabricId) ?? inquiryOptions[0];
+  const fabricLabel = selectedFabric?.name ?? "";
 
   useEffect(() => {
     if (!open) return;
@@ -119,7 +127,7 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
     setName("");
     setEmail("");
     setCompany("");
-    setFabricId(fabrics[0]?.id ?? "1");
+    setFabricId("catalog-1");
     setQuantity("");
     onClose();
   };
@@ -249,9 +257,9 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
                 onChange={(e) => setFabricId(e.target.value)}
                 className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
               >
-                {fabrics.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {getFabricCopy(f, locale).name}
+                {inquiryOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name}
                   </option>
                 ))}
               </select>

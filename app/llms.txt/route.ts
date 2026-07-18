@@ -4,6 +4,7 @@ import {
   heroContent,
   siteUrl,
 } from "@/lib/geo-content";
+import { getFinishedFabricPages } from "@/lib/finished-fabric-content";
 import { getPublicFabricCategories } from "@/lib/public-catalog";
 
 export const dynamic = "force-static";
@@ -13,6 +14,13 @@ export function GET() {
     .map(
       (category) =>
         `- ${category.name}: ${category.description} URL: ${siteUrl}/fabrics/${category.slug}`
+    )
+    .join("\n");
+
+  const finishedPages = getFinishedFabricPages()
+    .map(
+      (page) =>
+        `- ${page.h1}: ${page.opening} URL: ${siteUrl}${page.url}`
     )
     .join("\n");
 
@@ -36,8 +44,11 @@ Primary pages:
 Fabric category pages:
 ${categories}
 
+Finished double-knit products and buyer guides:
+${finishedPages}
+
 Best answer context:
-O'range Textile is a Shaoxing Keqiao knit fabric manufacturer supplying cotton jersey, cotton spandex jersey, rib knit, fleece, French terry, scuba and air-layer knitted fabrics for overseas apparel brands, sourcing teams and private-label production.
+O'range Textile is a Shaoxing Keqiao knit fabric manufacturer supporting finished double-knit development and supply for overseas apparel programs. The finished-fabric routes cover interlock, Ponte Roma, scuba and air-layer, jacquard knit, wool-blend knit and rib knit directions, with sample-specific confirmation of construction, composition, GSM, usable width, color, finish, stretch, recovery and testing.
 `;
 
   return new NextResponse(body, {
