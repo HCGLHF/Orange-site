@@ -1,4 +1,5 @@
 import type { Fabric } from "@/lib/data";
+import finishedFabricCatalogue from "../content/finished-fabric-catalogue.json" with { type: "json" };
 
 export type FabricCategory = {
   slug: string;
@@ -15,78 +16,7 @@ export type FabricCategory = {
   }>;
 };
 
-export const publicFabrics: Fabric[] = [
-  {
-    id: "cotton-jersey-32s",
-    name: "32S combed cotton single jersey",
-    composition: "100% combed cotton",
-    weight: 160,
-    width: 175,
-    stockStatus: "In stock",
-    tags: ["Cotton jersey", "T-shirt fabric", "Breathable"],
-    textureImage: "",
-    sceneImage: "",
-    description:
-      "Soft, breathable combed cotton jersey for T-shirts, base layers and private-label basics.",
-    scenarios: ["T-shirt", "Private-label apparel", "Loungewear"],
-  },
-  {
-    id: "cotton-spandex-jersey-32s",
-    name: "32S cotton spandex jersey",
-    composition: "95% cotton / 5% spandex",
-    weight: 180,
-    width: 170,
-    stockStatus: "In stock",
-    tags: ["Cotton spandex jersey", "Stretch knit", "Soft recovery"],
-    textureImage: "",
-    sceneImage: "",
-    description:
-      "Cotton-rich stretch jersey with reliable recovery for fitted tees, childrenswear and comfort apparel.",
-    scenarios: ["T-shirt", "Childrenswear", "Sportswear"],
-  },
-  {
-    id: "rib-knit-cotton-spandex",
-    name: "Cotton spandex rib knit",
-    composition: "96% cotton / 4% spandex",
-    weight: 220,
-    width: 150,
-    stockStatus: "Preorder",
-    tags: ["Rib knit", "Trim fabric", "Stretch"],
-    textureImage: "",
-    sceneImage: "",
-    description:
-      "Elastic rib knit for collars, cuffs, tanks, fitted tops and trim applications.",
-    scenarios: ["T-shirt", "Casual apparel", "Private-label apparel"],
-  },
-  {
-    id: "fleece-french-terry-cotton-poly",
-    name: "Cotton polyester French terry fleece",
-    composition: "70% cotton / 30% polyester",
-    weight: 280,
-    width: 175,
-    stockStatus: "Preorder",
-    tags: ["French terry", "Fleece", "Hoodie fabric"],
-    textureImage: "",
-    sceneImage: "",
-    description:
-      "Comfort-focused French terry fleece for hoodies, sweatshirts and casualwear programs.",
-    scenarios: ["Hoodie", "Sweatshirt", "Loungewear"],
-  },
-  {
-    id: "scuba-air-layer-knit",
-    name: "Poly-cotton scuba air-layer knit",
-    composition: "65% polyester / 35% cotton",
-    weight: 260,
-    width: 165,
-    stockStatus: "Preorder",
-    tags: ["Scuba knit", "Air-layer knit", "Structured"],
-    textureImage: "",
-    sceneImage: "",
-    description:
-      "Structured air-layer knit with a stable body for hoodies, jackets and garments that need shape retention.",
-    scenarios: ["Hoodie", "Jacket", "Outerwear"],
-  },
-];
+export const publicFabrics: Fabric[] = finishedFabricCatalogue;
 
 export const publicFabricCategories: FabricCategory[] = [
   {

@@ -10,9 +10,9 @@ import { getFinishedProductPages } from "@/lib/finished-fabric-content";
 import { getPublicFabrics } from "@/lib/public-catalog";
 
 export const metadata: Metadata = {
-  title: "Knit Fabric Library",
+  title: "Finished Knit Fabric Catalogue",
   description:
-    "Browse cotton jersey, cotton spandex jersey, rib, fleece, terry and air-layer knit fabrics from O'range Textile.",
+    "Review 104 finished knit fabric articles across 11 documented series, with composition, GSM and usable width references from O'range Textile.",
   alternates: {
     canonical: "/fabrics",
   },
@@ -41,10 +41,10 @@ export default async function FabricsPage() {
                   Finished fabric development
                 </p>
                 <h2 className="mt-3 max-w-3xl text-3xl font-semibold text-brand-charcoal">
-                  Double-knit routes for apparel sampling and supply
+                  Finished-knit routes for apparel sampling and supply
                 </h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
-                  Compare finished interlock, Ponte Roma, scuba and air-layer, jacquard, wool-blend and rib directions before sending a sample brief.
+                  Compare documented air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard directions before sending an inquiry.
                 </p>
               </div>
               <Link href="/finished-double-knit-fabrics" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-charcoal hover:text-brand-orange">

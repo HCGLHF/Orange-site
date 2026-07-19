@@ -25,12 +25,12 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
       <section className="bg-white px-5 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-sm font-semibold uppercase text-brand-orange">Stock confirmation</p>
+            <p className="text-sm font-semibold uppercase text-brand-orange">Catalogue confirmation</p>
             <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
-              Before sending a stock-fabric RFQ
+              Before sending a finished-fabric RFQ
             </h2>
             <p className="mt-4 text-sm leading-7 text-brand-charcoal/70">
-              The in-stock label is a purchasing route, not a blanket dispatch guarantee. Confirm the exact article, colour, usable quantity and current timing in writing.
+              A listed article is a sourcing reference, not a blanket inventory promise. Confirm the exact article, colour, usable quantity, finish and commercial terms directly with the sales team.
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -48,14 +48,14 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase text-brand-orange">Current catalogue status</p>
-              <h2 className="mt-3 text-3xl font-semibold">Articles marked in stock</h2>
+              <p className="text-sm font-semibold uppercase text-brand-orange">Current finished-fabric catalogue</p>
+              <h2 className="mt-3 text-3xl font-semibold">104 articles available for inquiry</h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
-                Filters open in the in-stock state. Use the article card to add a relevant fabric to the inquiry, then confirm the live commercial details with the sourcing team.
+                Use the series and specification filters to identify a relevant article, add it to the inquiry, and confirm live commercial details with the sourcing team.
               </p>
             </div>
             <Link href="/fabrics" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
-              View every knit fabric
+              View the complete catalogue
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>
@@ -70,8 +70,8 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
 
       <section className="bg-white px-5 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <p className="text-sm font-semibold uppercase text-brand-orange">Ready-stock questions</p>
-          <h2 className="mt-3 text-3xl font-semibold">What the stock label does and does not mean</h2>
+          <p className="text-sm font-semibold uppercase text-brand-orange">Catalogue questions</p>
+          <h2 className="mt-3 text-3xl font-semibold">What an available article does and does not confirm</h2>
           <div className="mt-8 divide-y divide-brand-soft border-y border-brand-soft">
             {page.faq.map((item) => (
               <details key={item.question} className="py-5">
@@ -83,7 +83,7 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
         </div>
       </section>
 
-      <LandingCtaBand page={page} title="Confirm the article before relying on stock timing" />
+      <LandingCtaBand page={page} title="Ask sales to confirm the exact article for your order" />
       <ContactCard />
       <BottomNav />
     </div>

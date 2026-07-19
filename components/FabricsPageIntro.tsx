@@ -13,15 +13,15 @@ function FabricsPageIntroContent() {
   const copy =
     stock === "in-stock"
       ? {
-          title: "In-stock knit fabrics",
+          title: "Finished fabrics available for inquiry",
           subtitle:
-            "Browse fabrics currently listed as in stock. Confirm colour, quantity, finish and dispatch timing in the current quotation.",
+            "Browse finished-fabric articles in the current sales catalogue. Confirm the exact colour, quantity, finish and commercial terms directly with the sourcing team.",
         }
       : stock === "preorder"
         ? {
-            title: "Preorder and made-to-order knit fabrics",
+            title: "Custom fabric and garment inquiry",
             subtitle:
-              "Browse fabrics developed or produced against an order brief. Sampling, colour, quantity, specification and timing require confirmation.",
+              "Browse fabrics developed or produced against an order brief. Colour, quantity, specification and commercial terms require direct confirmation.",
           }
         : {
             title: t("fabricsLibraryTitle"),

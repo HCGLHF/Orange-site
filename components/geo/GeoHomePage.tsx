@@ -25,22 +25,22 @@ type GeoHomePageProps = {
 
 const buyerRoutes: LandingRoute[] = [
   {
-    title: "Ready-stock knit fabrics",
-    description: "Review articles currently marked in stock, then confirm colour, quantity, finish, usable width and dispatch timing.",
+    title: "Current finished-fabric catalogue",
+    description: "Review 104 documented articles, then confirm the exact colour, quantity, finish and commercial terms directly with sales.",
     href: "/ready-stock-knit-fabrics",
-    action: "Review current stock route",
+    action: "Review current catalogue",
     icon: "stock",
   },
   {
-    title: "Finished double knits",
-    description: "Compare interlock, Ponte Roma, scuba and air-layer, jacquard, wool-blend and rib directions for apparel development.",
+    title: "Finished double-knit directions",
+    description: "Compare 11 documented air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard series.",
     href: "/finished-double-knit-fabrics",
     action: "Compare finished fabrics",
     icon: "range",
   },
   {
-    title: "Custom fabric development",
-    description: "Turn a garment requirement into a reviewable fabric brief, sample route and specification-led quotation.",
+    title: "Private fabric or garment inquiry",
+    description: "Send greige fabric, finished fabric or garment requirements for direct review by the sourcing team.",
     href: "/custom-knit-fabric-development",
     action: "Build a development brief",
     icon: "custom",
@@ -69,7 +69,7 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
               <div>
                 <p className="text-sm font-semibold uppercase text-brand-orange">Why buyers start here</p>
                 <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
-                  A clearer route from garment need to finished fabric
+                  One sourcing route from greige fabric to finished garments
                 </h2>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">

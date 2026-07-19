@@ -6,7 +6,7 @@
     "title": "Finished Double Knit Fabric Manufacturer | O'range Textile",
     "description": "Source finished double knit fabrics including Ponte Roma, air-layer, jacquard, rib and wool blends with samples and specification support from Shaoxing.",
     "h1": "Finished Double Knit Fabrics for Apparel Brands",
-    "opening": "O'range Textile develops finished double knit fabrics for apparel sourcing teams, garment manufacturers, and private-label programs. The supplied range covers structured double knits, air-layer and scuba-style fabrics, Roma directions, jacquard, rib, wool blends, brushed surfaces, and cashmere-feel articles. Manufacturing evidence includes 221 circular knitting machines and 104 documented finished-fabric records.",
+    "opening": "O'range Textile develops finished double knit and specialty knit fabrics for apparel sourcing teams, garment manufacturers, and private-label programs. The supplied range contains 104 documented articles across 11 finished-fabric series, including air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard directions. Manufacturing evidence includes 221 circular knitting machines.",
     "hero": {
       "src": "/images/finished-fabrics/finished-double-knit-factory.webp",
       "alt": "Finished dyed double knit fabric rolls and swatches displayed in front of circular knitting machines",
@@ -23,44 +23,72 @@
         "heading": "A finished-fabric range built around double-knit structure",
         "paragraphs": [
           "The commercial range starts after knitting: dyed, finished, brushed, patterned, yarn-dyed or otherwise prepared fabrics intended for apparel sampling and production. This distinction matters because buyers evaluate hand, surface, color, usable width, GSM, stretch, recovery and garment behavior on the finished state.",
-          "The supplied workbook contains 104 product records across 11 series. Air-layer, yarn-dyed wool-blend air-layer, structured polyester-viscose, acrylic-wool, lyocell-acetate-wool style, acetate-blend brushed, cashmere-feel and jacquard directions provide a factual base for a finished-fabric product architecture."
+          "The supplied workbook contains 104 product records across 11 documented finished-fabric series: air-layer, yarn-dyed wool-blend air-layer, structured polyester-viscose, faux-cashmere, acrylic-wool, lyocell-acetate-wool composite, acetate brushed, lyocell-acetate-wool texture, raised-pile, cashmere-blend and jacquard. The examples below preserve the article-level composition, usable width and GSM from that workbook."
         ],
         "table": {
           "headers": [
-            "Product route",
-            "Primary buyer decision",
-            "Recommended next page"
+            "Series",
+            "Representative article",
+            "Documented composition",
+            "Usable width",
+            "Weight"
           ],
           "rows": [
             [
-              "Interlock",
-              "Smooth balanced surface and stability",
-              "Interlock fabric development"
+              "Air-layer",
+              "GD2515",
+              "45% polyester, 25% combed cotton, 24% modal, 6% elastane",
+              "160 cm",
+              "300 GSM"
             ],
             [
-              "Ponte Roma",
-              "Compact body and controlled recovery",
-              "Ponte Roma fabric"
+              "Yarn-dyed wool-blend air-layer",
+              "GD2672",
+              "67.6% polyester, 13.6% viscose, 7.7% nylon, 5.3% acrylic, 4.1% elastane, 1.7% wool",
+              "160 cm",
+              "360 GSM"
             ],
             [
-              "Scuba / air-layer",
-              "Cushioning, thickness and shape",
-              "Scuba and air-layer fabric"
+              "Structured polyester-viscose",
+              "6128",
+              "85% polyester, 12% viscose, 3% elastane",
+              "160 cm",
+              "420 GSM"
             ],
             [
-              "Jacquard knit",
-              "Pattern, repeat and reverse",
-              "Jacquard knit fabric"
+              "Faux-cashmere",
+              "GD2502",
+              "27.7% polyester, 20.7% nylon, 48.5% viscose, 3.1% elastane",
+              "155-160 cm",
+              "280 GSM"
             ],
             [
-              "Wool blend",
-              "Fibre identity, hand and brushing",
-              "Wool-blend knit fabric"
+              "Acrylic-wool",
+              "2552",
+              "47.8% polyester, 26.3% viscose, 13.3% nylon, 9.1% acrylic, 3.5% wool",
+              "170-175 cm",
+              "240 GSM"
             ],
             [
-              "Rib knit",
-              "Repeat, extension and recovery",
-              "Rib knit fabric"
+              "Lyocell-acetate-wool composite",
+              "GD2712",
+              "86.7% polyester, 6.9% viscose, 4.4% lyocell, 1% wool, 1% acetate",
+              "165 cm",
+              "250-260 GSM"
+            ],
+            [
+              "Cashmere blend",
+              "GD2590",
+              "77.3% polyester, 5.7% lyocell, 13.6% viscose, 3.4% cashmere",
+              "Confirm by inquiry",
+              "240 GSM"
+            ],
+            [
+              "Wool-blend jacquard",
+              "GD2579",
+              "51.8% polyester, 23.9% viscose, 12.1% nylon, 8.2% acrylic, 4% wool",
+              "160-165 cm",
+              "240 GSM"
             ]
           ]
         }
@@ -123,7 +151,7 @@
     "faq": [
       {
         "q": "Does O'range Textile supply finished double knit fabric?",
-        "a": "The supplied catalogue contains 104 finished-fabric records across structured double-knit, air-layer, wool-blend, brushed, jacquard and related series. Exact articles and availability require confirmation."
+        "a": "Yes. The supplied catalogue contains 104 finished-fabric records across 11 documented series, including air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard directions. Exact articles and order details require confirmation."
       },
       {
         "q": "What double knit fabrics can buyers develop?",

@@ -32,6 +32,32 @@ test("landing registry exposes four unique buyer purposes without editor notes",
   assert.ok(pages.every((page) => page.secondaryCta.href));
 });
 
+test("landing copy reflects the supplied export, production and inquiry evidence", async () => {
+  const { getPublicLandingPage, landingPages } = await import("../content/landing-pages.ts");
+
+  const homeText = JSON.stringify(landingPages.home);
+  assert.match(homeText, /greige fabric.*finished fabric.*finished garment/i);
+  assert.match(homeText, /Bangladesh/i);
+  assert.match(homeText, /Russia/i);
+  assert.match(homeText, /Nepal/i);
+  assert.match(homeText, /Europe/i);
+  assert.match(homeText, /United States/i);
+  assert.match(homeText, /South America/i);
+  assert.match(homeText, /221 documented circular knitting machines/i);
+  assert.match(homeText, /GRS documentation/i);
+  assert.match(homeText, /applicable/i);
+
+  const readyStockText = JSON.stringify(getPublicLandingPage("readyStock"));
+  assert.match(readyStockText, /104 documented finished-fabric articles/i);
+  assert.match(readyStockText, /greige fabric.*finished garment/i);
+  assert.doesNotMatch(readyStockText, /dispatch timing|24-hour|stock update frequency/i);
+
+  const customText = JSON.stringify(landingPages.customDevelopment);
+  assert.match(customText, /email|WhatsApp|phone/i);
+  assert.match(landingPages.customDevelopment.primaryCta.label, /inquiry/i);
+  assert.match(landingPages.customDevelopment.primaryCta.href, /#contact|#inquiry-form/);
+});
+
 test("homepage uses the human-facing landing page system", async () => {
   const source = await readFile(
     new URL("../components/geo/GeoHomePage.tsx", import.meta.url),
@@ -71,9 +97,9 @@ test("ready-stock and custom development routes have distinct buyer flows", asyn
   assert.match(readyStockRoute, /ReadyStockLanding/);
   assert.match(customRoute, /CustomDevelopmentLanding/);
   assert.match(readyStockLanding, /defaultStock="in-stock"/);
-  assert.match(readyStockLanding, /Before sending a stock-fabric RFQ/);
+  assert.match(readyStockLanding, /Before sending a finished-fabric RFQ/);
   assert.match(customLanding, /What the development brief should contain/);
-  assert.match(customLanding, /How the development route works/);
+  assert.match(customLanding, /How the private inquiry route works/);
   assert.notEqual(readyStockLanding, customLanding);
 });
 
@@ -103,4 +129,50 @@ test("primary buyer navigation and discovery files expose all landing routes", a
   assert.match(finishedPage, /page\.kind === "hub"/);
   assert.match(finishedPage, /LandingHero/);
   assert.match(finishedPage, /LandingProofStrip/);
+});
+
+test("public copy does not retain unsupported fixed capacity or timing promises", async () => {
+  const i18n = await readFile(new URL("../lib/i18n.ts", import.meta.url), "utf8");
+  const fabricsIntro = await readFile(
+    new URL("../components/FabricsPageIntro.tsx", import.meta.url),
+    "utf8"
+  );
+  const geoHome = await readFile(
+    new URL("../components/geo/GeoHomePage.tsx", import.meta.url),
+    "utf8"
+  );
+  const fabricCard = await readFile(
+    new URL("../components/ui/FabricCard.tsx", import.meta.url),
+    "utf8"
+  );
+  const source = `${i18n}\n${fabricsIntro}\n${geoHome}\n${fabricCard}`;
+
+  for (const pattern of [
+    /20,000 m2/i,
+    /3000m MOQ/i,
+    /OEKO-TEX ready/i,
+    /within 24 hours/i,
+    /48-hour sampling/i,
+    /dispatch timing/i,
+    /ships in 24h/i,
+    /7-15 days lead time/i,
+  ]) {
+    assert.doesNotMatch(source, pattern);
+  }
+});
+
+test("public catalogue uses the supplied 104 finished-fabric articles", async () => {
+  const { getPublicFabrics } = await import("../lib/public-catalog.ts");
+  const fabrics = getPublicFabrics();
+  const source = JSON.stringify(fabrics);
+
+  assert.equal(fabrics.length, 104);
+  assert.equal(new Set(fabrics.map((fabric) => fabric.id)).size, 104);
+  assert.match(source, /GD2515/);
+  assert.match(source, /GD2672/);
+  assert.match(source, /GD2590/);
+  assert.match(source, /GD2579/);
+  assert.doesNotMatch(source, /32S combed cotton single jersey/i);
+  assert.doesNotMatch(source, /[\u3400-\u9fff]/u);
+  assert.ok(fabrics.every((fabric) => fabric.stockStatus === "Available by inquiry"));
 });

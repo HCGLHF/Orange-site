@@ -21,7 +21,7 @@ export function CustomDevelopmentLanding() {
       <section className="bg-white px-5 py-16 sm:px-6 md:py-20 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
           <div>
-            <p className="text-sm font-semibold uppercase text-brand-orange">Development input</p>
+            <p className="text-sm font-semibold uppercase text-brand-orange">Inquiry input</p>
             <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
               What the development brief should contain
             </h2>
@@ -47,10 +47,10 @@ export function CustomDevelopmentLanding() {
       <section className="px-5 py-16 sm:px-6 md:py-20 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase text-brand-orange">Sampling workflow</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">How the development route works</h2>
+            <p className="text-sm font-semibold uppercase text-brand-orange">Private sales review</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">How the private inquiry route works</h2>
             <p className="mt-4 text-sm leading-7 text-brand-charcoal/70">
-              Each step should leave a traceable decision: the brief, the proposed route, the labelled sample and the approved order basis.
+              Send the available requirement first. The sales team can then confirm which product, sample, quotation or garment route should be discussed privately.
             </p>
           </div>
           <ol className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -72,7 +72,7 @@ export function CustomDevelopmentLanding() {
             <h2 className="mt-3 text-3xl font-semibold">What is confirmed later</h2>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {["Exact article and construction", "Sample availability and timing", "MOQ and production lead time", "Testing, packing and documentation"].map((item) => (
+            {["Exact article or garment reference", "Colour and required quantity", "Commercial terms for the current order", "Testing, packing and documentation"].map((item) => (
               <div key={item} className="flex gap-3 border border-brand-soft bg-brand-cream p-5 text-sm leading-7 text-brand-charcoal/75">
                 <Check className="mt-1 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
                 <span>{item} are confirmed against the current requirement and quotation.</span>
@@ -97,7 +97,7 @@ export function CustomDevelopmentLanding() {
         </div>
       </section>
 
-      <LandingCtaBand page={page} title="Send a brief that can be reviewed article by article" />
+      <LandingCtaBand page={page} title="Send the requirement directly to the sourcing team" />
       <ContactCard />
       <BottomNav />
     </div>
