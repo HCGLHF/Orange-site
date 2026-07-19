@@ -15,6 +15,7 @@ test("uses the branded OrangeMark SVG favicon", () => {
   const svg = readFileSync(iconPath, "utf8");
 
   assert.match(svg, /viewBox="0 0 32 32"/);
+  assert.match(svg, /data-favicon-version="2026-07-20"/);
   assert.match(svg, /fill="#E07A5F"/);
   assert.match(svg, /fill="#5C9E6E"/);
   assert.match(svg, /<circle cx="16" cy="19" r="11"/);
