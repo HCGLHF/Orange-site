@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, ClipboardCheck, Quote } from "lucide-react";
 import ContactCard from "@/components/ContactCard";
+import { LandingHero } from "@/components/landing/LandingHero";
+import { LandingProofStrip } from "@/components/landing/LandingProofStrip";
 import { StructuredData } from "@/components/geo/StructuredData";
 import { SampleRequestCta } from "@/components/SampleRequestCta";
 import type {
@@ -9,6 +11,7 @@ import type {
   FinishedFabricSection,
 } from "@/lib/finished-fabric-content";
 import { buildFinishedFabricSchema } from "@/lib/finished-fabric-schema";
+import { getPublicLandingPage } from "@/lib/landing-page-content";
 
 function ContentTable({ table }: { table: NonNullable<FinishedFabricSection["table"]> }) {
   return (
@@ -96,11 +99,19 @@ function ContentSection({ section, index }: { section: FinishedFabricSection; in
 }
 
 export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
+  const landingPage = page.kind === "hub" ? getPublicLandingPage("finishedDoubleKnit") : null;
+
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
       <StructuredData data={buildFinishedFabricSchema(page)} />
 
       <article>
+        {landingPage ? (
+          <>
+            <LandingHero page={landingPage} />
+            <LandingProofStrip points={landingPage.proofPoints} />
+          </>
+        ) : (
         <header className="border-b border-brand-soft bg-white">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs text-brand-charcoal/60">
@@ -157,6 +168,7 @@ export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
             </div>
           </div>
         </header>
+        )}
 
         {page.sections.map((section, index) => (
           <ContentSection key={section.heading} section={section} index={index} />

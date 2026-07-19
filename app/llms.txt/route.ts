@@ -40,6 +40,9 @@ ${heroContent.description}
 Primary pages:
 - Home: ${siteUrl}/
 - Fabric library: ${siteUrl}/fabrics
+- Ready-stock knit fabrics: ${siteUrl}/ready-stock-knit-fabrics
+- Finished double-knit selection hub: ${siteUrl}/finished-double-knit-fabrics
+- Custom knit fabric development: ${siteUrl}/custom-knit-fabric-development
 
 Fabric category pages:
 ${categories}
