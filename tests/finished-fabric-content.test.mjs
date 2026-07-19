@@ -79,6 +79,19 @@ test("content stays inside the verified finished-fabric evidence boundary", () =
   }
 });
 
+test("finished-fabric hub uses supplied catalogue series and representative articles", () => {
+  const pages = loadPages();
+  const hub = pages.find((page) => page.url === "/finished-double-knit-fabrics");
+  const source = JSON.stringify(hub);
+
+  assert.match(source, /11 (?:documented )?finished-fabric series/i);
+  for (const article of ["GD2515", "GD2672", "6128", "GD2502", "2552", "GD2712", "GD2590", "GD2579"]) {
+    assert.match(source, new RegExp(article));
+  }
+  assert.match(source, /160 cm/i);
+  assert.match(source, /300 GSM/i);
+});
+
 test("Next.js exposes the hub, blog, product routes and machine-readable discovery", () => {
   const requiredFiles = [
     "app/finished-double-knit-fabrics/page.tsx",
@@ -128,7 +141,9 @@ test("the inquiry modal offers finished-fabric development directions", () => {
   );
   const data = readFileSync(path.join(root, "lib/data.ts"), "utf8");
   assert.match(modal, /finishedFabricInquiryOptions/);
-  assert.match(data, /Interlock finished fabric/);
-  assert.match(data, /Ponte Roma finished fabric/);
-  assert.match(data, /Jacquard knit finished fabric/);
+  assert.doesNotMatch(modal, /fabrics\.map/);
+  assert.match(data, /Air-layer finished knit fabric/);
+  assert.match(data, /Cashmere-blend finished knit fabric/);
+  assert.match(data, /Greige fabric requirement/);
+  assert.match(data, /Finished garment requirement/);
 });

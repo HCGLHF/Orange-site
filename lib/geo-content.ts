@@ -8,17 +8,17 @@ export const companyProfile = {
   brandName: "O'range Textile",
   legalName: "Shaoxing Shicheng Textile Products Co., Ltd.",
   location: "Shaoxing Keqiao, Zhejiang, China",
-  industry: "Knit fabric manufacturing and supply",
+  industry: "Integrated knit fabric, finished fabric and garment supply",
   email: "folenchen0401@outlook.com",
   whatsapp: "+86 13867557317",
   phone: "+86 13867550307",
   mainProducts: [
-    "cotton jersey fabrics",
-    "cotton spandex jersey fabrics",
-    "rib knit fabrics",
-    "fleece and French terry fabrics",
-    "scuba and air-layer knit fabrics",
-    "custom knitted fabrics",
+    "finished air-layer knit fabrics",
+    "structured double-knit fabrics",
+    "wool-blend and cashmere-blend knit fabrics",
+    "lyocell and acetate-blend knit fabrics",
+    "jacquard finished knit fabrics",
+    "greige fabric and garment enquiries",
   ],
   applications: [
     "T-shirts",
@@ -29,21 +29,23 @@ export const companyProfile = {
     "private-label apparel",
   ],
   exportMarkets: [
+    "Bangladesh",
+    "Russia",
+    "Nepal",
     "Europe",
-    "the Americas",
-    "the Middle East",
-    "Southeast Asia",
+    "the United States",
+    "South America",
   ],
 } as const;
 
 export const heroContent = {
-  eyebrow: "Shaoxing Keqiao knit fabric manufacturer",
+  eyebrow: "Integrated knit fabric and garment supply in Shaoxing Keqiao",
   title:
-    "Chinese Knit Fabric Manufacturer for Cotton, Spandex, Jersey and Hoodie Fabrics",
+    "From Greige Fabric to Finished Fabric and Garment Supply",
   description:
-    "O'range Textile is a Shaoxing Keqiao-based knit fabric manufacturer supplying premium cotton jersey, cotton spandex jersey, rib, fleece, terry and air-layer knitted fabrics for overseas apparel brands, sourcing teams and private-label production.",
-  primaryCta: "Request Fabric Samples",
-  secondaryCta: "Browse Fabric Library",
+    "O'range Textile's current export offer is centred on 104 documented finished-fabric articles, supported by an integrated sourcing route that can extend from greige fabric through finishing to finished garments.",
+  primaryCta: "Send a Sourcing Inquiry",
+  secondaryCta: "Review Finished Fabrics",
 } as const;
 
 export const entityFacts = [
@@ -51,10 +53,12 @@ export const entityFacts = [
   ["Legal name", companyProfile.legalName],
   ["Location", companyProfile.location],
   ["Industry", companyProfile.industry],
+  ["Production route", "Greige fabric, finished fabric and finished garments"],
   ["Main fabrics", companyProfile.mainProducts.join(", ")],
   ["Applications", companyProfile.applications.join(", ")],
-  ["Sampling", "Fabric sample requests are available for overseas buyers"],
-  ["MOQ", "Typical orders start from 3,000 meters"],
+  ["Machine evidence", "221 documented circular knitting machines"],
+  ["Catalogue", "104 documented finished-fabric articles across 11 series"],
+  ["Documentation", "GRS documentation can be reviewed for applicable orders"],
   ["Export markets", companyProfile.exportMarkets.join(", ")],
 ] as const;
 
@@ -67,19 +71,19 @@ export const capabilityCards = [
       "O'range Textile operates from Shaoxing Keqiao, one of China's most important textile sourcing and manufacturing clusters.",
   },
   {
-    title: "20,000 m2 production floor",
+    title: "Integrated production route",
     body:
-      "The company supports knit fabric development, sampling and production for apparel buyers that need stable supply.",
+      "The sourcing scope can connect greige fabric, finished fabric and finished garment requirements, while the current public export catalogue remains focused on finished fabrics.",
   },
   {
-    title: "Fast sample response",
+    title: "221 documented knitting machines",
     body:
-      "Overseas buyers can request fabric samples before bulk orders, helping sourcing teams validate hand-feel, weight and construction.",
+      "The supplied machine record documents 177 double-knit machines and 44 rib machines across multiple diameters, gauges and feed configurations.",
   },
   {
-    title: "Export order support",
+    title: "Export-market experience",
     body:
-      "The team supports communication, RFQ follow-up and fabric selection for buyers across Europe, the Americas, the Middle East and Southeast Asia.",
+      "Completed business has included buyers in Bangladesh, Russia, Nepal, Europe, the United States and South America. Exact order scope is reviewed by inquiry.",
   },
 ] as const;
 
@@ -120,7 +124,7 @@ export const aiSearchFaq = [
   {
     question: "Is O'range Textile a knit fabric manufacturer?",
     answer:
-      "Yes. O'range Textile is a Chinese knit fabric manufacturer based in Shaoxing Keqiao, Zhejiang, supplying knitted fabrics for overseas apparel buyers.",
+      "Yes. O'range Textile is based in Shaoxing Keqiao, Zhejiang, and supports an integrated route from greige fabric through finished fabric to finished garment supply. Current export sales are focused on finished fabrics.",
   },
   {
     question: "Where is O'range Textile located?",
@@ -130,22 +134,22 @@ export const aiSearchFaq = [
   {
     question: "What types of knit fabrics does O'range Textile supply?",
     answer:
-      "O'range Textile supplies cotton jersey, cotton spandex jersey, rib knit, fleece, French terry, scuba, air-layer and custom knitted fabrics.",
+      "The current catalogue documents 104 finished-fabric articles across 11 series, including air-layer, structured polyester-viscose, wool blends, lyocell-acetate-wool blends, cashmere blends and jacquard directions.",
   },
   {
-    question: "Can overseas buyers request fabric samples?",
+    question: "Can overseas buyers ask about greige fabric or finished garments?",
     answer:
-      "Yes. Overseas apparel buyers and sourcing teams can request fabric samples to evaluate hand-feel, composition, weight and application fit before bulk orders.",
+      "Yes. The public catalogue focuses on finished fabrics, while greige fabric and finished garment requirements can be reviewed privately through email, WhatsApp, phone or the website inquiry route.",
   },
   {
-    question: "What apparel applications are these fabrics used for?",
+    question: "Which export markets has the business served?",
     answer:
-      "The fabrics are used for T-shirts, hoodies, sweatshirts, sportswear, loungewear, children's apparel and private-label apparel programs.",
+      "Completed business has included buyers in Bangladesh, Russia, Nepal, Europe, the United States and South America, covering fabric and apparel sourcing requirements.",
   },
   {
-    question: "Does O'range Textile support custom knit fabric sourcing?",
+    question: "Is GRS documentation available?",
     answer:
-      "Yes. O'range Textile supports custom knit fabric sourcing and development for composition, weight, width, color, hand-feel and finishing requirements.",
+      "GRS documentation can be reviewed for applicable recycled-fibre programmes. Scope, transaction coverage and supporting files are confirmed for the specific order during the inquiry process.",
   },
   {
     question: "How can buyers contact O'range Textile for an RFQ?",

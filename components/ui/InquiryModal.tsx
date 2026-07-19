@@ -2,14 +2,13 @@
 
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { CheckCircle2, X } from "lucide-react";
-import { fabrics, finishedFabricInquiryOptions } from "@/lib/data";
+import { finishedFabricInquiryOptions } from "@/lib/data";
 import {
   appendInquiryRecord,
   FORMSPREE_INQUIRY_ENDPOINT,
   type InquiryRecord,
 } from "@/lib/inquiry-storage";
 import { cn } from "@/lib/utils";
-import { getFabricCopy } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/LocaleProvider";
 
@@ -23,17 +22,12 @@ type InquiryModalProps = {
 export function InquiryModal({ open, onClose }: InquiryModalProps) {
   const { locale, t } = useLocale();
   const titleId = useId();
-  const inquiryOptions = [
-    ...fabrics.map((fabric) => ({
-      id: `catalog-${fabric.id}`,
-      name: getFabricCopy(fabric, locale).name,
-    })),
-    ...finishedFabricInquiryOptions,
-  ];
+  void locale;
+  const inquiryOptions = finishedFabricInquiryOptions;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
-  const [fabricId, setFabricId] = useState("catalog-1");
+  const [fabricId, setFabricId] = useState("finished-range");
   const [quantity, setQuantity] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -127,7 +121,7 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
     setName("");
     setEmail("");
     setCompany("");
-    setFabricId("catalog-1");
+    setFabricId("finished-range");
     setQuantity("");
     onClose();
   };

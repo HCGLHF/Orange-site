@@ -2,15 +2,14 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { ArrowRight, Grid3X3, Package, Shirt, ShoppingCart } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ArrowRight, Layers3, Package, Ruler, ShoppingCart } from "lucide-react";
 import { useLocale } from "@/components/LocaleProvider";
 import { useInquiryCart } from "@/components/InquiryCartProvider";
 import { OrangeMark } from "@/components/OrangeMark";
 
 function NavbarContent() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { t } = useLocale();
   const { totalCount } = useInquiryCart();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -22,31 +21,27 @@ function NavbarContent() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const stockParam = searchParams.get("stock");
-  const onFabrics = pathname === "/fabrics";
-
   const navItems = [
     {
-      href: "/fabrics?stock=in-stock",
-      label: t("navStockFast"),
+      href: "/ready-stock-knit-fabrics",
+      label: "Ready stock",
       icon: Package,
-      badge: t("navBadge24h"),
       color: "text-emerald-600",
-      isActive: onFabrics && stockParam === "in-stock",
+      isActive: pathname === "/ready-stock-knit-fabrics",
     },
     {
-      href: "/fabrics?stock=preorder",
-      label: t("navStockPreorder"),
-      icon: Shirt,
+      href: "/finished-double-knit-fabrics",
+      label: "Finished double knits",
+      icon: Layers3,
       color: "text-amber-600",
-      isActive: onFabrics && stockParam === "preorder",
+      isActive: pathname.startsWith("/finished-double-knit-fabrics") || pathname.startsWith("/fabrics/") || pathname.startsWith("/blog/"),
     },
     {
-      href: "/fabrics",
-      label: t("navFabricsAll"),
-      icon: Grid3X3,
+      href: "/custom-knit-fabric-development",
+      label: "Custom development",
+      icon: Ruler,
       color: "text-gray-600",
-      isActive: onFabrics && !stockParam,
+      isActive: pathname === "/custom-knit-fabric-development",
     },
   ];
 
@@ -87,11 +82,6 @@ function NavbarContent() {
                   >
                     <Icon className={`h-4 w-4 shrink-0 ${active ? item.color : ""}`} aria-hidden />
                     <span className="whitespace-nowrap">{item.label}</span>
-                    {item.badge ? (
-                      <span className="ml-1 rounded-full bg-brand-orange px-1.5 py-0.5 text-[10px] font-bold text-white">
-                        {item.badge}
-                      </span>
-                    ) : null}
                   </Link>
                 );
               })}

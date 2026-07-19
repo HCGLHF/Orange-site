@@ -4,6 +4,8 @@ export type Fabric = {
   composition: string;
   weight: number;
   width: number;
+  widthLabel?: string;
+  weightLabel?: string;
   tags: string[];
   textureImage: string;
   sceneImage: string;
@@ -12,53 +14,21 @@ export type Fabric = {
   scenarios?: string[];
   images?: string[];
   notionPageId?: string;
+  articleNumber?: string;
+  series?: string;
 };
 
-export const fabrics: Fabric[] = [
-  {
-    id: "1",
-    name: "32S combed cotton spandex jersey",
-    composition: "95% cotton / 5% spandex",
-    weight: 180,
-    width: 170,
-    stockStatus: "In stock",
-    tags: ["In stock", "T-shirt favorite", "Soft stretch"],
-    textureImage: "",
-    sceneImage: "",
-    description: "Soft worn-in hand feel with reliable recovery for fitted tees.",
-  },
-  {
-    id: "2",
-    name: "40S pure cotton single jersey",
-    composition: "100% combed cotton",
-    weight: 160,
-    width: 175,
-    stockStatus: "In stock",
-    tags: ["Basics", "Breathable", "Natural white in stock"],
-    textureImage: "",
-    sceneImage: "",
-    description: "Light, breathable and clean for summer white tee programs.",
-  },
-  {
-    id: "3",
-    name: "Poly-cotton scuba air-layer knit",
-    composition: "65% polyester / 35% cotton",
-    weight: 260,
-    width: 165,
-    stockStatus: "Out of stock",
-    tags: ["Structured", "Sweatshirt fabric", "Warm"],
-    textureImage: "",
-    sceneImage: "",
-    description: "Structured air-layer knit with a stable body for hoodies.",
-  },
-];
-
 export const finishedFabricInquiryOptions = [
-  { id: "finished-range", name: "Finished double knit fabric range" },
-  { id: "finished-interlock", name: "Interlock finished fabric" },
-  { id: "finished-ponte", name: "Ponte Roma finished fabric" },
-  { id: "finished-scuba", name: "Scuba and air-layer finished fabric" },
-  { id: "finished-jacquard", name: "Jacquard knit finished fabric" },
-  { id: "finished-wool-blend", name: "Wool-blend finished knit fabric" },
-  { id: "finished-rib", name: "Rib knit finished fabric" },
+  { id: "finished-range", name: "Specific finished-fabric article" },
+  { id: "finished-air-layer", name: "Air-layer finished knit fabric" },
+  { id: "finished-yarn-dyed-wool", name: "Yarn-dyed wool-blend air-layer fabric" },
+  { id: "finished-structured", name: "Structured polyester-viscose knit fabric" },
+  { id: "finished-faux-cashmere", name: "Faux-cashmere finished knit fabric" },
+  { id: "finished-acrylic-wool", name: "Acrylic-wool finished knit fabric" },
+  { id: "finished-lyocell-acetate", name: "Lyocell-acetate-wool finished knit fabric" },
+  { id: "finished-brushed", name: "Brushed or raised-pile finished knit fabric" },
+  { id: "finished-cashmere", name: "Cashmere-blend finished knit fabric" },
+  { id: "finished-jacquard", name: "Wool-blend jacquard finished knit fabric" },
+  { id: "greige-fabric", name: "Greige fabric requirement" },
+  { id: "finished-garment", name: "Finished garment requirement" },
 ] as const;

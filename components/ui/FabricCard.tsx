@@ -41,7 +41,7 @@ const STOCK_CONFIG: Record<
     borderColor: "border-emerald-200",
     icon: CheckCircle2,
     label: "In stock",
-    eta: "Ships in 24h",
+    eta: "Confirm current details by inquiry",
     pulse: true,
   },
   preorder: {
@@ -51,7 +51,7 @@ const STOCK_CONFIG: Record<
     borderColor: "border-amber-200",
     icon: Clock,
     label: "Made to order",
-    eta: "7-15 days lead time",
+    eta: "Confirm production terms by inquiry",
     pulse: false,
   },
   "out-of-stock": {
@@ -169,7 +169,7 @@ export function FabricCard({ fabric }: FabricCardProps) {
         className={`absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-sm ${config.color}`}
       >
         <Icon className="h-3.5 w-3.5 opacity-90" aria-hidden />
-        <span>{config.label}</span>
+        <span>{fabric.stockStatus === "Available by inquiry" ? "Available by inquiry" : config.label}</span>
         {config.pulse && (
           <span
             className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${config.color} animate-ping`}
@@ -208,9 +208,9 @@ export function FabricCard({ fabric }: FabricCardProps) {
         <span
           className={`rounded-md px-2 py-1 font-medium ${config.bgColor} ${config.textColor}`}
         >
-          {fabric.weight || 0} g/m2
+          {fabric.weightLabel || `${fabric.weight || 0} GSM`}
         </span>
-        <span>Width {fabric.width || 0} cm</span>
+        <span>{fabric.widthLabel || `Width ${fabric.width || 0} cm`}</span>
         <span className="text-gray-400">|</span>
         <span>Knit</span>
       </div>

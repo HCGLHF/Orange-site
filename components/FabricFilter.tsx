@@ -5,8 +5,11 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Droplets, Scale } from "lucide-react";
 import { useLocale } from "@/components/LocaleProvider";
 import type { Fabric } from "@/lib/data";
+import {
+  resolveStockFilter,
+  type StockFilter,
+} from "@/lib/fabric-filter-state";
 
-type StockFilter = "all" | "in-stock" | "preorder" | "out-of-stock";
 type CompositionFilter = "all" | "cotton" | "spandex" | "polyester";
 type WeightFilter = "all" | "light" | "medium" | "heavy";
 
@@ -19,6 +22,7 @@ type ActiveFilters = {
 export type FabricFilterProps = {
   fabrics: Fabric[];
   onFilterChange: (filtered: Fabric[]) => void;
+  defaultStock?: StockFilter;
 };
 
 function normalizeStock(raw: string | undefined): StockFilter {
@@ -31,12 +35,6 @@ function normalizeStock(raw: string | undefined): StockFilter {
     return "out-of-stock";
   }
   return "in-stock";
-}
-
-function stockQueryToFilter(raw: string | null): StockFilter | null {
-  if (!raw) return null;
-  const normalized = normalizeStock(raw);
-  return normalized === "all" ? null : normalized;
 }
 
 function getWeightCategory(weight: number): WeightFilter {
@@ -73,19 +71,24 @@ const INITIAL: ActiveFilters = {
   weight: "all",
 };
 
-function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
+function FabricFilterInner({
+  fabrics,
+  onFilterChange,
+  defaultStock = "all",
+}: FabricFilterProps) {
   const { t } = useLocale();
   const searchParams = useSearchParams();
-  const [activeFilters, setActiveFilters] = useState<ActiveFilters>(INITIAL);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>(() => ({
+    ...INITIAL,
+    stock: defaultStock,
+  }));
 
   useEffect(() => {
-    const s = stockQueryToFilter(searchParams.get("stock"));
-    if (s) {
-      setActiveFilters((prev) =>
-        prev.stock === s ? prev : { ...prev, stock: s }
-      );
-    }
-  }, [searchParams]);
+    const stock = resolveStockFilter(searchParams.get("stock"), defaultStock);
+    setActiveFilters((prev) =>
+      prev.stock === stock ? prev : { ...prev, stock }
+    );
+  }, [defaultStock, searchParams]);
 
   const filteredFabrics = useMemo(
     () => applyFilters(fabrics, activeFilters),
@@ -259,7 +262,7 @@ function FabricFilterInner({ fabrics, onFilterChange }: FabricFilterProps) {
         {hasActive && (
           <button
             type="button"
-            onClick={() => setActiveFilters(INITIAL)}
+            onClick={() => setActiveFilters({ ...INITIAL, stock: defaultStock })}
             className="text-sm text-gray-500 underline transition-colors hover:text-gray-900"
           >
             {t("filterClear")}

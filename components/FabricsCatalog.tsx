@@ -7,8 +7,15 @@ import { useLocale } from "@/components/LocaleProvider";
 import { FabricCard } from "@/components/ui/FabricCard";
 import { FabricFilter } from "@/components/FabricFilter";
 import { ScenarioNav } from "@/components/ScenarioNav";
+import type { StockFilter } from "@/lib/fabric-filter-state";
 
-export function FabricsCatalog({ fabrics }: { fabrics: Fabric[] }) {
+export function FabricsCatalog({
+  fabrics,
+  defaultStock = "all",
+}: {
+  fabrics: Fabric[];
+  defaultStock?: StockFilter;
+}) {
   const { t } = useLocale();
   const searchParams = useSearchParams();
   const filterUrlKey = searchParams.toString();
@@ -78,6 +85,7 @@ export function FabricsCatalog({ fabrics }: { fabrics: Fabric[] }) {
         key={`${filterKey}-${filterUrlKey}`}
         fabrics={fabricsForFilters}
         onFilterChange={onFilterChange}
+        defaultStock={defaultStock}
       />
       {visible.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
