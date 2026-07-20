@@ -46,3 +46,49 @@ test("fabric catalogue exposes every public category through crawlable links", a
   );
   assert.match(fabricsPage, /category\.description/);
 });
+
+test("legacy fabric categories carry route-specific sourcing depth", async () => {
+  const catalogue = await readSource("lib/public-catalog.ts");
+
+  assert.equal(
+    (catalogue.match(/^    sourcingOverview:/gm) ?? []).length,
+    4,
+    "every legacy category needs a sourcing overview"
+  );
+  assert.equal(
+    (catalogue.match(/^    specificationChecks:/gm) ?? []).length,
+    4,
+    "every legacy category needs specification checks"
+  );
+  assert.equal(
+    (catalogue.match(/^    developmentGuidance:/gm) ?? []).length,
+    4,
+    "every legacy category needs development guidance"
+  );
+
+  for (const guide of [
+    "/blog/what-is-interlock-fabric",
+    "/blog/what-is-rib-knit-fabric",
+    "/blog/what-is-scuba-knit-fabric",
+    "/blog/jacquard-knit-vs-woven-jacquard",
+  ]) {
+    assert.match(catalogue, new RegExp(guide.replaceAll("/", "\\/")));
+  }
+});
+
+test("legacy category pages render sourcing evidence and contextual routes", async () => {
+  const categoryPage = await readSource("app/fabrics/[slug]/page.tsx");
+
+  assert.match(categoryPage, /category\.sourcingOverview/);
+  assert.match(categoryPage, /category\.specificationChecks\.map/);
+  assert.match(categoryPage, /category\.developmentGuidance/);
+  assert.match(categoryPage, /category\.relatedLinks\.map/);
+});
+
+test("ready-stock page provides a second crawlable entry to legacy categories", async () => {
+  const landing = await readSource("components/landing/ReadyStockLanding.tsx");
+
+  assert.match(landing, /getPublicFabricCategories/);
+  assert.match(landing, /publicCategories\.map/);
+  assert.match(landing, /href=\{`\/fabrics\/\$\{category\.slug\}`\}/);
+});
