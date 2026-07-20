@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FinishedFabricPage } from "@/components/finished-fabric/FinishedFabricPage";
 import { FabricsCatalog } from "@/components/FabricsCatalog";
 import { FabricsInquiryAnchor } from "@/components/FabricsInquiryAnchor";
@@ -133,7 +135,7 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
               {category.name} from O&apos;range Textile
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-brand-charcoal/75">
-              {category.metaDescription}
+              {category.description}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {category.buyerIntent.map((term) => (
@@ -144,6 +146,83 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
                   {term}
                 </span>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-brand-soft bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+              Sourcing overview
+            </p>
+            <h2 className="mt-3 max-w-3xl text-3xl font-semibold text-brand-charcoal">
+              Define the finished result before selecting an article
+            </h2>
+            <div className="mt-5 max-w-4xl space-y-4 text-base leading-8 text-brand-charcoal/75">
+              {category.sourcingOverview.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-brand-soft bg-brand-cream">
+          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+              Specification checks
+            </p>
+            <h2 className="mt-3 max-w-3xl text-3xl font-semibold text-brand-charcoal">
+              What to confirm on the offered finished sample
+            </h2>
+            <div className="mt-7 grid gap-4 md:grid-cols-2">
+              {category.specificationChecks.map((check) => (
+                <div key={check.label} className="flex gap-3 border-t border-brand-soft bg-white p-5">
+                  <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-600" aria-hidden />
+                  <div>
+                    <h3 className="font-semibold text-brand-charcoal">{check.label}</h3>
+                    <p className="mt-2 text-sm leading-7 text-brand-charcoal/70">{check.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-brand-soft bg-white">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+                Development guidance
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold text-brand-charcoal">
+                Prepare a sample and RFQ brief
+              </h2>
+              <div className="mt-5 space-y-4 text-base leading-8 text-brand-charcoal/75">
+                {category.developmentGuidance.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-brand-charcoal">Continue the buyer research</h2>
+              <div className="mt-5 divide-y divide-brand-soft border-y border-brand-soft">
+                {category.relatedLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group flex items-start justify-between gap-4 py-5"
+                  >
+                    <div>
+                      <h3 className="text-sm font-semibold text-brand-charcoal group-hover:text-brand-orange">
+                        {item.label}
+                      </h3>
+                      <p className="mt-1 text-sm leading-6 text-brand-charcoal/65">{item.description}</p>
+                    </div>
+                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-brand-orange transition-transform group-hover:translate-x-1" aria-hidden />
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -175,17 +254,36 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
-          <Suspense
-            fallback={
-              <div className="py-16 text-center text-sm text-brand-charcoal/60">
-                Loading fabrics...
+        {fabrics.length ? (
+          <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+            <Suspense
+              fallback={
+                <div className="py-16 text-center text-sm text-brand-charcoal/60">
+                  Loading fabrics...
+                </div>
+              }
+            >
+              <FabricsCatalog fabrics={fabrics} />
+            </Suspense>
+          </section>
+        ) : (
+          <section className="border-t border-brand-soft bg-brand-charcoal text-white">
+            <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+              <h2 className="text-xl font-semibold">Current catalogue boundary</h2>
+              <p className="mt-3 max-w-4xl text-sm leading-7 text-white/75">
+                The current public finished-fabric catalogue does not assign a specific article to this broad construction route. Share a reference sample or specification so the sourcing team can confirm the relevant sample and quotation path without implying unsupported live stock.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold">
+                <Link href="/fabrics" className="text-brand-orange hover:text-white">
+                  Review the documented catalogue
+                </Link>
+                <Link href="/custom-knit-fabric-development" className="text-brand-orange hover:text-white">
+                  Send a development brief
+                </Link>
               </div>
-            }
-          >
-            <FabricsCatalog fabrics={fabrics} />
-          </Suspense>
-        </section>
+            </div>
+          </section>
+        )}
 
         <FabricsInquiryAnchor />
       </div>

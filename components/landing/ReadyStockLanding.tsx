@@ -12,9 +12,11 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import type { Fabric } from "@/lib/data";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
 import { buildLandingPageSchema } from "@/lib/landing-page-schema";
+import { getPublicFabricCategories } from "@/lib/public-catalog";
 
 export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
   const page = getPublicLandingPage("readyStock");
+  const publicCategories = getPublicFabricCategories();
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -41,6 +43,36 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section className="border-y border-brand-soft bg-brand-cream px-5 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-semibold uppercase text-brand-orange">Browse by construction need</p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-semibold">
+            Prepare the category brief before asking about an article
+          </h2>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
+            These routes explain the garment use and finished-sample checks behind four common knit directions. Use them to prepare a clearer inquiry, then confirm the exact article, colour and quantity privately.
+          </p>
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {publicCategories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/fabrics/${category.slug}`}
+                className="group flex min-h-44 flex-col justify-between border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange"
+              >
+                <div>
+                  <h3 className="font-semibold text-brand-charcoal">{category.name}</h3>
+                  <p className="mt-3 text-sm leading-6 text-brand-charcoal/65">{category.description}</p>
+                </div>
+                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
+                  Review sourcing checks
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden />
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
