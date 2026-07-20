@@ -92,3 +92,47 @@ test("ready-stock page provides a second crawlable entry to legacy categories", 
   assert.match(landing, /publicCategories\.map/);
   assert.match(landing, /href=\{`\/fabrics\/\$\{category\.slug\}`\}/);
 });
+
+test("catalogue routes bound the server payload and hydrate the complete catalogue", async () => {
+  const catalogue = await readSource("lib/public-catalog.ts");
+  const fabricsPage = await readSource("app/fabrics/page.tsx");
+  const readyStockPage = await readSource(
+    "app/ready-stock-knit-fabrics/page.tsx"
+  );
+  const catalogComponent = await readSource("components/FabricsCatalog.tsx");
+
+  assert.match(catalogue, /INITIAL_CATALOGUE_SIZE\s*=\s*4/);
+  assert.match(catalogue, /getInitialPublicFabrics/);
+  assert.match(catalogue, /getPublicFabricCount/);
+  assert.match(fabricsPage, /getInitialPublicFabrics/);
+  assert.match(fabricsPage, /getPublicFabricCount/);
+  assert.doesNotMatch(fabricsPage, /const fabrics = getPublicFabrics\(\)/);
+  assert.match(readyStockPage, /getInitialPublicFabrics/);
+  assert.match(readyStockPage, /getPublicFabricCount/);
+  assert.match(catalogComponent, /fetch\("\/api\/fabrics"/);
+  assert.match(catalogComponent, /totalFabricCount/);
+});
+
+test("catalogue landing routes publish page-specific sourcing evidence", async () => {
+  const fabricsPage = await readSource("app/fabrics/page.tsx");
+  const readyStockLanding = await readSource(
+    "components/landing/ReadyStockLanding.tsx"
+  );
+
+  assert.match(fabricsPage, /What the catalogue confirms/);
+  assert.match(fabricsPage, /What still requires sample approval/);
+  assert.match(fabricsPage, /What makes an RFQ actionable/);
+  assert.match(fabricsPage, /How to shortlist a finished knit fabric/);
+  assert.match(fabricsPage, /Build an approval record/);
+  assert.match(readyStockLanding, /How availability is confirmed/);
+  assert.match(readyStockLanding, /Article match/);
+  assert.match(readyStockLanding, /Commercial confirmation/);
+  assert.match(readyStockLanding, /From catalogue reference to confirmed supply/);
+  assert.match(readyStockLanding, /Questions to settle before price confirmation/);
+});
+
+test("client locale state preserves route-specific metadata titles", async () => {
+  const localeProvider = await readSource("components/LocaleProvider.tsx");
+
+  assert.doesNotMatch(localeProvider, /document\.title\s*=/);
+});

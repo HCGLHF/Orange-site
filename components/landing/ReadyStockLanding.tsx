@@ -14,7 +14,13 @@ import { getPublicLandingPage } from "@/lib/landing-page-content";
 import { buildLandingPageSchema } from "@/lib/landing-page-schema";
 import { getPublicFabricCategories } from "@/lib/public-catalog";
 
-export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
+export function ReadyStockLanding({
+  fabrics,
+  totalFabricCount,
+}: {
+  fabrics: Fabric[];
+  totalFabricCount: number;
+}) {
   const page = getPublicLandingPage("readyStock");
   const publicCategories = getPublicFabricCategories();
 
@@ -76,12 +82,113 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
         </div>
       </section>
 
+      <section className="bg-white px-5 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-semibold uppercase text-brand-orange">
+            Availability decision record
+          </p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-semibold">
+            How availability is confirmed
+          </h2>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
+            The public catalogue starts the sourcing conversation. A supply decision is complete only after the article, sample and order conditions have been checked for the buyer&apos;s programme.
+          </p>
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
+            <article className="border border-brand-soft bg-brand-cream p-6">
+              <h3 className="font-semibold">Article match</h3>
+              <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                Match the garment use to a documented article number, composition, GSM, usable width and construction series. Share a reference swatch when the catalogue record is only an approximate match.
+              </p>
+            </article>
+            <article className="border border-brand-soft bg-brand-cream p-6">
+              <h3 className="font-semibold">Sample and finish approval</h3>
+              <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                Confirm colour, finish, hand feel, stretch, recovery and required testing on the actual sample. A catalogue listing does not replace buyer approval of the finished result.
+              </p>
+            </article>
+            <article className="border border-brand-soft bg-brand-cream p-6">
+              <h3 className="font-semibold">Commercial confirmation</h3>
+              <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                Sales confirms live quantity, sample route, lead time, price basis, destination and documentation against the current inquiry. No public article record is a fixed inventory promise.
+              </p>
+            </article>
+          </div>
+
+          <div className="mt-14 border-t border-brand-soft pt-12">
+            <h2 className="max-w-3xl text-3xl font-semibold">
+              From catalogue reference to confirmed supply
+            </h2>
+            <p className="mt-4 max-w-4xl text-sm leading-7 text-brand-charcoal/70">
+              Ready-stock sourcing is a sequence of checks, not a claim attached permanently to a web page. The public record lets a buyer identify a relevant finished-fabric direction. The sales confirmation then connects that reference to a sample, a current quantity and a defined order.
+            </p>
+            <div className="mt-8 grid gap-x-12 gap-y-9 lg:grid-cols-2">
+              <div>
+                <h3 className="font-semibold">1. Define the intended garment</h3>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  State the garment category, silhouette, season and end market. Include the behaviour that matters most, such as breathability, warmth, stretch, recovery, body, drape, surface texture or dimensional stability. This separates the functional requirement from a broad fabric name and helps sales identify the closest construction family.
+                </p>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  When available, attach a reference swatch, garment image or existing specification. Describe which features must be matched and which can be adjusted. A clear benchmark makes the first sample discussion more useful than a request for a generic jersey, interlock, fleece or air-layer fabric.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold">2. Select the closest article record</h3>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  Use the public article number, composition, GSM, usable width and series to form a shortlist. These fields are evidence from the current catalogue, but they do not establish colour, hand feel, finish or performance for a new order. Quote the exact article number in the inquiry so the buyer and sales team are discussing the same reference.
+                </p>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  If several records appear suitable, explain the trade-off being evaluated. For example, a buyer may be comparing lower weight with opacity, softer hand with recovery, or extra structure with seam bulk. This gives the supplier a reason to recommend one sample route over another.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold">3. Approve the relevant finished sample</h3>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  Confirm the sample in the requested colour and finish whenever those variables affect the garment result. Review hand feel, face and back appearance, drape, stretch, recovery and usable width. Align shrinkage, pilling, colourfastness and other tests with the destination market and intended care instructions.
+                </p>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  Record the approved sample reference and the conditions under which measurements were taken. This avoids using a catalogue value as a substitute for the finished approval standard and gives both sides a clearer basis for later production discussion.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold">4. Confirm the live commercial position</h3>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  Provide required quantity, colour allocation, delivery destination, timing request, price basis and documentation needs. Sales can then confirm the current usable quantity, whether sampling or additional production is required, and which commercial terms apply to that specific inquiry.
+                </p>
+                <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                  Treat the written confirmation for the inquiry as the live decision point. Catalogue publication dates and article descriptions support discovery, but they cannot guarantee that an unchanged quantity remains available for every buyer, colour and delivery window.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-14 border-t border-brand-soft pt-12">
+            <h2 className="max-w-3xl text-3xl font-semibold">
+              Questions to settle before price confirmation
+            </h2>
+            <div className="mt-7 max-w-4xl space-y-5 text-sm leading-7 text-brand-charcoal/70">
+              <p>
+                Confirm whether the target is an existing finished-fabric article, a modified finish or a new development. State the acceptable composition and GSM ranges, the required usable width and any non-negotiable surface or performance requirement. If the programme can accept alternatives, identify which fields may move and by how much.
+              </p>
+              <p>
+                Explain how the fabric will be cut, sewn, washed and tested. Garment engineering can expose issues that are not obvious in a small swatch, including seam bulk, edge curling, growth, torque, opacity and recovery. Sharing these conditions helps the supplier evaluate the article in the context that matters to the buyer.
+              </p>
+              <p>
+                Finally, provide quantity by colour, destination, target schedule, packaging needs and required certificates or test reports. Certification details can be reviewed privately when relevant to the programme. The resulting quotation should refer to the selected article or approved development, not to a broad category page alone.
+              </p>
+              <p>
+                Keep the article reference, sample approval, testing scope and commercial confirmation in one decision record. Note any later change to composition, GSM, usable width, colour, finish or quantity as a new revision. This makes it clear which evidence supported the quoted route and prevents an earlier catalogue screenshot from being mistaken for a current supply commitment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="px-5 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-sm font-semibold uppercase text-brand-orange">Current finished-fabric catalogue</p>
-              <h2 className="mt-3 text-3xl font-semibold">104 articles available for inquiry</h2>
+              <h2 className="mt-3 text-3xl font-semibold">{totalFabricCount} articles available for inquiry</h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
                 Use the series and specification filters to identify a relevant article, add it to the inquiry, and confirm live commercial details with the sourcing team.
               </p>
@@ -93,7 +200,11 @@ export function ReadyStockLanding({ fabrics }: { fabrics: Fabric[] }) {
           </div>
           <div className="mt-8">
             <Suspense fallback={<p className="py-12 text-center text-sm text-brand-charcoal/60">Loading current fabric records...</p>}>
-              <FabricsCatalog fabrics={fabrics} defaultStock="in-stock" />
+              <FabricsCatalog
+                fabrics={fabrics}
+                totalFabricCount={totalFabricCount}
+                defaultStock="in-stock"
+              />
             </Suspense>
           </div>
           <FabricsInquiryAnchor />

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { ReadyStockLanding } from "@/components/landing/ReadyStockLanding";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
-import { getPublicFabrics } from "@/lib/public-catalog";
+import {
+  getInitialPublicFabrics,
+  getPublicFabricCount,
+} from "@/lib/public-catalog";
 import { siteUrl } from "@/lib/geo-content";
 
 const page = getPublicLandingPage("readyStock");
@@ -22,5 +25,10 @@ export const metadata: Metadata = {
 };
 
 export default function ReadyStockKnitFabricsPage() {
-  return <ReadyStockLanding fabrics={getPublicFabrics()} />;
+  return (
+    <ReadyStockLanding
+      fabrics={getInitialPublicFabrics()}
+      totalFabricCount={getPublicFabricCount()}
+    />
+  );
 }
