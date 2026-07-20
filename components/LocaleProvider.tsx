@@ -42,9 +42,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!mounted) return;
-    document.documentElement.lang = "en";
-    document.title =
-      "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao";
+    document.documentElement.lang = locale;
   }, [locale, mounted]);
 
   const setLocale = useCallback((next: Locale) => {

@@ -29,6 +29,36 @@ export type FabricCategory = {
 
 export const publicFabrics: Fabric[] = finishedFabricCatalogue;
 
+export const INITIAL_CATALOGUE_SIZE = 4;
+
+export function getInitialPublicFabrics(): Fabric[] {
+  const representativeFabrics = new Map<string, Fabric>();
+
+  for (const fabric of publicFabrics) {
+    const seriesKey = fabric.series?.trim() || fabric.id;
+    if (!representativeFabrics.has(seriesKey)) {
+      representativeFabrics.set(seriesKey, fabric);
+    }
+  }
+
+  const initial = Array.from(representativeFabrics.values());
+  const selectedIds = new Set(initial.map((fabric) => fabric.id));
+
+  for (const fabric of publicFabrics) {
+    if (initial.length >= INITIAL_CATALOGUE_SIZE) break;
+    if (!selectedIds.has(fabric.id)) {
+      initial.push(fabric);
+      selectedIds.add(fabric.id);
+    }
+  }
+
+  return initial.slice(0, INITIAL_CATALOGUE_SIZE);
+}
+
+export function getPublicFabricCount(): number {
+  return publicFabrics.length;
+}
+
 export const publicFabricCategories: FabricCategory[] = [
   {
     slug: "cotton-jersey",

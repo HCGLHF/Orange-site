@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Fabric } from "@/lib/data";
 import { useLocale } from "@/components/LocaleProvider";
@@ -11,32 +11,61 @@ import type { StockFilter } from "@/lib/fabric-filter-state";
 
 export function FabricsCatalog({
   fabrics,
+  totalFabricCount = fabrics.length,
   defaultStock = "all",
 }: {
   fabrics: Fabric[];
+  totalFabricCount?: number;
   defaultStock?: StockFilter;
 }) {
   const { t } = useLocale();
   const searchParams = useSearchParams();
   const filterUrlKey = searchParams.toString();
+  const [catalogueFabrics, setCatalogueFabrics] = useState<Fabric[]>(fabrics);
   const [visible, setVisible] = useState<Fabric[]>(fabrics);
   const [filterKey, setFilterKey] = useState(0);
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (catalogueFabrics.length >= totalFabricCount) return;
+
+    const controller = new AbortController();
+
+    async function loadCompleteCatalogue() {
+      try {
+        const response = await fetch("/api/fabrics", {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const completeCatalogue = (await response.json()) as Fabric[];
+        if (completeCatalogue.length > catalogueFabrics.length) {
+          setCatalogueFabrics(completeCatalogue);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+
+    void loadCompleteCatalogue();
+
+    return () => controller.abort();
+  }, [catalogueFabrics.length, totalFabricCount]);
+
   const allScenarios = useMemo(() => {
     const scenarioSet = new Set<string>();
-    fabrics.forEach((fabric) => {
+    catalogueFabrics.forEach((fabric) => {
       fabric.scenarios?.forEach((s) => {
         const scenario = s.trim();
         if (scenario) scenarioSet.add(scenario);
       });
     });
     return Array.from(scenarioSet);
-  }, [fabrics]);
+  }, [catalogueFabrics]);
 
   const fabricCountByScenario = useMemo(() => {
     const counts: Record<string, number> = {};
-    fabrics.forEach((fabric) => {
+    catalogueFabrics.forEach((fabric) => {
       fabric.scenarios?.forEach((s) => {
         const key = s.trim();
         if (!key) return;
@@ -44,16 +73,16 @@ export function FabricsCatalog({
       });
     });
     return counts;
-  }, [fabrics]);
+  }, [catalogueFabrics]);
 
   const fabricsForFilters = useMemo(() => {
-    return fabrics.filter((f) => {
+    return catalogueFabrics.filter((f) => {
       if (!activeScenario) return true;
       return (
         f.scenarios?.some((s) => s.trim() === activeScenario) ?? false
       );
     });
-  }, [fabrics, activeScenario]);
+  }, [catalogueFabrics, activeScenario]);
 
   const handleScenarioChange = useCallback((scenario: string | null) => {
     setActiveScenario(scenario);
@@ -77,7 +106,7 @@ export function FabricsCatalog({
             activeScenario={activeScenario}
             onScenarioChange={handleScenarioChange}
             fabricCountByScenario={fabricCountByScenario}
-            totalFabricCount={fabrics.length}
+            totalFabricCount={catalogueFabrics.length}
           />
         </div>
       ) : null}
@@ -87,6 +116,11 @@ export function FabricsCatalog({
         onFilterChange={onFilterChange}
         defaultStock={defaultStock}
       />
+      {catalogueFabrics.length < totalFabricCount ? (
+        <p className="mb-5 text-sm text-brand-charcoal/60" role="status">
+          Loading the complete {totalFabricCount}-article catalogue...
+        </p>
+      ) : null}
       {visible.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((fabric) => (
