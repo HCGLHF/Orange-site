@@ -10,6 +10,7 @@ import type {
   FinishedFabricPage as FinishedFabricPageData,
   FinishedFabricSection,
 } from "@/lib/finished-fabric-content";
+import { getFinishedBlogArticles } from "@/lib/finished-fabric-content";
 import { buildFinishedFabricSchema } from "@/lib/finished-fabric-schema";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
 
@@ -100,6 +101,7 @@ function ContentSection({ section, index }: { section: FinishedFabricSection; in
 
 export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
   const landingPage = page.kind === "hub" ? getPublicLandingPage("finishedDoubleKnit") : null;
+  const blogArticles = page.kind === "index" ? getFinishedBlogArticles() : [];
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -169,6 +171,47 @@ export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
           </div>
         </header>
         )}
+
+        {blogArticles.length ? (
+          <section className="border-b border-brand-soft bg-brand-cream">
+            <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+                Finished-fabric buyer guides
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold text-brand-charcoal">
+                Choose a construction question to investigate
+              </h2>
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
+                Each guide connects a buyer question to specification checks, sample evidence, and a relevant finished-fabric sourcing route.
+              </p>
+              <div className="mt-7 grid gap-4 md:grid-cols-2">
+                {blogArticles.map((article) => (
+                  <Link
+                    key={article.url}
+                    href={article.url}
+                    className="group flex min-h-40 flex-col justify-between border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange"
+                  >
+                    <div>
+                      <h3 className="text-lg font-semibold text-brand-charcoal">
+                        {article.h1}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                        {article.description}
+                      </p>
+                    </div>
+                    <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
+                      Read the buyer guide
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                        aria-hidden
+                      />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {page.sections.map((section, index) => (
           <ContentSection key={section.heading} section={section} index={index} />

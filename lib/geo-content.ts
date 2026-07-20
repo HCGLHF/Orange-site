@@ -193,6 +193,7 @@ export const fabricCategoryItemListJsonLd = {
     position: index + 1,
     name: category.name,
     description: category.description,
+    url: `${siteUrl}/fabrics/${category.slug}`,
   })),
 };
 

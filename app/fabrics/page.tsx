@@ -7,7 +7,10 @@ import { FabricsInquiryAnchor } from "@/components/FabricsInquiryAnchor";
 import { FabricsPageIntro } from "@/components/FabricsPageIntro";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { getFinishedProductPages } from "@/lib/finished-fabric-content";
-import { getPublicFabrics } from "@/lib/public-catalog";
+import {
+  getPublicFabricCategories,
+  getPublicFabrics,
+} from "@/lib/public-catalog";
 
 export const metadata: Metadata = {
   title: "Finished Knit Fabric Catalogue",
@@ -23,6 +26,7 @@ export const dynamic = "force-static";
 export default async function FabricsPage() {
   const fabrics = getPublicFabrics();
   const finishedFabrics = getFinishedProductPages();
+  const publicCategories = getPublicFabricCategories();
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -61,6 +65,45 @@ export default async function FabricsPage() {
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-brand-charcoal/65">{page.opening}</p>
                   </div>
                   <ArrowRight className="h-4 w-4 shrink-0 text-brand-orange transition-transform group-hover:translate-x-1" aria-hidden />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-brand-soft/40 bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+              Browse by knit category
+            </p>
+            <h2 className="mt-3 max-w-3xl text-3xl font-semibold text-brand-charcoal">
+              Start with the garment and construction family
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
+              Use these category routes for application guidance, then compare the documented finished-fabric articles below before sending an inquiry.
+            </p>
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {publicCategories.map((category) => (
+                <Link
+                  key={category.slug}
+                  href={`/fabrics/${category.slug}`}
+                  className="group flex min-h-44 flex-col justify-between border border-brand-soft bg-brand-cream p-5 transition-colors hover:border-brand-orange"
+                >
+                  <div>
+                    <h3 className="font-semibold text-brand-charcoal">
+                      {category.name}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-brand-charcoal/65">
+                      {category.description}
+                    </p>
+                  </div>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
+                    Review this category
+                    <ArrowRight
+                      className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      aria-hidden
+                    />
+                  </span>
                 </Link>
               ))}
             </div>

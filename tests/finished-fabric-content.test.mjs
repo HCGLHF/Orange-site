@@ -92,6 +92,19 @@ test("finished-fabric hub uses supplied catalogue series and representative arti
   assert.match(source, /300 GSM/i);
 });
 
+test("finished-fabric hub links every commercial fabric route", () => {
+  const pages = loadPages();
+  const hub = pages.find((page) => page.url === "/finished-double-knit-fabrics");
+  const productRoutes = pages
+    .filter((page) => page.kind === "product")
+    .map((page) => page.url);
+  const hubRoutes = new Set(hub.relatedLinks.map((link) => link.href));
+
+  for (const route of productRoutes) {
+    assert.ok(hubRoutes.has(route), `hub must link ${route}`);
+  }
+});
+
 test("Next.js exposes the hub, blog, product routes and machine-readable discovery", () => {
   const requiredFiles = [
     "app/finished-double-knit-fabrics/page.tsx",

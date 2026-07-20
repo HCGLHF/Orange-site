@@ -34,14 +34,16 @@ export function buildFinishedFabricSchema(page: FinishedFabricPage) {
       : page.kind === "product"
         ? {
             "@context": "https://schema.org",
-            "@type": "Product",
+            "@type": "WebPage",
             name: page.product?.name ?? page.h1,
-            category: page.product?.category,
             description: page.description,
             url: pageUrl,
             image: `${siteUrl}${page.hero.src}`,
-            brand: organization,
-            manufacturer: organization,
+            provider: organization,
+            about: {
+              "@type": "Thing",
+              name: page.product?.category ?? page.product?.name ?? page.h1,
+            },
           }
         : {
             "@context": "https://schema.org",
