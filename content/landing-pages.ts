@@ -79,7 +79,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },
       { label: "Production route", value: "Greige fabric, finished fabric and garments", enabled: true },
-      { label: "Machine evidence", value: `${manufacturingScale[0].value} documented circular knitting machines`, enabled: true },
+      { label: "Parent-company machine record", value: `${manufacturingScale[0].value} documented circular knitting machines`, enabled: true },
       { label: "Export experience", value: "Asia, Europe, the Americas and Russia", enabled: true },
     ],
     advantages: [
@@ -189,7 +189,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     proofPoints: [
       { label: "Product range", value: "11 documented finished-fabric series", enabled: true },
       { label: "Catalogue evidence", value: "104 supplied finished-fabric records", enabled: true },
-      { label: "Machine evidence", value: "Double-knit and rib configurations", enabled: true },
+      { label: "Parent-company machine record", value: "Double-knit and rib configurations", enabled: true },
       { label: "Decision", value: "Article confirmed by sample and specification", enabled: true },
     ],
     advantages: [

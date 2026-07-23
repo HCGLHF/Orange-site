@@ -62,12 +62,33 @@ test("company evidence describes rounded parent records without capacity inferen
   );
 });
 
-test("landing machine evidence consumes the shared manufacturing scale value", async () => {
+test("landing machine proof labels identify the parent-company record", async () => {
   const landingPath = path.join(root, "content", "landing-pages.ts");
   const landingSource = readFileSync(landingPath, "utf8");
   const landing = await import(pathToFileURL(landingPath).href);
-  const machineEvidence = landing.landingPages.home.proofPoints.find(
-    ({ label }) => label === "Machine evidence"
+  const homeMachineRecord = landing.landingPages.home.proofPoints.find(
+    ({ label }) => label === "Parent-company machine record"
+  );
+  const finishedMachineRecord =
+    landing.landingPages.finishedDoubleKnit.proofPoints.find(
+      ({ label }) => label === "Parent-company machine record"
+    );
+
+  assert.deepEqual(
+    homeMachineRecord,
+    {
+      label: "Parent-company machine record",
+      value: "200+ documented circular knitting machines",
+      enabled: true,
+    }
+  );
+  assert.deepEqual(
+    finishedMachineRecord,
+    {
+      label: "Parent-company machine record",
+      value: "Double-knit and rib configurations",
+      enabled: true,
+    }
   );
 
   assert.match(
@@ -78,7 +99,6 @@ test("landing machine evidence consumes the shared manufacturing scale value", a
     landingSource,
     /value:\s*`\$\{manufacturingScale\[0\]\.value\} documented circular knitting machines`/
   );
-  assert.equal(machineEvidence?.value, "200+ documented circular knitting machines");
 });
 
 test("AI-search FAQ legal names do not produce duplicate punctuation", async () => {
