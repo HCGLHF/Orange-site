@@ -25,7 +25,7 @@ export function HomeCertificateSection() {
           >
             GRS Scope Documentation
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/80">
             Our parent company, {companyRelationship.parentCompany}, holds a{" "}
             {certificationEvidence.shortName} v{certificationEvidence.version}{" "}
             scope certificate covering {certificationEvidence.productCategory.toLowerCase()} ({" "}
@@ -33,13 +33,13 @@ export function HomeCertificateSection() {
             {certificationEvidence.process.toLowerCase()}. Documentation for applicable sourcing
             requests is reviewed case by case.
           </p>
-          <p className="mt-3 max-w-3xl border-l-2 border-brand-orange pl-3 text-xs leading-6 text-brand-charcoal/70">
+          <p className="mt-3 max-w-3xl border-l-2 border-brand-orange pl-3 text-xs leading-6 text-brand-charcoal/80">
             {certificationEvidence.qualification}
           </p>
         </div>
         <Link
           href="/about"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-charcoal underline decoration-brand-orange decoration-2 underline-offset-4 hover:text-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-4"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-charcoal underline decoration-brand-orange decoration-2 underline-offset-4 hover:decoration-brand-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-charcoal focus-visible:ring-offset-4"
         >
           Learn about our company
           <ArrowRight className="h-4 w-4" aria-hidden />
