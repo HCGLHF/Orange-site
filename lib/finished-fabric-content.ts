@@ -38,6 +38,14 @@ export type FinishedFabricPage = {
   published?: string;
   updated?: string;
   reviewer?: string;
+  evidenceSnapshot?: {
+    heading: string;
+    summary: string;
+    items: Array<{
+      label: string;
+      detail: string;
+    }>;
+  };
   sections: FinishedFabricSection[];
   faq: Array<{
     q: string;

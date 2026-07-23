@@ -35,6 +35,18 @@ test("blog index exposes every buyer guide through server-rendered links", async
   assert.match(component, /articleSeo\.metaDescription/);
 });
 
+test("catalogue guides render lightweight semantic evidence snapshots", async () => {
+  const component = await readSource(
+    "components/finished-fabric/FinishedFabricPage.tsx"
+  );
+
+  assert.match(component, /page\.evidenceSnapshot/);
+  assert.match(component, /evidenceSnapshot\.items\.map/);
+  assert.match(component, /<dl/);
+  assert.match(component, /<dt/);
+  assert.match(component, /<dd/);
+});
+
 test("fabric catalogue exposes every public category through crawlable links", async () => {
   const fabricsPage = await readSource("app/fabrics/page.tsx");
 
