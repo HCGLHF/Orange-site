@@ -138,3 +138,8 @@ test("production SEO audit is an automated package workflow", async () => {
   assert.match(runner, /node_modules.*next.*dist.*bin.*next/s);
   assert.match(runner, /"start"/);
 });
+
+test("ESLint treats this checkout as the configuration root", async () => {
+  const eslintConfig = JSON.parse(await readSource(".eslintrc.json"));
+  assert.equal(eslintConfig.root, true);
+});

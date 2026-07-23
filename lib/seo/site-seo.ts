@@ -458,7 +458,7 @@ const publicPageSeo = [
   },
 ] as const satisfies readonly PublicPageSeo[];
 
-const pageSeoByPath = new Map(
+const pageSeoByPath = new Map<string, PublicPageSeo>(
   publicPageSeo.map((page) => [page.path, page])
 );
 
@@ -475,5 +475,8 @@ export function getPublicPageSeo(path: string): PublicPageSeo {
 }
 
 export function toCanonicalUrl(path: string): string {
+  if (path === "/") {
+    return SEO_SITE_ORIGIN;
+  }
   return new URL(path, `${SEO_SITE_ORIGIN}/`).toString();
 }
