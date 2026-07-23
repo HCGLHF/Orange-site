@@ -108,6 +108,10 @@ test("primary buyer navigation and discovery files expose all landing routes", a
     new URL("../lib/navigation.ts", import.meta.url),
     "utf8"
   );
+  const navbar = await readFile(
+    new URL("../components/ui/Navbar.tsx", import.meta.url),
+    "utf8"
+  );
   const finishedPage = await readFile(
     new URL("../components/finished-fabric/FinishedFabricPage.tsx", import.meta.url),
     "utf8"
@@ -123,7 +127,7 @@ test("primary buyer navigation and discovery files expose all landing routes", a
     assert.match(navigation, new RegExp(route));
   }
 
-  assert.doesNotMatch(navigation, /navBadge24h/);
+  assert.doesNotMatch(navbar, /navBadge24h/);
   assert.match(sitemap, /getAllPublicPageSeo/);
   assert.match(llms, /getAllPublicPageSeo/);
   assert.match(finishedPage, /page\.kind === "hub"/);

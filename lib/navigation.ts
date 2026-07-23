@@ -119,8 +119,8 @@ const configuredHrefs = PRIMARY_NAVIGATION.flatMap((section) =>
     : [section.href]
 );
 
-export const NAVIGATION_DISCOVERY_HREFS = Array.from(
-  new Set([...configuredHrefs, INQUIRY_HREF])
+export const NAVIGATION_DISCOVERY_HREFS: readonly string[] = Object.freeze(
+  Array.from(new Set([...configuredHrefs, INQUIRY_HREF]))
 );
 
 export function getActiveNavigationId(
