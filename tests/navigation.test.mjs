@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -15,6 +14,10 @@ const mobileNavigationDrawerUrl = new URL(
 );
 const navbarUrl = new URL(
   "../components/ui/Navbar.tsx",
+  import.meta.url
+);
+const bottomNavigationUrl = new URL(
+  "../components/ui/BottomNav.tsx",
   import.meta.url
 );
 const appShellUrl = new URL("../components/AppShell.tsx", import.meta.url);
@@ -367,10 +370,7 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
 });
 
 test("global header exposes one accessible responsive row", async () => {
-  const [navbarSource, drawerSource] = await Promise.all([
-    readFile(navbarUrl, "utf8"),
-    readFile(mobileNavigationDrawerUrl, "utf8"),
-  ]);
+  const navbarSource = await readFile(navbarUrl, "utf8");
 
   assert.match(
     navbarSource,
@@ -379,10 +379,6 @@ test("global header exposes one accessible responsive row", async () => {
   assert.match(navbarSource, /<Menu\b[^>]*aria-hidden=["']true["']/);
   assert.match(navbarSource, /aria-label=["']Open navigation menu["']/);
   assert.match(navbarSource, /aria-expanded=\{drawerOpen\}/);
-  assert.match(
-    navbarSource,
-    /aria-controls=["']mobile-navigation-drawer["']/
-  );
   assert.match(navbarSource, /const\s+menuButtonRef\s*=\s*useRef/);
   assert.match(
     navbarSource,
@@ -391,10 +387,6 @@ test("global header exposes one accessible responsive row", async () => {
   assert.match(
     navbarSource,
     /onClick=\{\(\)\s*=>\s*setDrawerOpen\(true\)\}/
-  );
-  assert.match(
-    navbarSource,
-    /<Link\b(?=[^>]*href=["']\/["'])(?=[^>]*aria-label=\{t\(["']navHome["']\)\})(?=[^>]*aria-current=\{pathname\s*===\s*["']\/["'])/
   );
   assert.match(navbarSource, /<OrangeMark\b/);
   assert.match(navbarSource, />\s*O&apos;range Textile\s*</);
@@ -415,10 +407,61 @@ test("global header exposes one accessible responsive row", async () => {
   assert.match(navbarSource, /motion-reduce:transition-none/);
   assert.doesNotMatch(navbarSource, /\bmb-3\b/);
   assert.doesNotMatch(navbarSource, /\bw-full\b[^"']*sm:hidden/);
+});
 
+test("hamburger exposes its drawer IDREF only while the dialog exists", async () => {
+  const [navbarSource, drawerSource] = await Promise.all([
+    readFile(navbarUrl, "utf8"),
+    readFile(mobileNavigationDrawerUrl, "utf8"),
+  ]);
+
+  assert.match(
+    navbarSource,
+    /aria-controls=\{\s*drawerOpen\s*\?\s*["']mobile-navigation-drawer["']\s*:\s*undefined\s*\}/,
+    "drawer IDREF must exist only while its dialog target is rendered"
+  );
+  assert.doesNotMatch(
+    navbarSource,
+    /aria-controls=["']mobile-navigation-drawer["']/
+  );
   assert.match(
     drawerSource,
     /<div\b(?=[^>]*id=["']mobile-navigation-drawer["'])(?=[^>]*role=["']dialog["'])/
+  );
+
+  assert.throws(
+    () =>
+      assert.match(
+        navbarSource.replace(
+          /aria-controls=\{\s*drawerOpen\s*\?\s*["']mobile-navigation-drawer["']\s*:\s*undefined\s*\}/,
+          'aria-controls="mobile-navigation-drawer"'
+        ),
+        /aria-controls=\{\s*drawerOpen\s*\?\s*["']mobile-navigation-drawer["']\s*:\s*undefined\s*\}/,
+        "drawer IDREF must exist only while its dialog target is rendered"
+      ),
+    /only while/
+  );
+});
+
+test("brand home link combines brand identity with its destination", async () => {
+  const navbarSource = await readFile(navbarUrl, "utf8");
+
+  assert.match(
+    navbarSource,
+    /<Link\b(?=[^>]*href=["']\/["'])(?=[^>]*aria-label=\{`\$\{t\(["']heroTitle["']\)\}\s*·\s*\$\{t\(["']navHome["']\)\}`\})(?=[^>]*aria-current=\{pathname\s*===\s*["']\/["'])/,
+    "brand home link must expose both the brand and home in its accessible name"
+  );
+  assert.throws(
+    () =>
+      assert.match(
+        navbarSource.replace(
+          'aria-label={`${t("heroTitle")} · ${t("navHome")}`}',
+          'aria-label={t("navHome")}'
+        ),
+        /aria-label=\{`\$\{t\(["']heroTitle["']\)\}\s*·\s*\$\{t\(["']navHome["']\)\}`\}/,
+        "brand home link must expose both the brand and home in its accessible name"
+      ),
+    /brand and home/
   );
 });
 
@@ -439,17 +482,47 @@ test("English inquiry CTA uses the approved quote wording", async () => {
   assert.doesNotMatch(source, /navCtaInquiry:\s*["']Request samples["']/);
 });
 
-test("global header integration leaves BottomNav source untouched", () => {
-  assert.doesNotThrow(() => {
-    execFileSync(
-      "git",
-      ["diff", "--exit-code", "--", "components/ui/BottomNav.tsx"],
-      {
-        cwd: new URL("..", import.meta.url),
-        stdio: "pipe",
-      }
-    );
-  });
+test("BottomNav permanently exposes the four mobile tab behaviors", async () => {
+  const source = await readFile(bottomNavigationUrl, "utf8");
+  const tabDefinitions = source.match(
+    /const\s+tabDefs\s*:\s*Tab\[\]\s*=\s*\[([\s\S]*?)\];/
+  )?.[1];
+
+  assert.ok(tabDefinitions, "BottomNav tab definitions must exist");
+  assert.deepEqual(
+    [...tabDefinitions.matchAll(/id:\s*["']([^"']+)["']/g)].map(
+      (match) => match[1]
+    ),
+    ["home", "fabrics", "inquiry", "contact"]
+  );
+  assert.equal(
+    [...tabDefinitions.matchAll(/\{\s*id:/g)].length,
+    4,
+    "BottomNav must keep exactly four tab definitions"
+  );
+  assert.match(
+    tabDefinitions,
+    /\{\s*id:\s*["']home["']\s*,\s*href:\s*["']\/["']\s*,/
+  );
+  assert.match(
+    tabDefinitions,
+    /\{\s*id:\s*["']fabrics["']\s*,\s*href:\s*["']\/fabrics["']\s*,/
+  );
+  assert.match(
+    tabDefinitions,
+    /\{\s*id:\s*["']inquiry["'][^}]*action:\s*["']inquiry["']\s*\}/
+  );
+  assert.match(
+    tabDefinitions,
+    /\{\s*id:\s*["']contact["']\s*,\s*href:\s*["']\/#contact["']\s*,/
+  );
+  assert.match(source, /className=["'][^"']*\bmd:hidden\b[^"']*["']/);
+  assert.match(source, /<ul\s+className=["']grid grid-cols-4["']>/);
+  assert.match(source, /tabDefs\.map\s*\(/);
+  assert.match(source, /tab\.action\s*===\s*["']inquiry["']/);
+  assert.match(source, /openInquiry\s*\(\s*\)/);
+  assert.match(source, /<button\b/);
+  assert.match(source, /<Link\b/);
 });
 
 const assertMobileDrawerStructure = (source, primaryNavigation) => {

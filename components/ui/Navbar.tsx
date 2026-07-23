@@ -53,7 +53,9 @@ function NavbarContent() {
               type="button"
               aria-label="Open navigation menu"
               aria-expanded={drawerOpen}
-              aria-controls="mobile-navigation-drawer"
+              aria-controls={
+                drawerOpen ? "mobile-navigation-drawer" : undefined
+              }
               onClick={() => setDrawerOpen(true)}
               className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-brand-charcoal outline-none transition-colors hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none xl:hidden"
             >
@@ -63,7 +65,7 @@ function NavbarContent() {
             <Link
               href="/"
               title={t("heroTitle")}
-              aria-label={t("navHome")}
+              aria-label={`${t("heroTitle")} · ${t("navHome")}`}
               aria-current={pathname === "/" ? "page" : undefined}
               className="group flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg pr-1 text-brand-charcoal outline-none transition-colors hover:text-brand-orange focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none xl:flex-none"
             >
