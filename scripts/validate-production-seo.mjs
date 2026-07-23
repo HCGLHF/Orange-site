@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { NAVIGATION_DISCOVERY_HREFS } from "../lib/navigation.ts";
 import {
   SEO_SITE_ORIGIN,
   getAllPublicPageSeo,
@@ -208,6 +209,14 @@ for (const page of expectedPages) {
     const imagesMissingAlt = imageTags.filter(
       (tag) => getAttribute(tag, "alt") === null
     );
+    const pageHrefs = collectTags(html, "a")
+      .map((tag) => getAttribute(tag, "href"))
+      .filter((href) => href !== null);
+    const missingNavigationLinks = NAVIGATION_DISCOVERY_HREFS.filter(
+      (href) => !pageHrefs.includes(href)
+    );
+    const navigationLinksPresent =
+      missingNavigationLinks.length === 0;
     const robotsValues = findMetaValues(html, "name", "robots");
     const noindex = robotsValues.some((value) =>
       /\bnoindex\b/i.test(value)
@@ -260,6 +269,11 @@ for (const page of expectedPages) {
     if (!allowsGooglebot) {
       failures.push("Googlebot blocked by robots.txt");
     }
+    if (!navigationLinksPresent) {
+      failures.push(
+        `missing navigation links: ${missingNavigationLinks.join(", ")}`
+      );
+    }
 
     pageResults.push({
       url: expectedCanonical,
@@ -282,6 +296,8 @@ for (const page of expectedPages) {
       statusCode: response.status,
       sitemapPresent,
       noindex,
+      navigationLinksPresent,
+      missingNavigationLinks,
       inaccessible: false,
       result: failures.length === 0 ? "PASS" : "FAIL",
       failures,
@@ -305,6 +321,8 @@ for (const page of expectedPages) {
       statusCode: null,
       sitemapPresent: sitemapUrls.includes(expectedCanonical),
       noindex: false,
+      navigationLinksPresent: false,
+      missingNavigationLinks: [...NAVIGATION_DISCOVERY_HREFS],
       inaccessible: true,
       result: "FAIL",
       failures: [

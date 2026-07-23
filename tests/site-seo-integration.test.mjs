@@ -143,6 +143,27 @@ test("production SEO audit is an automated package workflow", async () => {
   assert.match(validator, /registryHash/);
   assert.match(
     validator,
+    /import\s*\{\s*NAVIGATION_DISCOVERY_HREFS\s*\}\s*from\s*["']\.\.\/lib\/navigation\.ts["']/
+  );
+  assert.match(
+    validator,
+    /collectTags\(html,\s*["']a["']\)[\s\S]*?getAttribute\(tag,\s*["']href["']\)/
+  );
+  assert.match(
+    validator,
+    /NAVIGATION_DISCOVERY_HREFS\.filter\([\s\S]*?!pageHrefs\.includes\(href\)/
+  );
+  assert.match(validator, /missing navigation links:/);
+  assert.match(
+    validator,
+    /navigationLinksPresent,\s*missingNavigationLinks,\s*inaccessible:\s*false/
+  );
+  assert.match(
+    validator,
+    /navigationLinksPresent:\s*false,\s*missingNavigationLinks:\s*\[\.\.\.NAVIGATION_DISCOVERY_HREFS\],[\s\S]*?inaccessible:\s*true/
+  );
+  assert.match(
+    validator,
     /reports\/seo\/production-html-audit\.json/
   );
   assert.match(runner, /node_modules.*next.*dist.*bin.*next/s);
