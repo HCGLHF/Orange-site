@@ -39,16 +39,17 @@ export const manufacturingScale = [
 
 export const certificationEvidence = {
   standard: "Global Recycled Standard",
-  abbreviation: "GRS",
+  shortName: "GRS",
   version: "4.0",
   holder: companyRelationship.parentCompany,
   certificationBody: "TÜV Rheinland (China) Ltd.",
-  certificateNumber: "TRC-GRS-350849-00",
-  productScopes: ["Greige fabrics", "Knitted fabrics"],
-  processScopes: ["Knitting"],
+  scopeCertificateNumber: "TRC-GRS-350849-00",
+  productCategory: ["Greige fabrics"],
+  productDetail: ["Knitted fabrics"],
+  process: ["Knitting"],
   validUntil: "2027-04-19",
   qualification:
-    "A scope certificate does not prove that a delivered product is automatically GRS. Shipment-level claims require a valid Transaction Certificate or equivalent supporting documentation.",
+    "Scope certification does not prove that a delivered product is GRS certified. Shipment-level claims require a valid Transaction Certificate or equivalent supporting documentation for the applicable order.",
 };
 
 export const knittingDirections = [
