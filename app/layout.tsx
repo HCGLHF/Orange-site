@@ -4,7 +4,7 @@ import Script from "next/script";
 import { AppShell } from "@/components/AppShell";
 import { InquiryProvider } from "@/components/InquiryProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
-import { companyProfile, heroContent, siteUrl } from "@/lib/geo-content";
+import { SEO_SITE_ORIGIN } from "@/lib/seo/site-seo";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -14,25 +14,7 @@ const spaceGrotesk = Space_Grotesk({
 const GA_ID = "G-LXGZLVJXNP";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default:
-      "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao",
-    template: "%s | O'range Textile",
-  },
-  description: heroContent.description,
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title:
-      "O'range Textile | Chinese Knit Fabric Manufacturer in Shaoxing Keqiao",
-    description: heroContent.description,
-    url: siteUrl,
-    siteName: companyProfile.brandName,
-    locale: "en_US",
-    type: "website",
-  },
+  metadataBase: new URL(SEO_SITE_ORIGIN),
 };
 
 export default function RootLayout({

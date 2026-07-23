@@ -19,6 +19,8 @@ import {
   getPublicFabricCategory,
 } from "@/lib/public-catalog";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
 type CategoryPageProps = {
   params: {
@@ -38,56 +40,32 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: CategoryPageProps): Metadata {
-  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  const path = `/fabrics/${params.slug}`;
+  const finishedPage = getFinishedFabricPage(path);
   if (finishedPage?.kind === "product") {
-    return {
-      title: { absolute: finishedPage.title },
-      description: finishedPage.description,
-      alternates: { canonical: finishedPage.url },
-      openGraph: {
-        title: finishedPage.title,
-        description: finishedPage.description,
-        url: `${siteUrl}${finishedPage.url}`,
-        siteName: companyProfile.brandName,
-        locale: "en_US",
-        type: "website",
-        images: [{ url: finishedPage.hero.src, alt: finishedPage.hero.alt }],
-      },
-    };
+    const seo = getPublicPageSeo(path);
+    return createPageMetadata(seo, {
+      image: { src: finishedPage.hero.src, alt: finishedPage.hero.alt },
+    });
   }
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) return {};
-
-  const title = `${category.name} Supplier`;
-  const path = `/fabrics/${category.slug}`;
-
-  return {
-    title,
-    description: category.metaDescription,
-    alternates: {
-      canonical: path,
-    },
-    openGraph: {
-      title: `${title} | O'range Textile`,
-      description: category.metaDescription,
-      url: `${siteUrl}${path}`,
-      siteName: companyProfile.brandName,
-      locale: "en_US",
-      type: "website",
-    },
-  };
+  return createPageMetadata(getPublicPageSeo(path));
 }
 
-function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricCategory>>) {
+function categoryJsonLd(
+  category: NonNullable<ReturnType<typeof getPublicFabricCategory>>,
+  seo: ReturnType<typeof getPublicPageSeo>
+) {
   const pageUrl = `${siteUrl}/fabrics/${category.slug}`;
   return [
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      name: `${category.name} Supplier`,
+      name: seo.h1,
       url: pageUrl,
-      description: category.metaDescription,
+      description: seo.metaDescription,
       about: category.name,
       provider: {
         "@type": "Organization",
@@ -112,19 +90,26 @@ function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricC
 }
 
 export default function FabricCategoryPage({ params }: CategoryPageProps) {
-  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  const path = `/fabrics/${params.slug}`;
+  const finishedPage = getFinishedFabricPage(path);
   if (finishedPage?.kind === "product") {
-    return <FinishedFabricPage page={finishedPage} />;
+    return (
+      <FinishedFabricPage
+        page={finishedPage}
+        seo={getPublicPageSeo(path)}
+      />
+    );
   }
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) notFound();
 
+  const seo = getPublicPageSeo(path);
   const fabrics = getFabricsForCategory(category.slug);
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
-      <StructuredData data={categoryJsonLd(category)} />
+      <StructuredData data={categoryJsonLd(category, seo)} />
       <div className="pb-28 max-md:pb-44 md:pb-12">
         <section className="border-b border-brand-soft/40 bg-white/80">
           <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -132,7 +117,7 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
               Knit fabric supplier
             </p>
             <h1 className="mt-3 max-w-4xl text-3xl font-bold text-brand-charcoal md:text-5xl">
-              {category.name} from O&apos;range Textile
+              {seo.h1}
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-brand-charcoal/75">
               {category.description}

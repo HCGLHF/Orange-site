@@ -24,11 +24,7 @@ export type FinishedFabricPage = {
   kind: "hub" | "product" | "index" | "article";
   url: string;
   eyebrow: string;
-  title: string;
-  description: string;
-  h1: string;
   opening: string;
-  primaryKeyword?: string;
   hero: {
     src: string;
     alt: string;

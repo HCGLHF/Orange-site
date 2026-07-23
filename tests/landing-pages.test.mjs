@@ -121,11 +121,11 @@ test("primary buyer navigation and discovery files expose all landing routes", a
     "/custom-knit-fabric-development",
   ]) {
     assert.match(navbar, new RegExp(route));
-    assert.match(sitemap, new RegExp(route));
-    assert.match(llms, new RegExp(route));
   }
 
   assert.doesNotMatch(navbar, /navBadge24h/);
+  assert.match(sitemap, /getAllPublicPageSeo/);
+  assert.match(llms, /getAllPublicPageSeo/);
   assert.match(finishedPage, /page\.kind === "hub"/);
   assert.match(finishedPage, /LandingHero/);
   assert.match(finishedPage, /LandingProofStrip/);
