@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ContactCard from "@/components/ContactCard";
+import { HomeCertificateSection } from "@/components/company/HomeCertificateSection";
 import { InquiryBar } from "@/components/InquiryBar";
 import { LandingCtaBand } from "@/components/landing/LandingCtaBand";
 import { LandingHero } from "@/components/landing/LandingHero";
@@ -63,6 +64,7 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
       <LandingHero page={page} h1={seo.h1} />
       <LandingProofStrip points={page.proofPoints} />
       <LandingRouteChooser routes={buyerRoutes} />
+      <HomeCertificateSection />
 
       {visibleAdvantages.length > 0 ? (
         <section className="px-5 py-16 sm:px-6 md:py-20 lg:px-8">

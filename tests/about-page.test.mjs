@@ -79,3 +79,22 @@ test("restricted evidence assets are absent from tracked files", () => {
     }
   }
 });
+
+test("homepage renders a compact certificate summary linked to About", () => {
+  const homepage = readFileSync(
+    path.join(root, "components", "geo", "GeoHomePage.tsx"),
+    "utf8"
+  );
+  const section = readFileSync(
+    path.join(root, "components", "company", "HomeCertificateSection.tsx"),
+    "utf8"
+  );
+
+  assert.match(homepage, /<HomeCertificateSection\s*\/>/);
+  assert.match(section, /GRS Scope Documentation/);
+  assert.match(section, /companyRelationship\.parentCompany/);
+  assert.match(section, /certificationEvidence\.productDetail/);
+  assert.match(section, /href="\/about"/);
+  assert.doesNotMatch(section, /<h1\b/i);
+  assert.doesNotMatch(section, /download|\.pdf|<img\b/i);
+});
