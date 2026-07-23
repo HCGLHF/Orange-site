@@ -44,29 +44,38 @@ test("company evidence excludes restricted source assets and production figures"
   assert.doesNotMatch(source, /["'`]50\+["'`]/);
   assert.match(source, /Transaction Certificate/);
 
+  const exportSections = source.split(/(?=export const )/);
   for (const contract of [
     "companyRelationship",
     "manufacturingScale",
     "certificationEvidence",
     "knittingDirections",
   ]) {
-    assert.match(source, new RegExp(`export const ${contract} = [\\s\\S]*? as const;`));
+    const section = exportSections.find((entry) =>
+      entry.startsWith(`export const ${contract} =`)
+    );
+    assert.ok(section, `${contract} export must exist`);
+    assert.match(section, /as const;\s*$/);
   }
 });
 
 test("restricted evidence assets are absent from tracked files", () => {
-  const trackedFiles = execFileSync("git", ["ls-files"], {
-    cwd: root,
-    encoding: "utf8",
-  });
+  const trackedFiles = execFileSync("git", ["ls-files", "-z"], { cwd: root })
+    .toString("utf8")
+    .split("\0")
+    .filter(Boolean);
 
-  for (const restrictedName of [
-    "GRS2026",
-    "针筒明细",
-    "grs-certificate-source",
-    "certificate-page",
-    "codex-clipboard-98e654d6",
+  for (const restrictedPath of [
+    /GRS2026/i,
+    /针筒明细/i,
+    /grs-certificate-source/i,
+    /certificate-page/i,
+    /codex-clipboard-98e654d6/i,
+    /(?:^|\/)tmp\/pdfs\//i,
+    /grs-certificate-(?:source|\d+)\.(?:pdf|png)/i,
   ]) {
-    assert.doesNotMatch(trackedFiles, new RegExp(restrictedName, "i"));
+    for (const trackedFile of trackedFiles) {
+      assert.doesNotMatch(trackedFile, restrictedPath);
+    }
   }
 });
