@@ -17,6 +17,7 @@ import {
   websiteJsonLd,
 } from "@/lib/geo-content";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
+import { getSeoPage } from "@/lib/seo";
 
 type GeoHomePageProps = {
   initialFabrics: Fabric[];
@@ -49,6 +50,7 @@ const buyerRoutes: LandingRoute[] = [
 
 export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePageProps) {
   const page = getPublicLandingPage("home");
+  const seo = getSeoPage("/");
   const featuredFabrics = initialFabrics.slice(0, 3);
   const visibleAdvantages = page.advantages.filter((item) => item.enabled);
 
@@ -58,7 +60,7 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
         data={[organizationJsonLd, websiteJsonLd, fabricCategoryItemListJsonLd, faqJsonLd]}
       />
 
-      <LandingHero page={page} />
+      <LandingHero page={page} h1={seo.h1} />
       <LandingProofStrip points={page.proofPoints} />
       <LandingRouteChooser routes={buyerRoutes} />
 

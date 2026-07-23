@@ -4,7 +4,13 @@ import { ArrowRight } from "lucide-react";
 import { SampleRequestCta } from "@/components/SampleRequestCta";
 import type { PublicLandingPage } from "@/lib/landing-page-content";
 
-export function LandingHero({ page }: { page: PublicLandingPage }) {
+export function LandingHero({
+  page,
+  h1,
+}: {
+  page: PublicLandingPage;
+  h1: string;
+}) {
   return (
     <header className="relative isolate min-h-[620px] overflow-hidden bg-brand-charcoal text-white md:min-h-[680px]">
       <Image
@@ -22,7 +28,7 @@ export function LandingHero({ page }: { page: PublicLandingPage }) {
             {page.eyebrow}
           </p>
           <h1 className="mt-5 text-4xl font-semibold leading-[1.08] text-white sm:text-5xl md:text-6xl">
-            {page.headline}
+            {h1}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-8 text-white/82 sm:text-lg">
             {page.summary}

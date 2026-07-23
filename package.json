@@ -9,6 +9,8 @@
     "dev:poll": "WATCHPACK_POLLING=1 next dev",
     "dev:clean": "rm -rf .next node_modules/.cache && WATCHPACK_POLLING=1 next dev",
     "build": "next build",
+    "verify:seo": "node scripts/verify-site-seo.mjs",
+    "report:seo": "node scripts/generate-seo-deliverables.mjs",
     "start": "next start",
     "lint": "next lint",
     "deploy": "vercel --prod"

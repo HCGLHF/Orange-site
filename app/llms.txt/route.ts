@@ -6,6 +6,7 @@ import {
 } from "@/lib/geo-content";
 import { getFinishedFabricPages } from "@/lib/finished-fabric-content";
 import { getPublicFabricCategories } from "@/lib/public-catalog";
+import { getSeoPage } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
@@ -20,7 +21,7 @@ export function GET() {
   const finishedPages = getFinishedFabricPages()
     .map(
       (page) =>
-        `- ${page.h1}: ${page.opening} URL: ${siteUrl}${page.url}`
+        `- ${getSeoPage(page.url).h1}: ${page.opening} URL: ${siteUrl}${page.url}`
     )
     .join("\n");
 

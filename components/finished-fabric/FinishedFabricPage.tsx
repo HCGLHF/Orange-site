@@ -13,6 +13,7 @@ import type {
 import { getFinishedBlogArticles } from "@/lib/finished-fabric-content";
 import { buildFinishedFabricSchema } from "@/lib/finished-fabric-schema";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
+import { getSeoPage } from "@/lib/seo";
 
 function ContentTable({ table }: { table: NonNullable<FinishedFabricSection["table"]> }) {
   return (
@@ -102,6 +103,7 @@ function ContentSection({ section, index }: { section: FinishedFabricSection; in
 export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
   const landingPage = page.kind === "hub" ? getPublicLandingPage("finishedDoubleKnit") : null;
   const blogArticles = page.kind === "index" ? getFinishedBlogArticles() : [];
+  const seo = getSeoPage(page.url);
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -110,7 +112,7 @@ export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
       <article>
         {landingPage ? (
           <>
-            <LandingHero page={landingPage} />
+            <LandingHero page={landingPage} h1={seo.h1} />
             <LandingProofStrip points={landingPage.proofPoints} />
           </>
         ) : (
@@ -133,7 +135,7 @@ export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
                   {page.eyebrow}
                 </p>
                 <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight text-brand-charcoal md:text-5xl">
-                  {page.h1}
+                  {seo.h1}
                 </h1>
                 <p className="mt-5 max-w-3xl text-lg leading-8 text-brand-charcoal/75">
                   {page.opening}
@@ -193,10 +195,10 @@ export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
                   >
                     <div>
                       <h3 className="text-lg font-semibold text-brand-charcoal">
-                        {article.h1}
+                        {getSeoPage(article.url).h1}
                       </h3>
                       <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
-                        {article.description}
+                        {getSeoPage(article.url).metaDescription}
                       </p>
                     </div>
                     <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">

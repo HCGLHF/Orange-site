@@ -12,19 +12,14 @@ import {
   getPublicFabricCategories,
   getPublicFabricCount,
 } from "@/lib/public-catalog";
+import { buildSeoMetadata, getSeoPage } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Finished Knit Fabric Catalogue",
-  description:
-    "Review 104 finished knit fabric articles across 11 documented series, with composition, GSM and usable width references from O'range Textile.",
-  alternates: {
-    canonical: "/fabrics",
-  },
-};
+export const metadata: Metadata = buildSeoMetadata("/fabrics");
 
 export const dynamic = "force-static";
 
 export default async function FabricsPage() {
+  const seo = getSeoPage("/fabrics");
   const fabrics = getInitialPublicFabrics();
   const totalFabricCount = getPublicFabricCount();
   const finishedFabrics = getFinishedProductPages();
@@ -35,7 +30,7 @@ export default async function FabricsPage() {
       <div className="pb-28 max-md:pb-44 md:pb-12">
         <div className="border-b border-brand-soft/40 bg-white/80">
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <FabricsPageIntro />
+            <FabricsPageIntro h1={seo.h1} />
           </div>
         </div>
 
@@ -63,7 +58,9 @@ export default async function FabricsPage() {
               {finishedFabrics.map((page) => (
                 <Link key={page.url} href={page.url} className="group flex min-h-28 items-center justify-between gap-4 rounded-lg border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange">
                   <div>
-                    <h3 className="font-semibold text-brand-charcoal">{page.h1}</h3>
+                    <h3 className="font-semibold text-brand-charcoal">
+                      {getSeoPage(page.url).h1}
+                    </h3>
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-brand-charcoal/65">{page.opening}</p>
                   </div>
                   <ArrowRight className="h-4 w-4 shrink-0 text-brand-orange transition-transform group-hover:translate-x-1" aria-hidden />

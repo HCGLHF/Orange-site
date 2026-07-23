@@ -114,6 +114,10 @@ test("primary buyer navigation and discovery files expose all landing routes", a
   );
   const sitemap = await readFile(new URL("../app/sitemap.ts", import.meta.url), "utf8");
   const llms = await readFile(new URL("../app/llms.txt/route.ts", import.meta.url), "utf8");
+  const seoPages = JSON.parse(
+    await readFile(new URL("../content/seo-pages.json", import.meta.url), "utf8")
+  );
+  const seoRoutes = new Set(seoPages.map((page) => page.path));
 
   for (const route of [
     "/ready-stock-knit-fabrics",
@@ -121,10 +125,11 @@ test("primary buyer navigation and discovery files expose all landing routes", a
     "/custom-knit-fabric-development",
   ]) {
     assert.match(navbar, new RegExp(route));
-    assert.match(sitemap, new RegExp(route));
+    assert.ok(seoRoutes.has(route), `${route} must be in the SEO sitemap source`);
     assert.match(llms, new RegExp(route));
   }
 
+  assert.match(sitemap, /getSeoPages/);
   assert.doesNotMatch(navbar, /navBadge24h/);
   assert.match(finishedPage, /page\.kind === "hub"/);
   assert.match(finishedPage, /LandingHero/);

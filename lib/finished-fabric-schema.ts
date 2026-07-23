@@ -1,8 +1,10 @@
 import type { FinishedFabricPage } from "@/lib/finished-fabric-content";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
+import { getSeoPage } from "@/lib/seo";
 
 export function buildFinishedFabricSchema(page: FinishedFabricPage) {
   const pageUrl = `${siteUrl}${page.url}`;
+  const seo = getSeoPage(page.url);
   const organization = {
     "@type": "Organization",
     name: companyProfile.brandName,
@@ -22,8 +24,8 @@ export function buildFinishedFabricSchema(page: FinishedFabricPage) {
       ? {
           "@context": "https://schema.org",
           "@type": "Article",
-          headline: page.h1,
-          description: page.description,
+          headline: seo.h1,
+          description: seo.metaDescription,
           url: pageUrl,
           image: `${siteUrl}${page.hero.src}`,
           datePublished: page.published,
@@ -35,21 +37,21 @@ export function buildFinishedFabricSchema(page: FinishedFabricPage) {
         ? {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: page.product?.name ?? page.h1,
-            description: page.description,
+            name: page.product?.name ?? seo.h1,
+            description: seo.metaDescription,
             url: pageUrl,
             image: `${siteUrl}${page.hero.src}`,
             provider: organization,
             about: {
               "@type": "Thing",
-              name: page.product?.category ?? page.product?.name ?? page.h1,
+              name: page.product?.category ?? page.product?.name ?? seo.h1,
             },
           }
         : {
             "@context": "https://schema.org",
             "@type": page.kind === "hub" ? "CollectionPage" : "Blog",
-            name: page.h1,
-            description: page.description,
+            name: seo.h1,
+            description: seo.metaDescription,
             url: pageUrl,
             image: `${siteUrl}${page.hero.src}`,
             provider: organization,

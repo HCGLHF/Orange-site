@@ -3,9 +3,6 @@
     "kind": "hub",
     "url": "/finished-double-knit-fabrics",
     "eyebrow": "Finished fabric manufacturing",
-    "title": "Finished Double Knit Fabric Manufacturer | O'range Textile",
-    "description": "Source finished double knit fabrics including Ponte Roma, air-layer, jacquard, rib and wool blends with samples and specification support from Shaoxing.",
-    "h1": "Finished Double Knit Fabrics for Apparel Brands",
     "opening": "O'range Textile develops finished double knit and specialty knit fabrics for apparel sourcing teams, garment manufacturers, and private-label programs. The supplied range contains 104 documented articles across 11 finished-fabric series, including air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard directions. Manufacturing evidence includes 221 circular knitting machines.",
     "hero": {
       "src": "/images/finished-fabrics/finished-double-knit-factory.webp",
@@ -206,11 +203,7 @@
     "kind": "product",
     "url": "/fabrics/interlock-fabric",
     "eyebrow": "Finished fabric sourcing route",
-    "title": "Interlock Fabric Manufacturer for Apparel | O'range Textile",
-    "description": "Develop finished interlock fabric for apparel with construction, GSM, usable-width, sample and RFQ guidance backed by double-knit capacity in Shaoxing.",
-    "h1": "Interlock Fabric Development for Apparel Programs",
     "opening": "Interlock fabric is a stable double-knit construction with two smooth-looking faces and more body than typical single jersey. O'range Textile can review interlock and adjacent smooth double-knit requirements for finished apparel fabrics. Buyers should confirm the exact construction on the labeled sample because a smooth double-sided surface alone does not prove that every proposed article is true interlock.",
-    "primaryKeyword": "interlock fabric",
     "hero": {
       "src": "/images/finished-fabrics/double-knit-interlock-comparison.webp",
       "alt": "Navy double knit and teal interlock finished fabric swatches beside inspection tools",
@@ -350,8 +343,8 @@
         "label": "Finished double knit fabric hub"
       },
       {
-        "href": "/fabrics/interlock-fabric",
-        "label": "Interlock fabric development"
+        "href": "/blog/what-is-interlock-fabric",
+        "label": "Read the interlock fabric guide"
       },
       {
         "href": "/fabrics/ponte-roma-fabric",
@@ -376,11 +369,7 @@
     "kind": "product",
     "url": "/fabrics/ponte-roma-fabric",
     "eyebrow": "Finished fabric sourcing route",
-    "title": "Ponte Roma Fabric Manufacturer | O'range Textile",
-    "description": "Source finished Ponte Roma fabric for structured apparel with specification, sample, construction and RFQ guidance from a Shaoxing double-knit manufacturer.",
-    "h1": "Ponte Roma Fabric for Structured Apparel",
     "opening": "Ponte Roma fabric is a firm double knit valued for body, shape retention, a clean surface, and controlled stretch when engineered into the construction. O'range Textile's supplied machine record names Roma fabric as a production strength. A buyer should still approve the exact composition, weight, usable width, recovery, surface, and care result for the selected finished article.",
-    "primaryKeyword": "ponte roma fabric",
     "hero": {
       "src": "/images/finished-fabrics/ponte-scuba-apparel-development.webp",
       "alt": "Burgundy, cobalt, black and grey Ponte Roma swatches arranged with apparel pattern pieces",
@@ -524,8 +513,8 @@
         "label": "Interlock fabric development"
       },
       {
-        "href": "/fabrics/ponte-roma-fabric",
-        "label": "Ponte Roma fabric"
+        "href": "/blog/what-is-ponte-fabric",
+        "label": "Read the Ponte fabric guide"
       },
       {
         "href": "/fabrics/scuba-air-layer-fabric",
@@ -546,11 +535,7 @@
     "kind": "product",
     "url": "/fabrics/scuba-air-layer-fabric",
     "eyebrow": "Finished fabric sourcing route",
-    "title": "Scuba Knit and Air-Layer Fabric Supplier | O'range Textile",
-    "description": "Develop finished scuba knit and air-layer double-knit fabric for apparel with structure, GSM, width, finish, sample and RFQ guidance from Shaoxing.",
-    "h1": "Scuba Knit and Air-Layer Finished Fabrics",
     "opening": "Scuba knit and air-layer fabrics are structured double knits used when an apparel program needs body, cushioning, shape, or a smooth modern profile. The supplied catalogue includes 21 air-layer records plus 14 yarn-dyed wool-blend air-layer records. Exact construction must be confirmed because commercial air-layer fabric is not automatically a true three-dimensional spacer fabric.",
-    "primaryKeyword": "scuba knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/ponte-scuba-apparel-development.webp",
       "alt": "Structured black, burgundy, cobalt and grey scuba-style finished fabric swatches for apparel",
@@ -698,8 +683,8 @@
         "label": "Ponte Roma fabric"
       },
       {
-        "href": "/fabrics/scuba-air-layer-fabric",
-        "label": "Scuba and air-layer fabric"
+        "href": "/blog/what-is-scuba-knit-fabric",
+        "label": "Read the scuba knit fabric guide"
       },
       {
         "href": "/blog",
@@ -716,11 +701,7 @@
     "kind": "product",
     "url": "/fabrics/jacquard-knit-fabric",
     "eyebrow": "Finished fabric sourcing route",
-    "title": "Jacquard Knit Fabric Manufacturer | O'range Textile",
-    "description": "Source finished jacquard knit fabric with pattern-definition, reverse, weight, width, sample and RFQ guidance backed by a documented jacquard catalogue series.",
-    "h1": "Jacquard Knit Fabric for Patterned Apparel",
     "opening": "Jacquard knit fabric builds a pattern through controlled yarn and loop selection rather than applying a surface print after knitting. O'range Textile's supplied workbook includes four jacquard finished-fabric records. Buyers should review the face and reverse, repeat, scale, weight, width, stretch, color placement, and finishing on a production-relevant sample before approving a garment program.",
-    "primaryKeyword": "jacquard knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/jacquard-wool-blend-swatches.webp",
       "alt": "Green, aubergine and gold finished jacquard knit fabrics with geometric patterns",
@@ -886,11 +867,7 @@
     "kind": "product",
     "url": "/fabrics/wool-blend-knit-fabric",
     "eyebrow": "Finished fabric sourcing route",
-    "title": "Wool Blend Knit Fabric Supplier | O'range Textile",
-    "description": "Review finished wool-blend, acrylic-wool and cashmere-feel knit fabrics with composition, hand, brushing, sample and RFQ guidance for apparel sourcing.",
-    "h1": "Wool-Blend and Cashmere-Feel Finished Knit Fabrics",
     "opening": "Wool-blend knit fabric combines wool with other fibres to balance warmth, hand, structure, durability, price, or care requirements. The supplied catalogue includes acrylic-wool, yarn-dyed wool-blend air-layer, lyocell-acetate-wool style, acetate-blend brushed, and cashmere-feel series. Fibre names must follow the exact composition: a soft brushed synthetic blend should not be sold as cashmere.",
-    "primaryKeyword": "wool blend fabric",
     "hero": {
       "src": "/images/finished-fabrics/jacquard-wool-blend-swatches.webp",
       "alt": "Heathered wool-blend and cashmere-feel finished knit swatches in cream, slate and green",
@@ -1056,11 +1033,7 @@
     "kind": "product",
     "url": "/fabrics/rib-knit-fabric",
     "eyebrow": "Finished fabric sourcing route",
-    "title": "Rib Knit Fabric Manufacturer for Apparel | O'range Textile",
-    "description": "Develop finished rib knit fabric for fitted apparel, collars, cuffs and panels with gauge, stretch, recovery, GSM, width, sample and RFQ guidance.",
-    "h1": "Rib Knit Fabric for Apparel and Trim Programs",
     "opening": "Rib knit fabric uses alternating knit and purl columns to create visible vertical ribs and useful crosswise extension. O'range Textile's machine sheet records 44 rib/72-feed machines across 38-inch configurations and gauges from 18 to 32. Buyers should select the exact rib structure, composition, weight, usable width, recovery, color, and finish for the garment or trim application.",
-    "primaryKeyword": "rib knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/finished-fabric-sample-inspection.webp",
       "alt": "Finished navy rib knit swatch beside other dyed fabrics and quality inspection instruments",
@@ -1226,9 +1199,6 @@
     "kind": "index",
     "url": "/blog",
     "eyebrow": "Finished fabric knowledge base",
-    "title": "Finished Knit Fabric Buyer Guides | O'range Textile",
-    "description": "Use finished knit fabric guides to compare double knit, interlock, Ponte Roma, scuba, rib and jacquard before requesting samples and quotations.",
-    "h1": "Finished Knit Fabric Guides for Apparel Buyers",
     "opening": "This library gives sourcing teams an answer-first route from fabric terminology to a measurable sample decision. Each guide defines one finished-knit category, explains where it differs from adjacent structures, lists the fields that belong in a specification, and links to the relevant product and inquiry route. Use the articles to prepare questions, not to replace a labeled sample or current quotation.",
     "hero": {
       "src": "/images/finished-fabrics/finished-fabric-sample-inspection.webp",
@@ -1364,8 +1334,8 @@
         "label": "Scuba and air-layer fabric"
       },
       {
-        "href": "/blog",
-        "label": "Finished fabric buyer guides"
+        "href": "/blog/knit-fabric-sourcing-questions",
+        "label": "Read the knit fabric sourcing Q&A"
       },
       {
         "href": "/#contact",
@@ -1378,11 +1348,7 @@
     "kind": "article",
     "url": "/blog/what-is-double-knit-fabric",
     "eyebrow": "Finished fabric buyer guide",
-    "title": "What Is Double Knit Fabric? A Finished-Fabric Buyer Guide",
-    "description": "Learn how double knit fabric is constructed, where it fits apparel programs, which specifications matter, and how buyers should evaluate finished samples.",
-    "h1": "What Is Double Knit Fabric?",
     "opening": "Double knit fabric is produced with two needle systems, creating interconnected loop structures that often give more body, stability, and surface balance than single jersey. The family includes interlock, Ponte Roma, air-layer, rib-derived, and other double-sided constructions. Buyers should use the family name to shortlist options, then approve the exact construction, composition, GSM, width, finish, recovery, and garment result.",
-    "primaryKeyword": "what is double knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/double-knit-interlock-comparison.webp",
       "alt": "Finished navy double knit and teal interlock fabric swatches shown face and reverse for comparison",
@@ -1587,11 +1553,7 @@
     "kind": "article",
     "url": "/blog/what-is-interlock-fabric",
     "eyebrow": "Finished fabric buyer guide",
-    "title": "What Is Interlock Fabric? Construction and Buyer Checks",
-    "description": "Understand interlock fabric construction, uses, differences from jersey and Ponte, and the specification and sample checks apparel buyers should request.",
-    "h1": "What Is Interlock Fabric?",
     "opening": "Interlock fabric is a double-knit construction formed by intermeshing rib systems, commonly creating two smooth-looking faces, useful body, and more edge stability than typical single jersey. It can suit tops, dresses, childrenswear, uniforms, linings, and soft structured pieces. Buyers must confirm true interlock construction, composition, GSM, usable width, finish, stretch, recovery, and garment performance on the offered sample.",
-    "primaryKeyword": "what is interlock fabric",
     "hero": {
       "src": "/images/finished-fabrics/double-knit-interlock-comparison.webp",
       "alt": "Teal interlock and navy double knit finished fabric swatches with folded faces and inspection tools",
@@ -1796,11 +1758,7 @@
     "kind": "article",
     "url": "/blog/what-is-ponte-fabric",
     "eyebrow": "Finished fabric buyer guide",
-    "title": "What Is Ponte Fabric? Ponte Roma Buyer Guide",
-    "description": "Learn what Ponte and Ponte Roma fabric mean, common garment uses, key structure and recovery differences, and the sample checks buyers should run.",
-    "h1": "What Is Ponte Fabric?",
     "opening": "Ponte fabric, often called Ponte Roma or Ponte di Roma, is a structured double knit used for garments that need body, a clean surface, controlled give, and shape retention. It is common in dresses, skirts, trousers, jackets, uniforms, and fitted workwear. Composition and recovery vary widely, so buyers must approve the exact article rather than assume one universal Ponte specification.",
-    "primaryKeyword": "what is ponte fabric",
     "hero": {
       "src": "/images/finished-fabrics/ponte-scuba-apparel-development.webp",
       "alt": "Finished black, burgundy, cobalt and grey Ponte fabric swatches beside tailored pattern pieces",
@@ -2005,11 +1963,7 @@
     "kind": "article",
     "url": "/blog/what-is-scuba-knit-fabric",
     "eyebrow": "Finished fabric buyer guide",
-    "title": "What Is Scuba Knit Fabric? Air-Layer Buyer Guide",
-    "description": "Understand scuba knit and air-layer fabric, how they differ from neoprene and spacer fabric, and which finished-sample checks apparel buyers need.",
-    "h1": "What Is Scuba Knit Fabric?",
     "opening": "Scuba knit fabric is a structured, often smooth double knit used for apparel that needs body, cushioning, shape, and a modern clean surface. It is a textile fabric and should not be confused automatically with foam-backed neoprene. Air-layer is a related commercial category, while true spacer fabric requires a verified three-dimensional connecting structure. Buyers should confirm the exact article on a finished sample.",
-    "primaryKeyword": "what is scuba knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/ponte-scuba-apparel-development.webp",
       "alt": "Structured black, cobalt, burgundy and grey scuba knit swatches arranged for apparel development",
@@ -2214,11 +2168,7 @@
     "kind": "article",
     "url": "/blog/what-is-rib-knit-fabric",
     "eyebrow": "Finished fabric buyer guide",
-    "title": "What Is Rib Knit Fabric? Stretch and Recovery Guide",
-    "description": "Learn how rib knit fabric works, where body and trim ribs differ, and how apparel buyers should specify stretch, recovery, gauge, GSM and samples.",
-    "h1": "What Is Rib Knit Fabric?",
     "opening": "Rib knit fabric uses alternating knit and purl columns to form visible vertical ribs and useful crosswise extension. The family includes fine 1x1 ribs, wider 2x2 ribs, compact trim ribs, and fashion ribs used as body fabric. Stretch and recovery are not fixed by the name, so buyers must approve the exact gauge, composition, weight, width, finish, and garment behavior.",
-    "primaryKeyword": "what is rib knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/finished-fabric-sample-inspection.webp",
       "alt": "Finished navy rib knit fabric beside dyed double-knit swatches and sample inspection tools",
@@ -2423,11 +2373,7 @@
     "kind": "article",
     "url": "/blog/jacquard-knit-vs-woven-jacquard",
     "eyebrow": "Finished fabric buyer guide",
-    "title": "Jacquard Knit vs Woven Jacquard: Buyer Comparison",
-    "description": "Compare jacquard knit and woven jacquard by structure, stretch, drape, reverse, repeat, garment use and the sample checks apparel buyers should run.",
-    "h1": "Jacquard Knit vs Woven Jacquard",
     "opening": "Jacquard knit and woven jacquard both build pattern into the textile structure, but they use different yarn systems and behave differently in stretch, drape, edge stability, reverse appearance, seam construction, and garment fit. Knit jacquard can support flexible apparel and structured double-knit effects, while woven jacquard can support crisp tailoring or decorative stability. Buyers should compare the exact sample, not the pattern image alone.",
-    "primaryKeyword": "jacquard knit fabric",
     "hero": {
       "src": "/images/finished-fabrics/jacquard-wool-blend-swatches.webp",
       "alt": "Finished green, aubergine and gold jacquard knit swatches with geometric patterns and yarn cones",
@@ -2632,5 +2578,971 @@
       }
     ],
     "evidenceBoundary": "The supplied catalogue supports a finished-fabric range and documents 104 product records across multiple series. Construction names, composition, GSM, usable width, finish, color, testing status, lead time, and commercial terms still have to be confirmed for the exact offered article and order."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/air-layer-knit-fabric-sourcing-guide",
+    "eyebrow": "Air-layer sourcing guide",
+    "opening": "Air-layer knit fabric should be sourced by article evidence, not by the category name alone. Start with the required garment structure, then compare composition, GSM, usable width, recovery and finished-sample behaviour before requesting current commercial confirmation.",
+    "hero": {
+      "src": "/images/finished-fabrics/air-layer-material-study.webp",
+      "alt": "Air-layer finished knit swatches beside GSM, thickness and usable-width inspection tools",
+      "caption": "A useful air-layer review connects article data to body, recovery, seams, care and the intended garment."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/air-layer-knit-fabric-sourcing-guide",
+        "label": "Air-layer sourcing guide"
+      }
+    ],
+    "published": "2026-07-23",
+    "updated": "2026-07-23",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Start with the garment result, not the air-layer label",
+        "paragraphs": [
+          "Air-layer is a commercial family name used for structured finished knits. It does not prove one universal loop arrangement, thickness or performance level. A buyer should define the garment, silhouette, season, target body, stretch direction, recovery, surface, care route and sewing method before choosing an article.",
+          "The catalogue provides several evidence points. GD2515 is recorded at 300 GSM and 160 cm with 45% polyester, 25% combed cotton, 24% modal and 6% elastane. GD2518 is a lighter 260 GSM direction at 160 cm. These records show real variety inside the category; they do not make the articles interchangeable."
+        ],
+        "bullets": [
+          "State whether the garment needs crisp structure, soft volume, stretch, warmth or shape retention.",
+          "Name the intended panels, seams, trims, lining, printing, bonding or embroidery.",
+          "Separate required properties from fields where the supplier may propose alternatives.",
+          "Use the exact article number on samples, test records and quotation discussions."
+        ]
+      },
+      {
+        "heading": "Compare article evidence before requesting samples",
+        "paragraphs": [
+          "Use composition, GSM and usable width to narrow the catalogue, then inspect the complete finished sample. A 260 GSM air-layer and a 300 GSM air-layer may differ in body, compression, drape, opacity and sewing response even when both are described with the same market term.",
+          "GD2672 is a yarn-dyed wool-blend air-layer article recorded at 360 GSM and 160 cm. Its composition includes polyester, viscose, nylon, acrylic, elastane and wool. This is a distinct direction from cotton, modal or lyocell blends and should be evaluated for colour construction, hand, pilling, care and garment use on its own evidence."
+        ],
+        "table": {
+          "headers": [
+            "Catalogue example",
+            "Recorded specification",
+            "Buyer decision"
+          ],
+          "rows": [
+            [
+              "GD2515",
+              "300 GSM; 160 cm; polyester/cotton/modal/elastane",
+              "Review body, recovery, seams and intended apparel use"
+            ],
+            [
+              "GD2518",
+              "260 GSM; 160 cm; polyester/cotton/lyocell/elastane",
+              "Compare lighter structure, drape and opacity"
+            ],
+            [
+              "GD2672",
+              "360 GSM; 160 cm; yarn-dyed wool-blend air-layer",
+              "Confirm colour construction, surface, pilling and care"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Approve the finished sample with measurable checks",
+        "paragraphs": [
+          "A useful sample review covers face and reverse, thickness, compression, crease recovery, extension, rested recovery, usable width, GSM and colour. Sew the intended seam and inspect bulk, puckering, needle marks, pressing response and shape after laundering. Record the method and result instead of relying on adjectives such as premium or stable.",
+          "Sample approval confirms the physical reference reviewed by the buyer. It does not automatically confirm every production colour, order quantity or delivery window. Link the approved swatch to a dated specification and list any test or shade approvals that remain open."
+        ],
+        "steps": [
+          "Label the swatch with supplier, article, colour, date and version.",
+          "Measure GSM and usable width by the agreed method.",
+          "Inspect face, reverse, thickness, recovery and surface consistency.",
+          "Sew and wash a garment-relevant trial.",
+          "Record sample approval and unresolved production conditions."
+        ]
+      },
+      {
+        "heading": "Write an air-layer RFQ that can be answered",
+        "paragraphs": [
+          "Send the article reference or closest benchmark, garment type, composition direction, target GSM, usable width, colour, finish, stretch and recovery needs, testing, quantity and destination. Add clear images of the face, reverse and garment if a physical swatch cannot be sent first.",
+          "Ask the supplier to separate article data from current commercial confirmation. The response should identify the proposed article, available sample route and any requested alternatives. Live availability, colour, quantity, price, MOQ, lead time, packing, documentation and shipping are confirmed for the current inquiry."
+        ],
+        "note": {
+          "label": "Decision rule",
+          "text": "Use catalogue data to shortlist. Use a labeled finished sample to approve performance. Use the current quotation to confirm commercial conditions."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is every air-layer knit a spacer fabric?",
+        "a": "No. Air-layer is a commercial category name and does not by itself prove a spacer construction. Confirm the exact loop or layered structure, face, reverse, thickness and finished behaviour for the proposed article."
+      },
+      {
+        "q": "Which GSM should an air-layer buyer choose?",
+        "a": "Choose GSM with the garment silhouette, season, opacity, body and drape. The catalogue includes examples from 260 GSM to heavier directions, but the physical sample and garment trial should decide suitability."
+      },
+      {
+        "q": "What does usable width mean in an RFQ?",
+        "a": "Usable width is the cuttable width agreed for planning consumption, excluding edges that cannot be used. Confirm the measurement method and production tolerance for the exact finished article."
+      },
+      {
+        "q": "Does a catalogue article guarantee stock?",
+        "a": "No. A catalogue record documents a sourcing direction. Live colour, quantity, sample availability and commercial terms require confirmation when the buyer sends the current inquiry."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/scuba-air-layer-fabric",
+        "label": "Review documented air-layer articles"
+      },
+      {
+        "href": "/fabrics",
+        "label": "Review the finished-fabric catalogue"
+      },
+      {
+        "href": "/finished-double-knit-fabrics",
+        "label": "Compare double-knit directions"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Check the current inquiry catalogue"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom development brief"
+      },
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "Build a complete knit fabric RFQ"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample or quotation"
+      }
+    ],
+    "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/how-to-source-wool-blend-knit-fabric",
+    "eyebrow": "Wool-blend sourcing guide",
+    "opening": "To source wool blend knit fabric, verify the exact fibre percentages first, then assess construction, surface, GSM, usable width, pilling, colourfastness, care and garment performance on a labeled finished sample. The word wool-blend is not a complete specification.",
+    "hero": {
+      "src": "/images/finished-fabrics/wool-blend-material-study.webp",
+      "alt": "Wool-blend finished knit swatches with fibre, surface and pilling review tools",
+      "caption": "Wool-blend sourcing requires exact composition records and sample-specific surface, care and performance checks."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/how-to-source-wool-blend-knit-fabric",
+        "label": "Wool-blend sourcing guide"
+      }
+    ],
+    "published": "2026-07-23",
+    "updated": "2026-07-23",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Read the full composition instead of the blend name",
+        "paragraphs": [
+          "Wool may be one component in a multi-fibre construction designed around hand, structure, colour and cost. Ask for every fibre percentage and keep the article number attached to that declaration. Do not infer fibre content from a soft surface or a commercial name such as cashmere-feel.",
+          "The catalogue demonstrates the range. GD2672 contains 1.7% wool within a yarn-dyed air-layer blend and is recorded at 360 GSM and 160 cm. Acrylic-wool article 2552-240g contains 3.5% wool and is recorded at 240 GSM with a 170-175 cm width reference. They serve different sourcing briefs."
+        ],
+        "bullets": [
+          "Record the complete fibre breakdown and article number.",
+          "State whether the priority is warmth, hand, structure, drape or appearance.",
+          "Confirm whether the surface is brushed, raised, compact or otherwise finished.",
+          "Match care and testing requirements to the destination market and garment label."
+        ]
+      },
+      {
+        "heading": "Use article data to compare weight and width",
+        "paragraphs": [
+          "GSM helps describe material mass, while usable width affects consumption and pattern planning. Neither proves softness, warmth or quality alone. Compare the recorded values with a full-width or garment-relevant sample, then confirm the tolerances and method in the production specification.",
+          "The catalogue includes wool-related directions at different weights and widths. GD2672 is 360 GSM at 160 cm; 2552-240g is 240 GSM at 170-175 cm; GD2579 is a wool-blend jacquard at 240 GSM and 160-165 cm. The buyer should shortlist by garment need rather than by fibre label alone."
+        ],
+        "table": {
+          "headers": [
+            "Article",
+            "Recorded data",
+            "Review focus"
+          ],
+          "rows": [
+            [
+              "GD2672",
+              "360 GSM; 160 cm; yarn-dyed wool-blend air-layer",
+              "Structure, colour construction, recovery and care"
+            ],
+            [
+              "2552-240g",
+              "240 GSM; 170-175 cm; acrylic-wool blend",
+              "Hand, width yield, pilling and garment drape"
+            ],
+            [
+              "GD2579",
+              "240 GSM; 160-165 cm; wool-blend jacquard",
+              "Pattern repeat, reverse, snagging and placement"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Test the surface and care route on the exact sample",
+        "paragraphs": [
+          "Inspect pilling, abrasion, shedding, snagging and colour transfer where relevant. Compare the face and reverse before and after the intended laundering, pressing or dry-cleaning route. If the surface is brushed, record pile direction and appearance changes after rubbing or repeated care.",
+          "A garment trial reveals seam bulk, needle response, edge behaviour, lining needs, shrinkage and shape retention. Keep the tested sample, results and approval note together. A pass on one article or finish does not automatically transfer to another composition or colour."
+        ],
+        "steps": [
+          "Photograph and label the original sample.",
+          "Confirm composition, GSM and usable width against the data sheet.",
+          "Run buyer-required pilling, colourfastness and dimensional checks.",
+          "Sew the intended seam and complete a garment-relevant care trial.",
+          "Approve a dated reference and state remaining production tests."
+        ]
+      },
+      {
+        "heading": "Separate sample approval from commercial confirmation",
+        "paragraphs": [
+          "The RFQ should include garment, season, article or benchmark, composition direction, GSM, usable width, colour, finish, quantity, destination, testing and documentation. Ask the supplier to identify any substitute and explain the changed fields rather than presenting it as equivalent.",
+          "Sample approval confirms the reviewed material. Commercial confirmation establishes live availability, colour, quantity, price, MOQ, lead time, packing, payment and shipping for the order being discussed. Keeping those decisions separate makes the sourcing record clearer."
+        ],
+        "note": {
+          "label": "Evidence rule",
+          "text": "A soft hand is an observation. Fibre percentages, test results, approved samples and current quotations are separate forms of evidence."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "Does wool blend fabric always feel warm?",
+        "a": "No. Warmth depends on construction, weight, density, surface, air retention, lining and garment design as well as wool percentage. Approve the exact finished sample for the intended season."
+      },
+      {
+        "q": "Can buyers rely on the word cashmere-feel?",
+        "a": "No. Cashmere-feel describes a surface impression, not fibre content. Ask for the full composition declaration and do not infer cashmere unless the documented article data states it."
+      },
+      {
+        "q": "What tests matter for brushed wool blends?",
+        "a": "Common checks include pilling, abrasion, shedding, colourfastness, dimensional stability and appearance after the intended care route. The buyer should specify applicable methods and acceptance criteria."
+      },
+      {
+        "q": "Should width be quoted as full or usable width?",
+        "a": "Use usable width for consumption planning and state the agreed measurement method. Confirm production tolerance on the exact finished article before final marker planning."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/wool-blend-knit-fabric",
+        "label": "Review wool-blend knit sourcing"
+      },
+      {
+        "href": "/fabrics",
+        "label": "Review the finished-fabric catalogue"
+      },
+      {
+        "href": "/finished-double-knit-fabrics",
+        "label": "Compare double-knit directions"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Check the current inquiry catalogue"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom development brief"
+      },
+      {
+        "href": "/blog/air-layer-knit-fabric-sourcing-guide",
+        "label": "Review the air-layer sourcing guide"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample or quotation"
+      }
+    ],
+    "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    "eyebrow": "Jacquard specification guide",
+    "opening": "Jacquard knit fabric weight and width should be read with construction, repeat, face and reverse, stretch, finish and intended garment placement. GSM and usable width guide body and consumption, but the approved sample determines whether the pattern and performance fit the program.",
+    "hero": {
+      "src": "/images/finished-fabrics/jacquard-knit-material-study.webp",
+      "alt": "Jacquard knit swatches measured for GSM, usable width and pattern repeat",
+      "caption": "Jacquard RFQs should connect weight and usable width to repeat, cutting yield, reverse and garment placement."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/jacquard-knit-fabric-weight-and-width-guide",
+        "label": "Jacquard specification guide"
+      }
+    ],
+    "published": "2026-07-23",
+    "updated": "2026-07-23",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Use GSM to describe body, not quality",
+        "paragraphs": [
+          "GSM records fabric mass per square metre. It helps buyers compare body and consumption, but it does not prove durability, warmth, softness or suitability by itself. Two jacquards at similar GSM can differ because of yarn, structure, repeat, density, finish and reverse floats.",
+          "The catalogue records GD2579 at 240 GSM and GD2683 at 280 GSM. Both are wool-blend jacquard directions with 160-165 cm width references, yet they should be reviewed as separate articles. Compare body, drape, pattern clarity, reverse, stretch and garment response on labeled samples."
+        ],
+        "table": {
+          "headers": [
+            "Article",
+            "GSM and width reference",
+            "Buyer check"
+          ],
+          "rows": [
+            [
+              "GD2579",
+              "240 GSM; 160-165 cm",
+              "Lighter body, repeat scale, reverse and cutting yield"
+            ],
+            [
+              "GD2683",
+              "280 GSM; 160-165 cm",
+              "Higher body, seam bulk, drape and pattern placement"
+            ],
+            [
+              "GD2583",
+              "240 GSM; 160-165 cm",
+              "Confirm colour, motif, face/reverse and current article data"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Use usable width for marker and repeat planning",
+        "paragraphs": [
+          "Usable width is the cuttable area available for pattern planning. A jacquard buyer also needs repeat dimensions and the orientation of the motif. The nominal roll width is not enough when edges, distortion, motif placement or shade zones reduce usable area.",
+          "Request enough material to see at least one complete repeat across the relevant direction. Place real garment pieces on the sample and estimate matching waste. Record whether motifs require centred placement, pair matching or one-way cutting."
+        ],
+        "bullets": [
+          "Confirm usable width and measurement method.",
+          "Record horizontal and vertical repeat dimensions.",
+          "Review face, reverse, floats and pattern distortion.",
+          "Estimate matching and placement waste before quoting consumption.",
+          "Check whether the design has a one-way cutting direction."
+        ]
+      },
+      {
+        "heading": "Inspect the sample beyond weight and width",
+        "paragraphs": [
+          "Check composition, stretch direction, recovery, snagging, abrasion, seam appearance, pressing response, colourfastness and dimensional stability. Inspect the reverse because floats and contrast yarns can affect lining, skin contact, cutting, seams and durability.",
+          "Photographs help communicate pattern and colour, but they cannot replace tactile and dimensional review. Approve one labeled sample with article, colour, date and version, then connect the production test plan to that reference."
+        ],
+        "steps": [
+          "Verify article number and complete composition.",
+          "Measure GSM, usable width and repeat by the agreed method.",
+          "Inspect face, reverse, motif scale, colour and surface.",
+          "Run placement, seam, snagging and care trials.",
+          "Record sample approval and open commercial conditions."
+        ]
+      },
+      {
+        "heading": "Put the right fields in the jacquard RFQ",
+        "paragraphs": [
+          "State garment, panel placement, artwork rights, article or reference, composition direction, GSM, usable width, repeat, colour, face, reverse, stretch, finish, quantity, destination, testing and delivery need. Mark proposal fields clearly so the supplier knows where alternatives are acceptable.",
+          "The current quotation should confirm availability, sample route, exact specification, price, MOQ, lead time, packing, documentation and shipping. Catalogue values are a factual starting point, not a substitute for commercial confirmation."
+        ],
+        "note": {
+          "label": "Planning rule",
+          "text": "GSM describes mass. Usable width supports consumption. Repeat and placement determine how much of that width a garment can actually use."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is a heavier jacquard always better?",
+        "a": "No. Higher GSM generally adds body or mass, but suitability depends on silhouette, drape, repeat, yarn, finish, seams, care and season. Compare approved samples in the intended garment."
+      },
+      {
+        "q": "Why is usable width important for jacquard?",
+        "a": "Usable width affects marker efficiency, especially when motifs need matching or centred placement. Confirm the cuttable width and repeat before final consumption planning."
+      },
+      {
+        "q": "How much sample is needed for a jacquard review?",
+        "a": "Request enough to see at least one complete repeat and to place garment pattern pieces. A small swatch may hide scale, reverse behaviour and matching waste."
+      },
+      {
+        "q": "Do GD2579 and GD2683 have the same specification?",
+        "a": "No. GD2579 is recorded at 240 GSM and GD2683 at 280 GSM, although both show 160-165 cm width references. Confirm all article details and samples separately."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/jacquard-knit-fabric",
+        "label": "Review jacquard knit sourcing"
+      },
+      {
+        "href": "/fabrics",
+        "label": "Review the finished-fabric catalogue"
+      },
+      {
+        "href": "/finished-double-knit-fabrics",
+        "label": "Compare double-knit directions"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Check the current inquiry catalogue"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom development brief"
+      },
+      {
+        "href": "/blog/knit-fabric-sourcing-questions",
+        "label": "Read the sourcing Q&A"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample or quotation"
+      }
+    ],
+    "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/brushed-and-pile-knit-fabric-finishes",
+    "eyebrow": "Surface finish guide",
+    "opening": "Brushed knit fabric finishes change hand, appearance, bulk and care behaviour without proving fibre content or durability. Buyers should identify the base construction and article, inspect face and reverse, then verify shedding, pilling, GSM, usable width, colour and care on the finished sample.",
+    "hero": {
+      "src": "/images/finished-fabrics/brushed-pile-knit-finishes.webp",
+      "alt": "Brushed and raised-pile finished knit surfaces examined under controlled light",
+      "caption": "Surface naming should lead to article-specific inspection, not assumptions about fibre or performance."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/brushed-and-pile-knit-fabric-finishes",
+        "label": "Surface finish guide"
+      }
+    ],
+    "published": "2026-07-23",
+    "updated": "2026-07-23",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Separate base construction from surface finish",
+        "paragraphs": [
+          "Brushing, raising and pile development alter the surface of a knit, while the underlying construction and composition still control stretch, recovery, stability and sewing response. A soft hand does not identify the fibre blend. Ask for the article number, full composition and finish description together.",
+          "The catalogue contains faux-cashmere, acetate brushed and raised-pile series. These labels describe sourcing directions, not a universal performance claim. GD2706 is an acetate-brushed article recorded at 250 GSM; GD2650 is a raised-pile article recorded at 240 GSM and 165 cm."
+        ],
+        "bullets": [
+          "Identify the base knit and the surface treatment.",
+          "Record complete composition rather than inferring fibre from hand.",
+          "Photograph face, reverse and pile direction under consistent light.",
+          "Confirm whether brushing or raising occurs on one side or both.",
+          "Keep article and colour attached to every sample and test."
+        ]
+      },
+      {
+        "heading": "Compare documented finish directions",
+        "paragraphs": [
+          "A faux-cashmere direction can produce a soft impression without containing cashmere. A cashmere-blend article should state cashmere in the actual composition record. The buyer must preserve this distinction in product copy, care labels and sourcing decisions.",
+          "Raised-pile GD2650 is recorded at 240 GSM and 165 cm. GD2652 is recorded at 250-260 GSM and 165 cm. Acetate-brushed entries may require usable width confirmation. These differences affect RFQ completeness and sample planning."
+        ],
+        "table": {
+          "headers": [
+            "Finish direction",
+            "Catalogue evidence",
+            "Required confirmation"
+          ],
+          "rows": [
+            [
+              "Acetate brushed",
+              "GD2706; 250 GSM",
+              "Usable width, face/reverse, brushing and care"
+            ],
+            [
+              "Raised pile",
+              "GD2650; 240 GSM; 165 cm",
+              "Pile direction, shedding, pilling and seam response"
+            ],
+            [
+              "Raised pile",
+              "GD2652; 250-260 GSM; 165 cm",
+              "Body, recovery, surface consistency and colour"
+            ],
+            [
+              "Faux-cashmere",
+              "GD2502; 280 GSM; 155-160 cm reference",
+              "Full composition and no unsupported cashmere claim"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Test pilling, shedding and appearance after care",
+        "paragraphs": [
+          "Inspect loose fibre, pile direction, streaks, shade, crush marks and surface consistency before testing. Run the buyer-required pilling, abrasion, shedding, colourfastness and dimensional methods, then compare appearance after the intended wash, dry, press or dry-clean route.",
+          "A garment trial should include seam and edge areas because surface and bulk may change under stitching or pressing. Record any appearance difference between panels cut in opposite directions. If pile direction matters, add a one-way cutting note to the garment specification."
+        ],
+        "steps": [
+          "Label and photograph the original finished sample.",
+          "Inspect face, reverse, pile direction and loose fibre.",
+          "Measure GSM and usable width.",
+          "Run relevant surface, colour and dimensional tests.",
+          "Approve appearance after the intended garment care route."
+        ]
+      },
+      {
+        "heading": "Create a finish-specific sample and RFQ record",
+        "paragraphs": [
+          "State base construction, exact composition, article or benchmark, GSM, usable width, face and reverse finish, pile direction, colour, garment, quantity, destination, testing and care requirements. Include expected surface appearance after laundering or wear.",
+          "Ask sales to confirm the proposed article, sample route and any alternative. Sample approval covers the reviewed physical reference. Current availability, colour, quantity, price, MOQ, lead time, packing, documentation and shipping require commercial confirmation."
+        ],
+        "note": {
+          "label": "Claim boundary",
+          "text": "Words such as cashmere-feel describe an impression. Only the article composition record can support a fibre-content statement."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is brushed knit fabric the same as fleece?",
+        "a": "Not necessarily. Brushing is a surface process, while fleece is a broad market term often associated with a raised back. Confirm the base construction, treated side and finished sample."
+      },
+      {
+        "q": "Does cashmere-feel mean the fabric contains cashmere?",
+        "a": "No. Cashmere-feel describes hand or surface. A cashmere content claim requires the exact article composition to state cashmere and any buyer-required verification."
+      },
+      {
+        "q": "What should buyers check on raised-pile knit?",
+        "a": "Check pile direction, shedding, pilling, abrasion, colourfastness, surface consistency, GSM, usable width, seams and appearance after the intended care route."
+      },
+      {
+        "q": "Why can usable width be missing from a finish record?",
+        "a": "Some catalogue records require width confirmation. Ask sales to measure the offered finished article and state the method and tolerance before consumption planning."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/wool-blend-knit-fabric",
+        "label": "Review wool-blend surface options"
+      },
+      {
+        "href": "/fabrics",
+        "label": "Review the finished-fabric catalogue"
+      },
+      {
+        "href": "/finished-double-knit-fabrics",
+        "label": "Compare double-knit directions"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Check the current inquiry catalogue"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom development brief"
+      },
+      {
+        "href": "/blog/knit-fabric-sourcing-questions",
+        "label": "Read the sourcing Q&A"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample or quotation"
+      }
+    ],
+    "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/how-to-write-a-knit-fabric-rfq",
+    "eyebrow": "RFQ template guide",
+    "opening": "A useful knit fabric RFQ identifies the garment, construction or article, complete composition, target GSM, usable width, colour, finish, performance tests, quantity and destination. It also separates sample approval from the commercial conditions that require a current quotation.",
+    "hero": {
+      "src": "/images/finished-fabrics/knit-fabric-rfq-specification.webp",
+      "alt": "Knit fabric RFQ specification sheet beside labeled finished samples and measuring tools",
+      "caption": "A complete RFQ gives buyer and supplier the same measurable target and records what still needs confirmation."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "RFQ template guide"
+      }
+    ],
+    "published": "2026-07-23",
+    "updated": "2026-07-23",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Begin with the garment and decision context",
+        "paragraphs": [
+          "Name the garment, target market, season, silhouette and panels where the fabric will be used. Attach a reference garment, swatch, technical sketch or article number when available. Explain which properties are fixed and where the supplier may propose an alternative.",
+          "A category name such as air-layer, Ponte, rib or jacquard is not a full specification. Add the required structure, face and reverse, stretch direction, recovery, opacity, drape, surface and care route so the supplier can evaluate fit."
+        ],
+        "bullets": [
+          "Garment type, end use, season and destination market",
+          "Construction family or exact catalogue article",
+          "Reference swatch, garment, image or technical drawing",
+          "Fixed requirements and acceptable proposal fields",
+          "Buyer contact and decision timeline"
+        ]
+      },
+      {
+        "heading": "Record measurable fabric specifications",
+        "paragraphs": [
+          "State complete composition, target GSM, usable width, colour, finish and required tolerances. Add repeat dimensions for jacquard, pile direction for raised surfaces, and stretch or recovery methods for elastic constructions. If a field is unknown, request a proposal instead of inventing a value.",
+          "Catalogue examples show why exact fields matter. GD2515 is 300 GSM and 160 cm; GD2579 is 240 GSM with a 160-165 cm width reference; GD2683 is 280 GSM with the same width range. Similar category names do not make these articles equivalent."
+        ],
+        "table": {
+          "headers": [
+            "RFQ field",
+            "What to provide",
+            "What to confirm"
+          ],
+          "rows": [
+            [
+              "Identity",
+              "Construction, article or reference sample",
+              "Exact proposed article and version"
+            ],
+            [
+              "Material",
+              "Complete composition and required verification",
+              "Written article declaration"
+            ],
+            [
+              "Dimensions",
+              "Target GSM and usable width",
+              "Method, tolerance and finished result"
+            ],
+            [
+              "Appearance",
+              "Colour, face, reverse, finish, repeat or pile",
+              "Approved shade and surface sample"
+            ],
+            [
+              "Performance",
+              "Tests, methods and acceptance criteria",
+              "Sample or production result"
+            ],
+            [
+              "Commercial",
+              "Quantity, destination and timing need",
+              "Price, MOQ, lead time, packing and shipping"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Define sample approval and testing",
+        "paragraphs": [
+          "Ask for a labeled sample with supplier, article, colour, date and version. State the minimum sample size needed for repeat, width, garment panel, washing or laboratory checks. List the test methods and acceptance criteria that apply to the buyer's market and garment.",
+          "Record observations and measured results separately. A sample can be approved for hand and appearance while laboratory or bulk shade checks remain open. The approval note should identify what was accepted and what must still be confirmed."
+        ],
+        "steps": [
+          "Receive and label the proposed finished sample.",
+          "Verify article data and measure agreed physical fields.",
+          "Run garment, care and buyer-required tests.",
+          "Approve one dated sample version.",
+          "List unresolved production and commercial conditions."
+        ]
+      },
+      {
+        "heading": "Request commercial confirmation without guessing terms",
+        "paragraphs": [
+          "Include estimated quantity, colour plan, destination, packaging, documentation, inspection and timing needs. Ask sales to respond with the current article availability, sample route, price basis, MOQ, lead time, payment, packing and shipping conditions.",
+          "Do not treat catalogue inclusion as a live-stock guarantee. The catalogue supports discovery and technical comparison. The current quotation is the record for commercial confirmation, and production should reference the same approved sample and specification."
+        ],
+        "note": {
+          "label": "Copyable RFQ line",
+          "text": "Please quote the proposed article against the attached garment brief and confirm composition, GSM, usable width, colour, finish, testing, sample route, quantity conditions, packing, lead time and shipping basis."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "What is the minimum information for a knit fabric RFQ?",
+        "a": "Provide garment use, construction or article, composition direction, GSM, usable width, colour, finish, quantity and destination. Add testing, sample and timing needs when known."
+      },
+      {
+        "q": "Should a buyer specify usable width or total width?",
+        "a": "Use usable width for consumption planning and state the measurement method. The supplier should confirm the finished production tolerance for the proposed article."
+      },
+      {
+        "q": "Can a buyer request an alternative article?",
+        "a": "Yes. Mark proposal fields clearly and ask the supplier to identify every changed specification. Review the alternative as a new labeled sample rather than assuming equivalence."
+      },
+      {
+        "q": "When are MOQ and lead time confirmed?",
+        "a": "MOQ and lead time are commercial conditions confirmed for the current article, colour, quantity and order context. They should come from the current quotation, not a generic content page."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/blog/air-layer-knit-fabric-sourcing-guide",
+        "label": "See an article-based sourcing example"
+      },
+      {
+        "href": "/fabrics",
+        "label": "Review the finished-fabric catalogue"
+      },
+      {
+        "href": "/finished-double-knit-fabrics",
+        "label": "Compare double-knit directions"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Check the current inquiry catalogue"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom development brief"
+      },
+      {
+        "href": "/blog/knit-fabric-sourcing-questions",
+        "label": "Read the sourcing Q&A"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample or quotation"
+      }
+    ],
+    "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/knit-fabric-sourcing-questions",
+    "eyebrow": "Knit fabric sourcing Q&A",
+    "opening": "These short knit fabric sourcing questions help apparel buyers move from a broad category to a verifiable article, finished sample and current quotation. Each answer identifies what the website can document and what still requires sample approval or commercial confirmation.",
+    "hero": {
+      "src": "/images/finished-fabrics/finished-fabric-sample-inspection.webp",
+      "alt": "Finished knit fabric samples arranged with inspection tools for buyer questions",
+      "caption": "Short answers are useful when they preserve the boundary between catalogue evidence, sample approval and commercial confirmation."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/knit-fabric-sourcing-questions",
+        "label": "Knit fabric sourcing Q&A"
+      }
+    ],
+    "published": "2026-07-23",
+    "updated": "2026-07-23",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Questions about article identity and construction",
+        "paragraphs": [
+          "Start with the exact article or a clearly labeled reference. Category names help discovery, but construction, composition, GSM, usable width and finish identify what is actually being reviewed."
+        ],
+        "table": {
+          "headers": [
+            "Buyer question",
+            "Short answer"
+          ],
+          "rows": [
+            [
+              "Is every double knit interlock?",
+              "No. Interlock is one construction within a broader double-knit family. Confirm the loop structure and article."
+            ],
+            [
+              "Is every air-layer a spacer fabric?",
+              "No. Air-layer is a commercial category name. Confirm construction, face, reverse and thickness."
+            ],
+            [
+              "Does soft hand prove cashmere?",
+              "No. Only the exact composition record can support a cashmere fibre claim."
+            ],
+            [
+              "Can two articles share one sample approval?",
+              "No. Approval should identify one article, colour, finish, date and version."
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Questions about GSM, width and consumption",
+        "paragraphs": [
+          "Physical values become useful only when the method and tolerance are clear. The catalogue records article directions such as GD2515 at 300 GSM and 160 cm, GD2579 at 240 GSM and 160-165 cm, and GD2683 at 280 GSM and 160-165 cm."
+        ],
+        "table": {
+          "headers": [
+            "Buyer question",
+            "Short answer"
+          ],
+          "rows": [
+            [
+              "Does higher GSM mean better quality?",
+              "No. GSM describes mass, not total quality or garment suitability."
+            ],
+            [
+              "Why request usable width?",
+              "Usable width supports marker and consumption planning after unusable edges are excluded."
+            ],
+            [
+              "Should jacquard repeat affect consumption?",
+              "Yes. Matching, placement and one-way cutting can increase usage."
+            ],
+            [
+              "Can catalogue width be used without confirmation?",
+              "Use it for shortlisting, then confirm the offered article and tolerance."
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Questions about samples and evidence",
+        "paragraphs": [
+          "Sample approval should record what the buyer inspected and what remains open. A swatch can confirm appearance and hand while testing, bulk shade, production tolerance or commercial terms still require separate decisions."
+        ],
+        "table": {
+          "headers": [
+            "Buyer question",
+            "Short answer"
+          ],
+          "rows": [
+            [
+              "What should a sample label include?",
+              "Supplier, article, colour, finish, date and version."
+            ],
+            [
+              "Is a small swatch enough for jacquard?",
+              "Not always. Request a full repeat and enough area for garment placement."
+            ],
+            [
+              "What should be tested on brushed fabric?",
+              "Review pilling, shedding, abrasion, colourfastness, dimensions and care appearance."
+            ],
+            [
+              "What does sample approval mean?",
+              "It approves the identified physical reference for stated checks, not every commercial condition."
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Questions about availability and quotation",
+        "paragraphs": [
+          "The public catalogue documents 104 finished-fabric records across 11 series. It supports discovery and technical comparison. Live colour, quantity, sample route, testing, price, MOQ, lead time, packing, documentation and shipping depend on the current inquiry."
+        ],
+        "table": {
+          "headers": [
+            "Buyer question",
+            "Short answer"
+          ],
+          "rows": [
+            [
+              "Does a listed article guarantee stock?",
+              "No. Ask sales to confirm current colour and quantity."
+            ],
+            [
+              "When is price confirmed?",
+              "After the article, colour, quantity, finish, testing and delivery basis are clear."
+            ],
+            [
+              "Can the factory review a custom brief?",
+              "Yes. Send the garment, swatch or specification and mark fixed versus proposal fields."
+            ],
+            [
+              "What makes an RFQ answerable?",
+              "Article or construction, composition, GSM, usable width, colour, finish, quantity, destination and tests."
+            ]
+          ]
+        },
+        "note": {
+          "label": "Three-part evidence model",
+          "text": "Catalogue data supports discovery. The labeled finished sample supports approval. The current quotation supports commercial confirmation."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "How many finished-fabric records are documented?",
+        "a": "The current owner-confirmed catalogue contains 104 finished-fabric records across 11 series. Use the records for comparison and ask sales to confirm the current article and order conditions."
+      },
+      {
+        "q": "Which article examples are useful starting points?",
+        "a": "Examples include air-layer GD2515 at 300 GSM and 160 cm, yarn-dyed wool-blend GD2672 at 360 GSM and 160 cm, and jacquards GD2579 and GD2683 at 160-165 cm."
+      },
+      {
+        "q": "What is the fastest way to request a sample?",
+        "a": "Send the article or closest category, garment use, colour, target GSM, usable width, finish, quantity and destination. Sales can then confirm the relevant sample route."
+      },
+      {
+        "q": "What should remain private in an inquiry?",
+        "a": "Current price, quantity availability, MOQ, lead time, payment, packing, testing documents and shipping conditions are confirmed directly for the buyer's actual order context."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "Build a complete knit fabric RFQ"
+      },
+      {
+        "href": "/fabrics",
+        "label": "Review the finished-fabric catalogue"
+      },
+      {
+        "href": "/finished-double-knit-fabrics",
+        "label": "Compare double-knit directions"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Check the current inquiry catalogue"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom development brief"
+      },
+      {
+        "href": "/blog/air-layer-knit-fabric-sourcing-guide",
+        "label": "Review the air-layer sourcing guide"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample or quotation"
+      }
+    ],
+    "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
   }
 ]

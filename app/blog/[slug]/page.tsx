@@ -6,7 +6,7 @@ import {
   getFinishedFabricPage,
   getFinishedFabricSlug,
 } from "@/lib/finished-fabric-content";
-import { siteUrl } from "@/lib/geo-content";
+import { buildSeoMetadata } from "@/lib/seo";
 
 type BlogPageProps = {
   params: {
@@ -15,6 +15,7 @@ type BlogPageProps = {
 };
 
 export const dynamic = "force-static";
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return getFinishedBlogArticles().map((page) => ({
@@ -25,21 +26,7 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: BlogPageProps): Metadata {
   const page = getFinishedFabricPage(`/blog/${params.slug}`);
   if (!page) return {};
-
-  return {
-    title: { absolute: page.title },
-    description: page.description,
-    alternates: { canonical: page.url },
-    openGraph: {
-      title: page.title,
-      description: page.description,
-      url: `${siteUrl}${page.url}`,
-      type: "article",
-      publishedTime: page.published,
-      modifiedTime: page.updated,
-      images: [{ url: page.hero.src, alt: page.hero.alt }],
-    },
-  };
+  return buildSeoMetadata(page.url);
 }
 
 export default function FinishedFabricBlogPage({ params }: BlogPageProps) {

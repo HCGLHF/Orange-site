@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useLocale } from "@/components/LocaleProvider";
 import { resolveStockFilter } from "@/lib/fabric-filter-state";
 
-function FabricsPageIntroContent() {
+function FabricsPageIntroContent({ h1 }: { h1: string }) {
   const { t } = useLocale();
   const searchParams = useSearchParams();
   const stock = resolveStockFilter(searchParams.get("stock"));
@@ -30,16 +30,16 @@ function FabricsPageIntroContent() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-brand-charcoal">{copy.title}</h1>
+      <h1 className="text-3xl font-bold text-brand-charcoal">{h1}</h1>
       <p className="mt-2 max-w-3xl text-brand-charcoal/70">{copy.subtitle}</p>
     </>
   );
 }
 
-export function FabricsPageIntro() {
+export function FabricsPageIntro({ h1 }: { h1: string }) {
   return (
     <Suspense fallback={<div className="h-16 animate-pulse bg-brand-soft/30" aria-hidden />}>
-      <FabricsPageIntroContent />
+      <FabricsPageIntroContent h1={h1} />
     </Suspense>
   );
 }

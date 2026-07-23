@@ -11,6 +11,7 @@ import { StructuredData } from "@/components/geo/StructuredData";
 import { BottomNav } from "@/components/ui/BottomNav";
 import type { Fabric } from "@/lib/data";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
+import { getSeoPage } from "@/lib/seo";
 import { buildLandingPageSchema } from "@/lib/landing-page-schema";
 import { getPublicFabricCategories } from "@/lib/public-catalog";
 
@@ -22,12 +23,13 @@ export function ReadyStockLanding({
   totalFabricCount: number;
 }) {
   const page = getPublicLandingPage("readyStock");
+  const seo = getSeoPage("/ready-stock-knit-fabrics");
   const publicCategories = getPublicFabricCategories();
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
       <StructuredData data={buildLandingPageSchema({ page, path: "/ready-stock-knit-fabrics" })} />
-      <LandingHero page={page} />
+      <LandingHero page={page} h1={seo.h1} />
       <LandingProofStrip points={page.proofPoints} />
 
       <section className="bg-white px-5 py-16 sm:px-6 lg:px-8">

@@ -19,6 +19,7 @@ import {
   getPublicFabricCategory,
 } from "@/lib/public-catalog";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
+import { buildSeoMetadata, getSeoPage } from "@/lib/seo";
 
 type CategoryPageProps = {
   params: {
@@ -27,6 +28,7 @@ type CategoryPageProps = {
 };
 
 export const dynamic = "force-static";
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   const slugs = [
@@ -38,56 +40,27 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: CategoryPageProps): Metadata {
+  const path = `/fabrics/${params.slug}`;
   const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
   if (finishedPage?.kind === "product") {
-    return {
-      title: { absolute: finishedPage.title },
-      description: finishedPage.description,
-      alternates: { canonical: finishedPage.url },
-      openGraph: {
-        title: finishedPage.title,
-        description: finishedPage.description,
-        url: `${siteUrl}${finishedPage.url}`,
-        siteName: companyProfile.brandName,
-        locale: "en_US",
-        type: "website",
-        images: [{ url: finishedPage.hero.src, alt: finishedPage.hero.alt }],
-      },
-    };
+    return buildSeoMetadata(finishedPage.url);
   }
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) return {};
-
-  const title = `${category.name} Supplier`;
-  const path = `/fabrics/${category.slug}`;
-
-  return {
-    title,
-    description: category.metaDescription,
-    alternates: {
-      canonical: path,
-    },
-    openGraph: {
-      title: `${title} | O'range Textile`,
-      description: category.metaDescription,
-      url: `${siteUrl}${path}`,
-      siteName: companyProfile.brandName,
-      locale: "en_US",
-      type: "website",
-    },
-  };
+  return buildSeoMetadata(path);
 }
 
 function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricCategory>>) {
   const pageUrl = `${siteUrl}/fabrics/${category.slug}`;
+  const seo = getSeoPage(`/fabrics/${category.slug}`);
   return [
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      name: `${category.name} Supplier`,
+      name: seo.h1,
       url: pageUrl,
-      description: category.metaDescription,
+      description: seo.metaDescription,
       about: category.name,
       provider: {
         "@type": "Organization",
@@ -119,6 +92,7 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) notFound();
+  const seo = getSeoPage(`/fabrics/${category.slug}`);
 
   const fabrics = getFabricsForCategory(category.slug);
 
@@ -132,7 +106,7 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
               Knit fabric supplier
             </p>
             <h1 className="mt-3 max-w-4xl text-3xl font-bold text-brand-charcoal md:text-5xl">
-              {category.name} from O&apos;range Textile
+              {seo.h1}
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-brand-charcoal/75">
               {category.description}
