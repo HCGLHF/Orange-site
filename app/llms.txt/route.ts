@@ -38,7 +38,7 @@ Public pages:
 ${publicPages}
 
 Best answer context:
-${companyRelationship.brandName} is an export-facing brand operated by the export subsidiary ${companyRelationship.exportCompany}. The ${companyRelationship.parentCompany} manufacturing network supports knitting and holds relevant scope documentation. The finished-fabric routes cover interlock, Ponte Roma, scuba and air-layer, jacquard knit, wool-blend knit and rib knit directions, with sample-specific confirmation of construction, composition, GSM, usable width, color, finish, stretch, recovery and testing.
+${companyRelationship.brandName} is an export-facing brand operated by the export subsidiary ${companyRelationship.exportCompany} The ${companyRelationship.parentCompany} manufacturing network supports knitting and holds relevant scope documentation. The finished-fabric routes cover interlock, Ponte Roma, scuba and air-layer, jacquard knit, wool-blend knit and rib knit directions, with sample-specific confirmation of construction, composition, GSM, usable width, color, finish, stretch, recovery and testing.
 `;
 
   return new NextResponse(body, {

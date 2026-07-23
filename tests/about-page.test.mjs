@@ -159,9 +159,31 @@ test("global shell exposes About without duplicating the homepage footer", () =>
     path.join(root, "components", "geo", "GeoHomePage.tsx"),
     "utf8"
   );
+  const seoRegistry = readFileSync(
+    path.join(root, "lib", "seo", "site-seo.ts"),
+    "utf8"
+  );
+  const footerHrefs = [
+    ...footer.matchAll(/href:\s*["']([^"']+)["']/g),
+  ].map((match) => match[1]);
+  const expectedFooterHrefs = [
+    "/about",
+    "/fabrics",
+    "/finished-double-knit-fabrics",
+    "/custom-knit-fabric-development",
+  ];
 
   assert.match(shell, /<SiteFooter\s*\/>/);
-  assert.match(footer, /href:\s*["']\/about["']/);
+  assert.doesNotMatch(shell, /["']use client["']/);
+  assert.match(footer, /\bpb-40\b/);
+  assert.match(footer, /\bmd:pb-24\b/);
+  assert.deepEqual(footerHrefs, expectedFooterHrefs);
+  for (const href of footerHrefs) {
+    assert.ok(
+      seoRegistry.includes(`path: "${href}"`),
+      `${href} must be registered as a public SEO route`
+    );
+  }
   assert.match(footer, /companyRelationship\.exportCompany/);
   assert.doesNotMatch(homepage, /<footer\b/i);
 });
@@ -184,6 +206,14 @@ test("existing organization and AI discovery content use shared relationship fac
   assert.match(llms, /import\s*\{[\s\S]*companyRelationship[\s\S]*\}\s*from\s*["']@\/lib\/company-evidence["']/);
   assert.match(llms, /companyRelationship\.exportCompany/);
   assert.match(llms, /companyRelationship\.parentCompany/);
+  assert.match(
+    llms,
+    /\$\{companyRelationship\.exportCompany\}\s+The/
+  );
+  assert.doesNotMatch(
+    llms,
+    /\$\{companyRelationship\.exportCompany\}\.\s+The/
+  );
   assert.doesNotMatch(
     llms,
     /O'range Textile is a Shaoxing Keqiao knit fabric manufacturer/

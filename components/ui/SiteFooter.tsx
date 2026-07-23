@@ -16,7 +16,7 @@ const footerLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-brand-soft bg-white px-5 pb-28 pt-10 text-brand-charcoal sm:px-6 md:pb-12 lg:px-8">
+    <footer className="border-t border-brand-soft bg-white px-5 pb-40 pt-10 text-brand-charcoal sm:px-6 md:pb-24 lg:px-8">
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
         <div>
           <p className="text-base font-semibold">
