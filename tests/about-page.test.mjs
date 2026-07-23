@@ -93,7 +93,9 @@ test("homepage renders a compact certificate summary linked to About", () => {
   assert.match(homepage, /<HomeCertificateSection\s*\/>/);
   assert.match(section, /GRS Scope Documentation/);
   assert.match(section, /companyRelationship\.parentCompany/);
+  assert.match(section, /certificationEvidence\.productCategory/);
   assert.match(section, /certificationEvidence\.productDetail/);
+  assert.match(section, /certificationEvidence\.qualification/);
   assert.match(section, /href="\/about"/);
   assert.doesNotMatch(section, /<h1\b/i);
   assert.doesNotMatch(section, /download|\.pdf|<img\b/i);
