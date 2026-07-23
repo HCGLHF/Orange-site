@@ -171,7 +171,7 @@ const englishMessages: Messages = {
     "Shaoxing Shicheng Textile Products Co., Ltd. | Finished fabrics and sourcing enquiries",
   heroTagline: "From greige fabric to finished fabric and garment supply",
   ctaButton: "Send an inquiry",
-  trustBadges: ["221 knitting machines", "104 finished-fabric articles", "11 product series"],
+  trustBadges: ["200+ knitting machines", "104 finished-fabric articles", "11 product series"],
   fabricsTitle: "Featured fabrics",
   fabricsSubtitle: "Selected knit programs",
   fabricsViewAll: "View all",

@@ -77,7 +77,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },
       { label: "Production route", value: "Greige fabric, finished fabric and garments", enabled: true },
-      { label: "Machine evidence", value: "221 documented circular knitting machines", enabled: true },
+      { label: "Machine evidence", value: "200+ documented circular knitting machines", enabled: true },
       { label: "Export experience", value: "Asia, Europe, the Americas and Russia", enabled: true },
     ],
     advantages: [
@@ -309,6 +309,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
 };
 
 export function getPublicLandingPage(key: LandingPageKey): PublicLandingPage {
-  const { editorNotes: _editorNotes, ...publicContent } = landingPages[key];
+  const { editorNotes, ...publicContent } = landingPages[key];
+  void editorNotes;
   return publicContent;
 }

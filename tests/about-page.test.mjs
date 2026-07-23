@@ -59,6 +59,27 @@ test("company evidence excludes restricted source assets and production figures"
   }
 });
 
+test("public machine evidence uses rounded counts", () => {
+  const i18n = readFileSync(path.join(root, "lib", "i18n.ts"), "utf8");
+  const landingPages = readFileSync(
+    path.join(root, "content", "landing-pages.ts"),
+    "utf8"
+  );
+  const finishedFabrics = readFileSync(
+    path.join(root, "content", "finished-fabrics.json"),
+    "utf8"
+  );
+  const publicCopy = `${i18n}\n${landingPages}\n${finishedFabrics}`;
+  const exactMachineCount =
+    /(?:\b(?:221|177|114|63|44)\b(?=[^\r\n.!?]{0,80}\b(?:machines?|machine (?:sheet|inventory)|double[- ]knit|rib)\b)|\b(?:machines?|machine (?:sheet|inventory)|double[- ]knit|rib)\b(?=[^\r\n.!?]{0,80}\b(?:221|177|114|63|44)\b))/i;
+
+  assert.doesNotMatch(publicCopy, exactMachineCount);
+  assert.match(publicCopy, /\b200\+(?=\s)[^\r\n.!?]{0,80}\b(?:knitting )?machines?\b/i);
+  assert.match(finishedFabrics, /\b60\+(?=\s)[^\r\n.!?]{0,80}\bdouble[- ]knit\b/i);
+  assert.match(finishedFabrics, /\b40\+(?=\s)[^\r\n.!?]{0,80}\brib\b/i);
+  assert.match(finishedFabrics, /\b100\+(?=\s)[^\r\n.!?]{0,80}\bdouble[- ]knit\b/i);
+});
+
 test("restricted evidence assets are absent from tracked files", () => {
   const trackedFiles = execFileSync("git", ["ls-files", "-z"], { cwd: root })
     .toString("utf8")

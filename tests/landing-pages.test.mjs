@@ -43,7 +43,7 @@ test("landing copy reflects the supplied export, production and inquiry evidence
   assert.match(homeText, /Europe/i);
   assert.match(homeText, /United States/i);
   assert.match(homeText, /South America/i);
-  assert.match(homeText, /221 documented circular knitting machines/i);
+  assert.match(homeText, /200\+ documented circular knitting machines/i);
   assert.match(homeText, /GRS documentation/i);
   assert.match(homeText, /applicable/i);
 
