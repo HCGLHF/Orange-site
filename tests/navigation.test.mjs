@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile as readTextFile } from "node:fs/promises";
 import test from "node:test";
+
+const readFile = async (...args) =>
+  (await readTextFile(...args)).replace(/\r\n?/g, "\n");
 
 const navigationUrl = new URL("../lib/navigation.ts", import.meta.url);
 const desktopNavigationUrl = new URL(
