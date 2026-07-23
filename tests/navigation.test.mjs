@@ -162,6 +162,19 @@ test("desktop navigation implements the shared accessible menu contract", async 
   ]);
 
   assert.match(source, /["']use client["']/);
+  assert.match(
+    source,
+    /import\s+Link\s+from\s+["']next\/link["'];?/
+  );
+  assert.doesNotMatch(source, /<a(?:\s|>)/);
+  assert.match(
+    source,
+    /<Link\b(?=[^>]*href=\{section\.href\})[^>]*>/
+  );
+  assert.match(
+    source,
+    /<Link\b(?=[^>]*href=\{item\.href\})(?=[^>]*role=["']menuitem["'])[^>]*>/
+  );
   assert.match(source, /PRIMARY_NAVIGATION\.map\s*\(/);
   assert.match(source, /getActiveNavigationId\s*\(\s*pathname\s*\)/);
   assert.doesNotMatch(source, /const\s+navItems\s*=/);
@@ -181,7 +194,18 @@ test("desktop navigation implements the shared accessible menu contract", async 
   assert.match(source, /tabIndex=\{isOpen\s*\?\s*0\s*:\s*-1\}/);
   assert.match(source, /invisible pointer-events-none/);
 
-  assert.match(source, /\.items\.map\s*\(/);
+  assert.doesNotMatch(
+    source,
+    /\{\s*isOpen\s*&&[^}]*section\.items\.map\s*\(/
+  );
+  assert.doesNotMatch(
+    source,
+    /\{\s*isOpen\s*\?[^}]*section\.items\.map\s*\(/
+  );
+  assert.match(
+    source,
+    /<div\b(?=[^>]*id=\{panelId\})(?=[^>]*role=["']menu["'])(?=[^>]*aria-hidden=\{!isOpen\})[^>]*>\s*\{section\.items\.map\s*\(/
+  );
   assert.match(source, /\{\s*item\.label\s*\}/);
   assert.match(source, /href=\{\s*item\.href\s*\}/);
   for (const section of PRIMARY_NAVIGATION) {
@@ -220,6 +244,15 @@ test("desktop navigation implements the shared accessible menu contract", async 
   assert.match(source, /hidden[^"']*xl:flex/);
   assert.match(source, /focus-visible:ring-2/);
   assert.match(source, /motion-reduce:transition-none/);
+  assert.equal(
+    [
+      ...source.matchAll(
+        /<span\s+className=\{`(?=[^`]*\babsolute\b)(?=[^`]*\bh-0\.5\b)[^`]*\$\{\s*isActive\s*\?\s*["']opacity-100["']\s*:\s*["']opacity-0["']\s*\}[^`]*`\}\s+aria-hidden=["']true["']\s*\/>/g
+      ),
+    ].length,
+    2,
+    "direct links and group triggers need width-stable active underlines"
+  );
   assert.match(source, /ChevronDown/);
   assert.match(source, /aria-hidden=["']true["']/);
 });
