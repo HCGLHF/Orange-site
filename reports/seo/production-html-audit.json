@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-07-23T13:39:13.392Z",
-  "gitCommit": "38a8e81afc1b78231b155a72a41da7657619f510",
-  "buildId": "xhkTNv5BRaiMTnpoh8GoW",
-  "registryHash": "a884da8e41e92151db0b58b427d608e2d06110ef4d138ebe9ab26f59212000fd",
-  "baseUrl": "http://127.0.0.1:3219",
+  "generatedAt": "2026-07-23T14:33:36.024Z",
+  "gitCommit": "d521f7a84cf645a03bb4349f06160a64d8a25d93",
+  "buildId": "-peEeRPrI_eUAtQ4atMTA",
+  "registryHash": "0b415480754e7521cdad8cfc7d65a15f568a3f7b31b76b45a069d2332390cc11",
+  "baseUrl": "http://127.0.0.1:3210",
   "productionOrigin": "https://orangetextiles.com",
   "summary": {
-    "total": 28,
-    "checked": 28,
-    "passed": 28,
+    "total": 29,
+    "checked": 29,
+    "passed": 29,
     "failed": 0,
     "unchecked": 0,
     "inaccessible": 0
@@ -20,12 +20,12 @@
   },
   "sitemap": {
     "status": 200,
-    "urlCount": 28,
+    "urlCount": 29,
     "matchesRegistry": true
   },
   "discovery": {
-    "registryCount": 28,
-    "builtPublicCount": 28,
+    "registryCount": 29,
+    "builtPublicCount": 29,
     "missingFromRegistry": [],
     "missingFromBuild": []
   },
@@ -52,6 +52,32 @@
       "imageCount": 1,
       "imageAltResult": "PASS",
       "canonical": "https://orangetextiles.com",
+      "statusCode": 200,
+      "sitemapPresent": true,
+      "noindex": false,
+      "inaccessible": false,
+      "result": "PASS",
+      "failures": []
+    },
+    {
+      "url": "https://orangetextiles.com/about",
+      "path": "/about",
+      "primaryKeyword": "O'range Textile",
+      "secondaryKeywords": [
+        "Shaoxing knit fabric company",
+        "China knit fabric supplier",
+        "knit fabric export company"
+      ],
+      "searchIntent": "navigational",
+      "topicCluster": "company-trust",
+      "targetPageType": "about",
+      "title": "O'range Textile | Knit Fabric Company in Shaoxing",
+      "metaDescription": "O'range Textile is the export-focused knit fabric business of Shaoxing Shicheng Textile Products Co., Ltd. Explore its parent-company manufacturing network, 200+ circular knitting machines, GRS scope documentation and support for global B2B buyers.",
+      "h1": "O'range Textile: Export-Focused Knit Fabric Sourcing",
+      "h1Count": 1,
+      "imageCount": 0,
+      "imageAltResult": "PASS",
+      "canonical": "https://orangetextiles.com/about",
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
