@@ -115,7 +115,7 @@ test("Next.js exposes the hub, blog, product routes and machine-readable discove
 
   const sitemap = readFileSync(path.join(root, "app/sitemap.ts"), "utf8");
   const llms = readFileSync(path.join(root, "app/llms.txt/route.ts"), "utf8");
-  assert.match(sitemap, /getFinishedFabricPages/);
+  assert.match(sitemap, /getAllPublicPageSeo/);
   assert.match(llms, /getAllPublicPageSeo/);
 });
 

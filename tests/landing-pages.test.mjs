@@ -124,7 +124,7 @@ test("primary buyer navigation and discovery files expose all landing routes", a
   }
 
   assert.doesNotMatch(navbar, /navBadge24h/);
-  assert.match(sitemap, /getFinishedFabricPages/);
+  assert.match(sitemap, /getAllPublicPageSeo/);
   assert.match(llms, /getAllPublicPageSeo/);
   assert.match(finishedPage, /page\.kind === "hub"/);
   assert.match(finishedPage, /LandingHero/);

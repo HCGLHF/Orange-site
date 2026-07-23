@@ -102,3 +102,14 @@ test("schema and llms discovery consume the SEO registry", async () => {
   assert.match(llms, /page\.h1/);
   assert.match(llms, /page\.metaDescription/);
 });
+
+test("sitemap comes only from the unified public inventory", async () => {
+  const source = await readSource("app/sitemap.ts");
+  assert.match(source, /getAllPublicPageSeo/);
+  assert.match(source, /page\.updatedAt/);
+  assert.doesNotMatch(source, /new Date\(\)/);
+  assert.doesNotMatch(
+    source,
+    /getFinishedFabricPages|getPublicFabricCategories/
+  );
+});
