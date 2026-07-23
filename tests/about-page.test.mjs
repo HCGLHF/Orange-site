@@ -119,6 +119,19 @@ test("About route uses unified metadata and one registry-owned H1", () => {
   assert.match(component, /manufacturingScale\.map/);
   assert.match(component, /certificationEvidence\.qualification/);
   assert.doesNotMatch(component, /<img\b|\.pdf|download/i);
+  assert.doesNotMatch(component, /<main\b/i);
+  assert.doesNotMatch(
+    component,
+    /text-brand-charcoal\/(?:55|60|65|70)\b/
+  );
+  assert.match(
+    component,
+    /<dd\b[^>]*>[\s\S]*?\{metric\.value\}[\s\S]*?\{metric\.detail\}[\s\S]*?<\/dd>/
+  );
+  assert.doesNotMatch(
+    component,
+    /<\/dd>\s*<p\b[^>]*>[\s\S]*?\{metric\.detail\}/
+  );
 });
 
 test("About schema identifies the parent without assigning its certificate to the subsidiary", () => {

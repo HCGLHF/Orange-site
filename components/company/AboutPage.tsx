@@ -31,7 +31,7 @@ const sourcingBrief = [
 
 export function AboutPage({ seo }: { seo: PublicPageSeo }) {
   return (
-    <main className="min-h-screen bg-brand-cream text-brand-charcoal">
+    <div className="min-h-screen bg-brand-cream text-brand-charcoal">
       <StructuredData data={createAboutPageJsonLd(seo)} />
 
       <article>
@@ -48,7 +48,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
               <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.05] tracking-[-0.035em] text-brand-charcoal sm:text-5xl lg:text-7xl">
                 {seo.h1}
               </h1>
-              <p className="mt-7 max-w-3xl text-lg leading-8 text-brand-charcoal/75 sm:text-xl sm:leading-9">
+              <p className="mt-7 max-w-3xl text-lg leading-8 text-brand-charcoal/80 sm:text-xl sm:leading-9">
                 O&apos;range Textile connects international apparel teams with
                 documented knit-fabric directions, sample coordination and
                 export-order support through a defined company and parent
@@ -57,14 +57,14 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
             </div>
 
             <aside className="self-end border-t-4 border-brand-orange pt-6">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-charcoal/65">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-charcoal/80">
                 Operating model
               </p>
               <p className="mt-3 text-2xl font-semibold leading-8 text-brand-charcoal">
                 Export communication at the front. Documented knitting
                 capability behind it.
               </p>
-              <p className="mt-5 text-sm leading-7 text-brand-charcoal/70">
+              <p className="mt-5 text-sm leading-7 text-brand-charcoal/80">
                 {companyRelationship.location}
               </p>
             </aside>
@@ -85,13 +85,13 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
             <div className="mt-10 grid gap-px overflow-hidden border border-brand-charcoal/15 bg-brand-charcoal/15 md:grid-cols-2">
               <div className="bg-white p-7 sm:p-9">
                 <Building2 className="h-7 w-7 text-brand-charcoal" aria-hidden />
-                <p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-brand-charcoal/60">
+                <p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-brand-charcoal/80">
                   Export company
                 </p>
                 <h3 className="mt-3 text-xl font-semibold text-brand-charcoal">
                   {companyRelationship.exportCompany}
                 </h3>
-                <p className="mt-4 text-base leading-8 text-brand-charcoal/70">
+                <p className="mt-4 text-base leading-8 text-brand-charcoal/80">
                   Shicheng operates O&apos;range export business, supporting
                   international sales, buyer communication, sampling
                   coordination and export orders.
@@ -100,13 +100,13 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
 
               <div className="bg-white p-7 sm:p-9">
                 <Factory className="h-7 w-7 text-brand-charcoal" aria-hidden />
-                <p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-brand-charcoal/60">
+                <p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-brand-charcoal/80">
                   Parent manufacturer
                 </p>
                 <h3 className="mt-3 text-xl font-semibold text-brand-charcoal">
                   {companyRelationship.parentCompany}
                 </h3>
-                <p className="mt-4 text-base leading-8 text-brand-charcoal/70">
+                <p className="mt-4 text-base leading-8 text-brand-charcoal/80">
                   Jingtian supports documented knitting and is the GRS scope certificate holder.
                   Certificate status belongs to the parent entity, not the
                   export subsidiary.
@@ -126,7 +126,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                 <h2 className="mt-4 text-3xl font-semibold tracking-tight text-brand-charcoal sm:text-4xl">
                   Rounded figures backed by the parent company record
                 </h2>
-                <p className="mt-5 max-w-xl text-base leading-8 text-brand-charcoal/70">
+                <p className="mt-5 max-w-xl text-base leading-8 text-brand-charcoal/80">
                   These figures describe recorded machinery and configurations.
                   They are context for development conversations, not a promise
                   of available capacity for a specific order.
@@ -141,15 +141,17 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                       index === 0 ? "sm:col-span-2" : ""
                     }`}
                   >
-                    <dt className="text-sm font-semibold leading-6 text-brand-charcoal/70">
+                    <dt className="text-sm font-semibold leading-6 text-brand-charcoal/80">
                       {metric.label}
                     </dt>
-                    <dd className="mt-5 text-4xl font-bold tracking-[-0.04em] text-brand-charcoal">
-                      {metric.value}
+                    <dd className="mt-5 text-brand-charcoal">
+                      <span className="block text-4xl font-bold tracking-[-0.04em]">
+                        {metric.value}
+                      </span>
+                      <span className="mt-4 block text-sm font-normal leading-7 text-brand-charcoal/80">
+                        {metric.detail}
+                      </span>
                     </dd>
-                    <p className="mt-4 text-sm leading-7 text-brand-charcoal/65">
-                      {metric.detail}
-                    </p>
                   </div>
                 ))}
               </dl>
@@ -168,7 +170,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                   Start with a construction family
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-7 text-brand-charcoal/70">
+              <p className="max-w-md text-sm leading-7 text-brand-charcoal/80">
                 Review the relevant sourcing page, then confirm the actual
                 article against your garment and test brief.
               </p>
@@ -186,7 +188,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <span className="text-xs font-bold tabular-nums text-brand-charcoal/55">
+                    <span className="text-xs font-bold tabular-nums text-brand-charcoal/80">
                       0{index + 1}
                     </span>
                     <ArrowUpRight
@@ -198,7 +200,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                     <h3 className="text-2xl font-semibold text-brand-charcoal">
                       {direction.name}
                     </h3>
-                    <p className="mt-3 max-w-lg text-sm leading-7 text-brand-charcoal/70">
+                    <p className="mt-3 max-w-lg text-sm leading-7 text-brand-charcoal/80">
                       {direction.description}
                     </p>
                   </div>
@@ -219,7 +221,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                 <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
                   GRS scope documentation, with the holder made explicit
                 </h2>
-                <p className="mt-5 text-base leading-8 text-white/70">
+                <p className="mt-5 text-base leading-8 text-white/80">
                   The scope record supports due diligence on the parent
                   manufacturer. It is not presented as a product-level claim.
                 </p>
@@ -251,7 +253,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                       key={label}
                       className="border-b border-white/20 py-5 sm:odd:pr-6 sm:even:pl-6"
                     >
-                      <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">
+                      <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
                         {label}
                       </dt>
                       <dd className="mt-2 text-sm font-medium leading-6 text-white">
@@ -268,7 +270,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                       aria-hidden
                     />
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/65">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
                         Qualification
                       </p>
                       <p className="mt-3 text-sm leading-7 text-white/80">
@@ -292,7 +294,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
               <h2 className="mt-4 text-3xl font-semibold tracking-tight text-brand-charcoal sm:text-4xl">
                 English-language B2B support for global buyers
               </h2>
-              <p className="mt-5 max-w-xl text-base leading-8 text-brand-charcoal/70">
+              <p className="mt-5 max-w-xl text-base leading-8 text-brand-charcoal/80">
                 O&apos;range supports international apparel sourcing teams,
                 including buyers in the United States and Australia, from
                 initial construction direction through sample and RFQ review.
@@ -314,7 +316,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
                 {sourcingBrief.map((item) => (
                   <li
                     key={item}
-                    className="flex items-center gap-3 border-t border-brand-charcoal/15 pt-4 text-sm font-medium text-brand-charcoal/75"
+                    className="flex items-center gap-3 border-t border-brand-charcoal/15 pt-4 text-sm font-medium text-brand-charcoal/80"
                   >
                     <span
                       className="h-1.5 w-1.5 shrink-0 bg-brand-orange"
@@ -330,6 +332,6 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
       </article>
 
       <ContactCard />
-    </main>
+    </div>
   );
 }
