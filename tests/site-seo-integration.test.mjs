@@ -56,7 +56,11 @@ test("metadata adapter aligns descriptions and uses absolute titles", async () =
     source,
     /twitter:[\s\S]+description:\s*page\.metaDescription/
   );
-  assert.match(source, /canonical:\s*page\.path/);
+  assert.match(
+    source,
+    /alternates:\s*\{\s*canonical\s*,?\s*\}/
+  );
+  assert.doesNotMatch(source, /canonical:\s*page\.path/);
 });
 
 test("shared H1 components accept the SEO registry value", async () => {

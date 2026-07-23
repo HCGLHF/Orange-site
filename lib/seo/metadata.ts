@@ -54,7 +54,7 @@ export function createPageMetadata(
   return {
     title: { absolute: page.metaTitle },
     description: page.metaDescription,
-    alternates: { canonical: page.path },
+    alternates: { canonical },
     robots: { index: true, follow: true },
     openGraph,
     twitter: {

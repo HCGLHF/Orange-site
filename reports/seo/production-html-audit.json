@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-07-23T12:25:06.674Z",
-  "gitCommit": "0ec3ef10c10d3e4bd2aedefc0fb1b0b952f3a908",
-  "buildId": "H7MKDyeFIUGtNmAa5TXlv",
-  "registryHash": "52efde0ee2c818baa5c42820b8f2971edf66084fdd08af676ceeb485fe63fe3a",
-  "baseUrl": "http://127.0.0.1:3210",
+  "generatedAt": "2026-07-23T13:39:13.392Z",
+  "gitCommit": "38a8e81afc1b78231b155a72a41da7657619f510",
+  "buildId": "xhkTNv5BRaiMTnpoh8GoW",
+  "registryHash": "a884da8e41e92151db0b58b427d608e2d06110ef4d138ebe9ab26f59212000fd",
+  "baseUrl": "http://127.0.0.1:3219",
   "productionOrigin": "https://orangetextiles.com",
   "summary": {
     "total": 28,

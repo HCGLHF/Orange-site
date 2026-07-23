@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const moduleUrl = new URL("../lib/seo/site-seo.ts", import.meta.url);
@@ -121,4 +121,19 @@ test("crawl fields use the production origin and stable valid values", async () 
     assert.ok(allowedChangeFrequencies.has(page.changeFrequency));
     assert.ok(page.priority >= 0 && page.priority <= 1);
   }
+});
+
+test("canonical URLs normalize the homepage and sitemap through one helper", async () => {
+  const { toCanonicalUrl } = await loadSeo();
+  const sitemap = readFileSync(
+    new URL("../app/sitemap.ts", import.meta.url),
+    "utf8"
+  );
+
+  assert.equal(toCanonicalUrl("/"), "https://orangetextiles.com");
+  assert.equal(
+    toCanonicalUrl("/blog/how-to-write-a-knit-fabric-rfq"),
+    "https://orangetextiles.com/blog/how-to-write-a-knit-fabric-rfq"
+  );
+  assert.match(sitemap, /url: toCanonicalUrl\(page\.path\)/);
 });

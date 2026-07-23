@@ -8,6 +8,13 @@
 
 **Tech Stack:** Next.js 14 App Router, React Server Components, TypeScript, JSON content registries, Node test runner, Semrush Site Audit.
 
+> **Implementation addendum:** The root trailing-slash hypothesis in Tasks 1
+> and 3 was falsified by the production build. Next.js 14 deliberately emits
+> the root canonical as `https://orangetextiles.com`. The final implementation
+> and test align metadata and sitemap to that bare origin instead of enabling a
+> sitewide trailing-slash policy. The sitemap-orphan warning remains pending
+> production Semrush measurement.
+
 ---
 
 ### Task 1: Lock the Semrush Regressions into Tests

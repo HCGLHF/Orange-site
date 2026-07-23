@@ -19,6 +19,18 @@ The 2026-07-23 saved audit crawled 32 pages and reported:
 - Low text/HTML ratio pages: 28
 - Sitemap orphan pages: 1
 
+## Implementation Evidence Update
+
+The root trailing-slash hypothesis below was tested and disproved during the
+production build. Next.js 14 serializes a root canonical `URL` as its bare
+origin, and the final homepage HTML contains
+`https://orangetextiles.com`. The homepage also has server-rendered `/` links.
+
+The accepted implementation therefore keeps the bare origin and makes the
+sitemap use the same canonical helper. The original hypothesis is retained
+below as the experiment that was run; it is not a requirement to enable a
+global trailing-slash URL policy.
+
 The three AI Search issues are pages with only one inbound internal link:
 
 - `/blog/brushed-and-pile-knit-fabric-finishes`
@@ -65,6 +77,11 @@ An automated test will verify:
 This tests the leading explanation for the reported sitemap orphan signal:
 Semrush may be separating the no-slash root value from the crawlable slash
 variant. A post-deploy audit will determine whether the warning is removed.
+
+Implementation result: the production build showed that Next.js 14 removes the
+root slash when serializing metadata. The final behavior is one consistent bare
+origin in metadata and sitemap output. The orphan remains a post-deploy
+measurement target, not a claimed local fix.
 
 ### 3. Run a Buyer-Guide Density Experiment
 

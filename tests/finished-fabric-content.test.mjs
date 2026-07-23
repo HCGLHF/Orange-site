@@ -141,6 +141,56 @@ test("catalogue guides use approved article and specification evidence", () => {
   }
 });
 
+test("new catalogue guides have at least three contextual inbound routes", () => {
+  const pages = loadPages();
+  const targets = [
+    "/blog/how-to-source-wool-blend-knit-fabric",
+    "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    "/blog/brushed-and-pile-knit-fabric-finishes",
+  ];
+
+  for (const target of targets) {
+    const registryEntries = pages.filter((page) =>
+      page.relatedLinks.some((link) => link.href === target)
+    );
+    assert.ok(
+      registryEntries.length >= 2,
+      `${target} needs two contextual entries in addition to the blog index`
+    );
+  }
+});
+
+test("catalogue-derived guides publish unique evidence snapshots", () => {
+  const pages = loadPages();
+  const guideRoutes = [
+    "/blog/air-layer-knit-fabric-sourcing-guide",
+    "/blog/how-to-source-wool-blend-knit-fabric",
+    "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    "/blog/brushed-and-pile-knit-fabric-finishes",
+    "/blog/how-to-write-a-knit-fabric-rfq",
+    "/blog/knit-fabric-sourcing-questions",
+  ];
+  const guides = pages.filter((page) => guideRoutes.includes(page.url));
+
+  assert.equal(guides.length, guideRoutes.length);
+  assert.equal(
+    new Set(guides.map((page) => page.evidenceSnapshot?.heading)).size,
+    guideRoutes.length
+  );
+
+  for (const page of guides) {
+    assert.ok(page.evidenceSnapshot, `${page.url} needs an evidence snapshot`);
+    assert.ok(
+      page.evidenceSnapshot.summary.length >= 180,
+      `${page.url} needs a substantive evidence summary`
+    );
+    assert.ok(
+      page.evidenceSnapshot.items.length >= 3,
+      `${page.url} needs at least three evidence decisions`
+    );
+  }
+});
+
 test("Next.js exposes the hub, blog, product routes and machine-readable discovery", () => {
   const requiredFiles = [
     "app/finished-double-knit-fabrics/page.tsx",

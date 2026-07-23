@@ -112,6 +112,7 @@ export function FinishedFabricPage({
 }) {
   const landingPage = page.kind === "hub" ? getPublicLandingPage("finishedDoubleKnit") : null;
   const blogArticles = page.kind === "index" ? getFinishedBlogArticles() : [];
+  const evidenceSnapshot = page.evidenceSnapshot;
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
@@ -229,6 +230,30 @@ export function FinishedFabricPage({
         {page.sections.map((section, index) => (
           <ContentSection key={section.heading} section={section} index={index} />
         ))}
+
+        {evidenceSnapshot ? (
+          <section className="bg-white">
+            <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+                Article evidence snapshot
+              </p>
+              <h2 className="mt-3 max-w-3xl text-2xl font-semibold text-brand-charcoal md:text-3xl">
+                {evidenceSnapshot.heading}
+              </h2>
+              <p className="mt-5 max-w-4xl text-base leading-8 text-brand-charcoal/75">
+                {evidenceSnapshot.summary}
+              </p>
+              <dl className="mt-7 divide-y divide-brand-soft border-y border-brand-soft">
+                {evidenceSnapshot.items.map((item) => (
+                  <div key={item.label} className="grid gap-2 py-5 md:grid-cols-[0.34fr_0.66fr] md:gap-8">
+                    <dt className="font-semibold text-brand-charcoal">{item.label}</dt>
+                    <dd className="text-sm leading-7 text-brand-charcoal/75">{item.detail}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </section>
+        ) : null}
 
         <section className="border-y border-brand-soft bg-brand-charcoal text-white">
           <div className="mx-auto grid max-w-5xl gap-6 px-4 py-10 sm:px-6 md:grid-cols-[auto_1fr] md:items-start lg:px-8">
