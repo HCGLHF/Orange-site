@@ -44,7 +44,7 @@ The site must not introduce an unsupported `50+` claim or convert machine counts
 The supplied certificate supports the following public facts:
 
 - Certificate holder: Shaoxing Jingtian Textile Technology Co., Ltd.
-- Certification body: T脺V Rheinland (China) Ltd.
+- Certification body: TÜV Rheinland (China) Ltd.
 - Standard: Global Recycled Standard (GRS) v4.0
 - Scope Certificate No.: TRC-GRS-350849-00
 - Product category: Greige fabrics
@@ -137,9 +137,9 @@ The final meta description must:
 
 This keyword allocation is intentionally navigational. It does not compete with:
 
-- `/` 鈥?`double knit fabric`
-- `/finished-double-knit-fabrics` 鈥?`double knit fabric manufacturer`
-- `/fabrics` 鈥?`finished knit fabrics`
+- `/`: `double knit fabric`
+- `/finished-double-knit-fabrics`: `double knit fabric manufacturer`
+- `/fabrics`: `finished knit fabrics`
 
 The new page must receive its canonical, Open Graph metadata, Twitter metadata, sitemap entry, and server-rendered metadata from the existing unified SEO data source.
 
@@ -179,7 +179,7 @@ Implementation must begin with failing regression tests and then satisfy:
 - The page has a non-empty unique primary keyword.
 - The final title starts with the primary keyword and is no longer than 70 characters.
 - The brand appears no more than once in the title.
-- The final meta description is unique, 160鈥?00 characters, and contains the complete primary keyword.
+- The final meta description is unique, 160-300 characters, and contains the complete primary keyword.
 - The final rendered About page has exactly one `h1`.
 - The `h1` contains the complete primary keyword.
 - The homepage still has exactly one `h1`.

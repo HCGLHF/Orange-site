@@ -35,6 +35,19 @@ function loadPages() {
   return JSON.parse(readFileSync(contentPath, "utf8"));
 }
 
+function flattenText(value) {
+  if (typeof value === "string") {
+    return [value];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap(flattenText);
+  }
+  if (value && typeof value === "object") {
+    return Object.values(value).flatMap(flattenText);
+  }
+  return [];
+}
+
 function wordCount(page) {
   const text = JSON.stringify(page)
     .replace(/https?:\/\/\S+/g, " ")
@@ -82,6 +95,56 @@ test("content stays inside the verified finished-fabric evidence boundary", () =
   for (const pattern of forbidden) {
     assert.doesNotMatch(source, pattern);
   }
+});
+
+test("machine-source copy keeps private configuration details unpublished", () => {
+  const machineContext = flattenText(loadPages())
+    .flatMap((text) => text.split(/(?<=[.!?])\s+/))
+    .filter((sentence) =>
+      /\b(?:machine (?:sheet|record|inventory)|inventory|machines?)\b/i.test(sentence)
+    )
+    .join("\n");
+
+  assert.doesNotMatch(
+    machineContext,
+    /34-inch|38-inch|gauges from 12 to 36|gauges from 18 to 32|across gauges 18, 20/i
+  );
+  assert.match(machineContext, /\b(?:72|84)-(?:feed|feeder)\b/i);
+  assert.match(machineContext, /\b17 (?:documented )?(?:machine )?configurations\b/i);
+});
+
+test("machine evidence is attributed to the parent company at reviewed locations", () => {
+  const pages = loadPages();
+  const ponte = pages.find((page) => page.url === "/fabrics/ponte-roma-fabric");
+  const rib = pages.find((page) => page.url === "/fabrics/rib-knit-fabric");
+  const doubleKnitGuide = pages.find(
+    (page) => page.url === "/blog/what-is-double-knit-fabric"
+  );
+  const doubleKnitEvidence = doubleKnitGuide.sections.find(
+    (section) => section.heading === "Connect the learning page to a finished-fabric RFQ"
+  ).paragraphs[0];
+  const source = flattenText(pages).join("\n");
+
+  assert.match(
+    ponte.opening,
+    /The parent company's machine record lists Roma fabric among its documented entries\./
+  );
+  assert.match(
+    rib.opening,
+    /The parent company's machine record documents 40\+ rib\/72-feed machines across multiple configurations\./
+  );
+  assert.match(
+    doubleKnitEvidence,
+    /O'range Textile's supplied catalogue describes 104 finished-fabric records across 11 series\. The parent company's supplied machine record describes 200\+ circular knitting machines across double-knit and rib configurations\./
+  );
+  assert.doesNotMatch(
+    source,
+    /O'range Textile's (?:supplied )?machine|O'range Textile's supplied evidence/i
+  );
+  assert.doesNotMatch(
+    source,
+    /(?:The submitted machine sheet|The supplied machine sheet|The machine inventory)\b/i
+  );
 });
 
 test("finished-fabric hub uses supplied catalogue series and representative articles", () => {

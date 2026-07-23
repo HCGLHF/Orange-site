@@ -13,27 +13,27 @@ export const manufacturingScale = [
   {
     value: "200+",
     label: "circular knitting machines",
-    detail: "A broad circular-knitting base supports parallel development and production planning.",
+    detail: "Rounded public count from the parent company's documented machine record.",
   },
   {
     value: "17",
     label: "machine configurations",
-    detail: "Configuration options help match knit structures to the requested fabric direction.",
+    detail: "Documented configurations summarized without publishing the private inventory.",
   },
   {
     value: "60+",
     label: "84-feeder double-knit machines",
-    detail: "Double-knit capacity supports development of stable, structured fabric constructions.",
+    detail: "Rounded public count for the 84-feeder double-knit group in the parent company's documented machine record.",
   },
   {
     value: "40+",
     label: "72-feeder rib machines",
-    detail: "Dedicated rib capability supports elastic and textured knit requirements.",
+    detail: "Rounded public count for the 72-feeder rib group in the parent company's documented machine record.",
   },
   {
     value: "100+",
     label: "72-feeder double-knit machines",
-    detail: "Additional double-knit capacity provides flexibility across recurring buyer programs.",
+    detail: "Rounded public count for the 72-feeder double-knit group in the parent company's documented machine record.",
   },
 ] as const;
 

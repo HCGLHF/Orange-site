@@ -1,3 +1,5 @@
+import { manufacturingScale } from "../lib/company-evidence.ts";
+
 /**
  * MANUAL LANDING PAGE CONTENT ENTRY
  *
@@ -77,7 +79,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },
       { label: "Production route", value: "Greige fabric, finished fabric and garments", enabled: true },
-      { label: "Machine evidence", value: "200+ documented circular knitting machines", enabled: true },
+      { label: "Machine evidence", value: `${manufacturingScale[0].value} documented circular knitting machines`, enabled: true },
       { label: "Export experience", value: "Asia, Europe, the Americas and Russia", enabled: true },
     ],
     advantages: [

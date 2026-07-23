@@ -134,7 +134,7 @@ export const aiSearchFaq = [
   {
     question: "Is O'range Textile a knit fabric manufacturer?",
     answer:
-      `${companyRelationship.brandName} is the export-facing brand operated by ${companyRelationship.exportCompany}. Its parent, ${companyRelationship.parentCompany}, supports documented knitting manufacturing across the group.`,
+      `${companyRelationship.brandName} is the export-facing brand operated by ${companyRelationship.exportCompany} Its parent company is ${companyRelationship.parentCompany} The parent company supports documented knitting manufacturing across the group.`,
   },
   {
     question: "Where is O'range Textile located?",

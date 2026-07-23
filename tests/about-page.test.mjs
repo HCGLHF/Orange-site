@@ -7,6 +7,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const evidencePath = path.join(root, "lib", "company-evidence.ts");
+const designSpecPath = path.join(
+  root,
+  "docs",
+  "superpowers",
+  "specs",
+  "2026-07-23-certificates-about-page-design.md"
+);
 
 test("company evidence records the verified corporate and GRS facts", async () => {
   const evidence = await import(pathToFileURL(evidencePath).href);
@@ -34,6 +41,67 @@ test("company evidence records the verified corporate and GRS facts", async () =
     { value: "40+", label: "72-feeder rib machines" },
     { value: "100+", label: "72-feeder double-knit machines" },
   ]);
+});
+
+test("company evidence describes rounded parent records without capacity inferences", async () => {
+  const evidence = await import(pathToFileURL(evidencePath).href);
+
+  assert.deepEqual(
+    evidence.manufacturingScale.map(({ detail }) => detail),
+    [
+      "Rounded public count from the parent company's documented machine record.",
+      "Documented configurations summarized without publishing the private inventory.",
+      "Rounded public count for the 84-feeder double-knit group in the parent company's documented machine record.",
+      "Rounded public count for the 72-feeder rib group in the parent company's documented machine record.",
+      "Rounded public count for the 72-feeder double-knit group in the parent company's documented machine record.",
+    ]
+  );
+  assert.doesNotMatch(
+    evidence.manufacturingScale.map(({ detail }) => detail).join("\n"),
+    /parallel development and production planning|flexibility across recurring buyer programs|\bcapacity\b/i
+  );
+});
+
+test("landing machine evidence consumes the shared manufacturing scale value", async () => {
+  const landingPath = path.join(root, "content", "landing-pages.ts");
+  const landingSource = readFileSync(landingPath, "utf8");
+  const landing = await import(pathToFileURL(landingPath).href);
+  const machineEvidence = landing.landingPages.home.proofPoints.find(
+    ({ label }) => label === "Machine evidence"
+  );
+
+  assert.match(
+    landingSource,
+    /import\s+\{\s*manufacturingScale\s*\}\s+from\s+["']\.\.\/lib\/company-evidence\.ts["']/
+  );
+  assert.match(
+    landingSource,
+    /value:\s*`\$\{manufacturingScale\[0\]\.value\} documented circular knitting machines`/
+  );
+  assert.equal(machineEvidence?.value, "200+ documented circular knitting machines");
+});
+
+test("AI-search FAQ legal names do not produce duplicate punctuation", async () => {
+  const evidence = await import(pathToFileURL(evidencePath).href);
+  const geoSource = readFileSync(path.join(root, "lib", "geo-content.ts"), "utf8");
+  const manufacturerAnswer =
+    `${evidence.companyRelationship.brandName} is the export-facing brand operated by ` +
+    `${evidence.companyRelationship.exportCompany} Its parent company is ` +
+    `${evidence.companyRelationship.parentCompany} The parent company supports documented knitting manufacturing across the group.`;
+
+  assert.match(
+    geoSource,
+    /\$\{companyRelationship\.exportCompany\} Its parent company is \$\{companyRelationship\.parentCompany\} The parent company supports/
+  );
+  assert.doesNotMatch(manufacturerAnswer, /Ltd\.\.|Ltd\., supports/);
+});
+
+test("certificate design specification is UTF-8 clean and preserves exact facts", () => {
+  const specification = readFileSync(designSpecPath, "utf8");
+
+  assert.match(specification, /TÜV Rheinland \(China\) Ltd\./);
+  assert.match(specification, /160-300/);
+  assert.doesNotMatch(specification, /T脺V|T鑴篤|閳|鑴/);
 });
 
 test("company evidence excludes restricted source assets and production figures", () => {
