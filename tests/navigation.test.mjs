@@ -4,6 +4,10 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const navigationUrl = new URL("../lib/navigation.ts", import.meta.url);
+const desktopNavigationUrl = new URL(
+  "../components/ui/DesktopNavigation.tsx",
+  import.meta.url
+);
 
 const loadNavigation = async () => {
   assert.ok(existsSync(navigationUrl), "lib/navigation.ts must exist");
@@ -144,4 +148,78 @@ test("active navigation follows the approved route families", async () => {
   );
   assert.equal(getActiveNavigationId("/about"), "about");
   assert.equal(getActiveNavigationId("/unknown"), null);
+});
+
+test("desktop navigation implements the shared accessible menu contract", async () => {
+  assert.ok(
+    existsSync(desktopNavigationUrl),
+    "components/ui/DesktopNavigation.tsx must exist"
+  );
+
+  const [source, { PRIMARY_NAVIGATION }] = await Promise.all([
+    readFile(desktopNavigationUrl, "utf8"),
+    loadNavigation(),
+  ]);
+
+  assert.match(source, /["']use client["']/);
+  assert.match(source, /PRIMARY_NAVIGATION\.map\s*\(/);
+  assert.match(source, /getActiveNavigationId\s*\(\s*pathname\s*\)/);
+  assert.doesNotMatch(source, /const\s+navItems\s*=/);
+  assert.match(source, /useState<NavigationGroupId\s*\|\s*null>/);
+  assert.match(
+    source,
+    /current\s*===\s*section\.id\s*\?\s*null\s*:\s*section\.id/
+  );
+
+  assert.match(source, /aria-haspopup=["']menu["']/);
+  assert.match(source, /aria-expanded=\{/);
+  assert.match(source, /aria-controls=\{/);
+  assert.match(source, /aria-current=\{/);
+  assert.match(source, /role=["']menu["']/);
+  assert.match(source, /role=["']menuitem["']/);
+  assert.match(source, /aria-hidden=\{!isOpen\}/);
+  assert.match(source, /tabIndex=\{isOpen\s*\?\s*0\s*:\s*-1\}/);
+  assert.match(source, /invisible pointer-events-none/);
+
+  assert.match(source, /\.items\.map\s*\(/);
+  assert.match(source, /\{\s*item\.label\s*\}/);
+  assert.match(source, /href=\{\s*item\.href\s*\}/);
+  for (const section of PRIMARY_NAVIGATION) {
+    if (section.kind !== "group") continue;
+    for (const item of section.items) {
+      assert.doesNotMatch(
+        source,
+        new RegExp(
+          item.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        ),
+        `${item.href} must come from PRIMARY_NAVIGATION`
+      );
+      assert.doesNotMatch(
+        source,
+        new RegExp(
+          item.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        ),
+        `${item.label} must come from PRIMARY_NAVIGATION`
+      );
+    }
+  }
+
+  assert.match(source, /event\.key\s*===\s*["']Escape["']/);
+  assert.match(source, /triggerRefs\.current\[openGroup\]/);
+  assert.match(source, /trigger\?\.focus\s*\(\s*\)/);
+  assert.match(source, /["']pointerdown["']/);
+  assert.match(source, /["']focusin["']/);
+  assert.match(source, /addEventListener/);
+  assert.match(source, /contains\s*\(\s*event\.target/);
+  assert.match(source, /onClick=\{\(\)\s*=>\s*setOpenGroup\(null\)\}/);
+
+  assert.match(
+    source,
+    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*setOpenGroup\s*\(\s*null\s*\)\s*;\s*\}\s*,\s*\[\s*pathname\s*\]\s*\)/
+  );
+  assert.match(source, /hidden[^"']*xl:flex/);
+  assert.match(source, /focus-visible:ring-2/);
+  assert.match(source, /motion-reduce:transition-none/);
+  assert.match(source, /ChevronDown/);
+  assert.match(source, /aria-hidden=["']true["']/);
 });
