@@ -131,6 +131,11 @@ test("production SEO audit is an automated package workflow", async () => {
   assert.match(validator, /Googlebot/);
   assert.match(validator, /sitemap\.xml/);
   assert.match(validator, /robots\.txt/);
+  assert.match(validator, /prerender-manifest\.json/);
+  assert.match(validator, /SEO_AUDIT_REPORT_PATH/);
+  assert.match(validator, /gitCommit/);
+  assert.match(validator, /buildId/);
+  assert.match(validator, /registryHash/);
   assert.match(
     validator,
     /reports\/seo\/production-html-audit\.json/

@@ -22,10 +22,10 @@ const includesFolded = (text, keyword) =>
     .toLocaleLowerCase("en-US")
     .includes(keyword.toLocaleLowerCase("en-US"));
 
-test("SEO registry owns exactly 22 normalized public pages", async () => {
+test("SEO registry owns exactly 28 normalized public pages", async () => {
   const { getAllPublicPageSeo } = await loadSeo();
   const pages = getAllPublicPageSeo();
-  assert.equal(pages.length, 22);
+  assert.equal(pages.length, 28);
   assert.equal(new Set(pages.map((page) => page.path)).size, pages.length);
   for (const page of pages) {
     assert.match(page.path, /^\/(?:[a-z0-9-]+(?:\/[a-z0-9-]+)*)?$/);

@@ -456,6 +456,124 @@ const publicPageSeo = [
     changeFrequency: "monthly",
     priority: 0.7,
   },
+  {
+    path: "/blog/air-layer-knit-fabric-sourcing-guide",
+    primaryKeyword: "air layer knit fabric sourcing guide",
+    secondaryKeywords: [
+      "air-layer fabric articles",
+      "structured knit sourcing",
+      "air-layer GSM and width",
+    ],
+    searchIntent: "informational",
+    topicCluster: "buyer-education-structured-knit",
+    targetPageType: "blog",
+    metaTitle:
+      "Air Layer Knit Fabric Sourcing Guide | O'range Textile",
+    metaDescription:
+      "Air layer knit fabric sourcing guide for comparing documented articles such as GD2515 and GD2672, with practical checks for composition, 260–300 GSM directions, usable width, structure, recovery, seams, sample approval, and commercial confirmation.",
+    h1: "Air Layer Knit Fabric Sourcing Guide for Apparel Buyers",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
+  },
+  {
+    path: "/blog/how-to-source-wool-blend-knit-fabric",
+    primaryKeyword: "how to source wool blend knit fabric",
+    secondaryKeywords: [
+      "wool blend fabric supplier",
+      "brushed wool knit sourcing",
+      "wool blend sample approval",
+    ],
+    searchIntent: "informational",
+    topicCluster: "buyer-education-wool-blend",
+    targetPageType: "blog",
+    metaTitle:
+      "How to Source Wool Blend Knit Fabric | O'range Textile",
+    metaDescription:
+      "How to source wool blend knit fabric using article-level composition evidence, hand and surface review, GSM, usable width, brushing, pilling, colourfastness, care, garment testing, sample approval, and commercial confirmation before production.",
+    h1: "How to Source Wool Blend Knit Fabric with Verifiable Evidence",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
+  },
+  {
+    path: "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    primaryKeyword: "jacquard knit fabric weight and width",
+    secondaryKeywords: [
+      "jacquard knit GSM",
+      "jacquard usable width",
+      "jacquard article specification",
+    ],
+    searchIntent: "informational",
+    topicCluster: "buyer-education-jacquard",
+    targetPageType: "blog",
+    metaTitle:
+      "Jacquard Knit Fabric Weight and Width | O'range Textile",
+    metaDescription:
+      "Jacquard knit fabric weight and width guide using article GD2579 at 240 GSM and GD2683 at 280 GSM with 160–165 cm references, plus repeat, reverse, finish, usable width, cutting yield, sample approval, and commercial confirmation.",
+    h1: "Jacquard Knit Fabric Weight and Width for RFQ Planning",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
+  },
+  {
+    path: "/blog/brushed-and-pile-knit-fabric-finishes",
+    primaryKeyword: "brushed knit fabric finishes",
+    secondaryKeywords: [
+      "pile knit fabric",
+      "raised surface knit",
+      "brushed fabric sourcing",
+    ],
+    searchIntent: "informational",
+    topicCluster: "buyer-education-surface-finishes",
+    targetPageType: "blog",
+    metaTitle: "Brushed Knit Fabric Finishes | O'range Textile",
+    metaDescription:
+      "Brushed knit fabric finishes guide for comparing faux-cashmere, acetate-brushed, and raised-pile directions, with buyer checks for face and reverse, shedding, pilling, GSM, usable width, colour, care, sample approval, and commercial confirmation.",
+    h1: "Brushed Knit Fabric Finishes and Raised-Pile Sourcing Checks",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
+  },
+  {
+    path: "/blog/how-to-write-a-knit-fabric-rfq",
+    primaryKeyword: "knit fabric RFQ template",
+    secondaryKeywords: [
+      "fabric quotation request",
+      "knit fabric specification sheet",
+      "sample request brief",
+    ],
+    searchIntent: "informational",
+    topicCluster: "buyer-education-procurement",
+    targetPageType: "blog",
+    metaTitle:
+      "Knit Fabric RFQ Template for Buyers | O'range Textile",
+    metaDescription:
+      "Knit fabric RFQ template for apparel buyers who need to state construction, article reference, composition, GSM, usable width, colour, finish, testing, quantity, destination, sample approval, packing, documentation, and commercial confirmation.",
+    h1: "Knit Fabric RFQ Template for a Complete Sourcing Brief",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
+  },
+  {
+    path: "/blog/knit-fabric-sourcing-questions",
+    primaryKeyword: "knit fabric sourcing questions",
+    secondaryKeywords: [
+      "fabric buyer FAQ",
+      "finished knit fabric questions",
+      "fabric sample checklist",
+    ],
+    searchIntent: "informational",
+    topicCluster: "buyer-education",
+    targetPageType: "blog",
+    metaTitle: "Knit Fabric Sourcing Questions | O'range Textile",
+    metaDescription:
+      "Knit fabric sourcing questions answered for apparel buyers comparing construction, composition, GSM, usable width, finish, article evidence, testing, sample approval, live availability, order details, documentation, and commercial confirmation.",
+    h1: "Knit Fabric Sourcing Questions for Faster Buyer Decisions",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
+  },
 ] as const satisfies readonly PublicPageSeo[];
 
 const pageSeoByPath = new Map<string, PublicPageSeo>(

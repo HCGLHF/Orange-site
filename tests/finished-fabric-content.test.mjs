@@ -22,6 +22,12 @@ const requiredRoutes = [
   "/blog/what-is-scuba-knit-fabric",
   "/blog/what-is-rib-knit-fabric",
   "/blog/jacquard-knit-vs-woven-jacquard",
+  "/blog/air-layer-knit-fabric-sourcing-guide",
+  "/blog/how-to-source-wool-blend-knit-fabric",
+  "/blog/jacquard-knit-fabric-weight-and-width-guide",
+  "/blog/brushed-and-pile-knit-fabric-finishes",
+  "/blog/how-to-write-a-knit-fabric-rfq",
+  "/blog/knit-fabric-sourcing-questions",
 ];
 
 function loadPages() {
@@ -53,6 +59,10 @@ test("every page has answer-first copy, FAQs and internal routes", () => {
     assert.ok(page.sections.length >= 3, `${page.url} needs at least three sections`);
     assert.ok(page.faq.length >= 3, `${page.url} needs at least three FAQs`);
     assert.ok(page.relatedLinks.length >= 5, `${page.url} needs five internal routes`);
+    assert.ok(
+      page.relatedLinks.every((link) => link.href !== page.url),
+      `${page.url} must not link to itself`
+    );
     assert.ok(wordCount(page) >= 650, `${page.url} needs publishable content depth`);
   }
 });
@@ -100,6 +110,37 @@ test("finished-fabric hub links every commercial fabric route", () => {
   }
 });
 
+test("catalogue guides use approved article and specification evidence", () => {
+  const pages = loadPages();
+  const routes = [
+    "/blog/air-layer-knit-fabric-sourcing-guide",
+    "/blog/how-to-source-wool-blend-knit-fabric",
+    "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    "/blog/brushed-and-pile-knit-fabric-finishes",
+    "/blog/how-to-write-a-knit-fabric-rfq",
+    "/blog/knit-fabric-sourcing-questions",
+  ];
+  const source = JSON.stringify(
+    pages.filter((page) => routes.includes(page.url))
+  );
+
+  for (const signal of [
+    "GD2515",
+    "GD2672",
+    "GD2579",
+    "GD2683",
+    "260 GSM",
+    "300 GSM",
+    "160 cm",
+    "160-165 cm",
+    "usable width",
+    "sample approval",
+    "commercial confirmation",
+  ]) {
+    assert.match(source, new RegExp(signal, "i"));
+  }
+});
+
 test("Next.js exposes the hub, blog, product routes and machine-readable discovery", () => {
   const requiredFiles = [
     "app/finished-double-knit-fabrics/page.tsx",
@@ -133,6 +174,11 @@ test("the native pages use the real inquiry modal and bundled visual assets", ()
     "ponte-scuba-apparel-development.webp",
     "jacquard-wool-blend-swatches.webp",
     "finished-fabric-sample-inspection.webp",
+    "air-layer-material-study.webp",
+    "wool-blend-material-study.webp",
+    "jacquard-knit-material-study.webp",
+    "brushed-pile-knit-finishes.webp",
+    "knit-fabric-rfq-specification.webp",
   ];
   for (const image of images) {
     assert.ok(

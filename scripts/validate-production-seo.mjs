@@ -1,3 +1,6 @@
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +19,43 @@ const reportUrl = new URL(
   "../reports/seo/production-html-audit.json",
   import.meta.url
 );
+const reportPath =
+  process.env.SEO_AUDIT_REPORT_PATH || fileURLToPath(reportUrl);
+const buildId = readFileSync(
+  new URL("../.next/BUILD_ID", import.meta.url),
+  "utf8"
+).trim();
+const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+  encoding: "utf8",
+  windowsHide: true,
+}).trim();
+const registryHash = createHash("sha256")
+  .update(
+    readFileSync(new URL("../lib/seo/site-seo.ts", import.meta.url))
+  )
+  .digest("hex");
+
+function getBuildPublicRoutes() {
+  const manifest = JSON.parse(
+    readFileSync(
+      new URL("../.next/prerender-manifest.json", import.meta.url),
+      "utf8"
+    )
+  );
+  const excludedRoutes = new Set([
+    "/_not-found",
+    "/icon.svg",
+    "/llms.txt",
+    "/robots.txt",
+    "/sitemap.xml",
+  ]);
+
+  return Object.keys(manifest.routes)
+    .filter(
+      (route) => !route.startsWith("/api/") && !excludedRoutes.has(route)
+    )
+    .sort();
+}
 
 function decodeHtml(value = "") {
   const named = {
@@ -101,6 +141,14 @@ function sorted(values) {
 }
 
 const expectedPages = getAllPublicPageSeo();
+const expectedPaths = expectedPages.map((page) => page.path).sort();
+const builtPublicRoutes = getBuildPublicRoutes();
+const missingFromRegistry = builtPublicRoutes.filter(
+  (route) => !expectedPaths.includes(route)
+);
+const missingFromBuild = expectedPaths.filter(
+  (route) => !builtPublicRoutes.includes(route)
+);
 const expectedCanonicalUrls = expectedPages.map((page) =>
   toCanonicalUrl(page.path)
 );
@@ -167,6 +215,11 @@ for (const page of expectedPages) {
     const sitemapPresent = sitemapUrls.includes(expectedCanonical);
 
     if (response.status !== 200) failures.push(`HTTP ${response.status}`);
+    if (
+      !(response.headers.get("content-type") ?? "").includes("text/html")
+    ) {
+      failures.push("response is not HTML");
+    }
     if (titles.length !== 1) {
       failures.push(`title count ${titles.length}`);
     }
@@ -286,9 +339,22 @@ if (sitemapResponse.status !== 200) {
 if (!sitemapMatchesRegistry) {
   globalFailures.push("sitemap URL set does not match the SEO registry");
 }
+if (missingFromRegistry.length > 0) {
+  globalFailures.push(
+    `build routes missing from SEO registry: ${missingFromRegistry.join(", ")}`
+  );
+}
+if (missingFromBuild.length > 0) {
+  globalFailures.push(
+    `SEO registry routes missing from build: ${missingFromBuild.join(", ")}`
+  );
+}
 
 const report = {
   generatedAt: new Date().toISOString(),
+  gitCommit,
+  buildId,
+  registryHash,
   baseUrl,
   productionOrigin: SEO_SITE_ORIGIN,
   summary: {
@@ -309,11 +375,16 @@ const report = {
     urlCount: sitemapUrls.length,
     matchesRegistry: sitemapMatchesRegistry,
   },
+  discovery: {
+    registryCount: expectedPaths.length,
+    builtPublicCount: builtPublicRoutes.length,
+    missingFromRegistry,
+    missingFromBuild,
+  },
   globalFailures,
   pages: pageResults,
 };
 
-const reportPath = fileURLToPath(reportUrl);
 await mkdir(dirname(reportPath), { recursive: true });
 await writeFile(
   reportPath,
