@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import {
@@ -13,21 +14,137 @@ type DesktopNavigationProps = {
   pathname: string;
 };
 
+type PendingMenuFocus = {
+  groupId: NavigationGroupId;
+  itemIndex: number;
+};
+
 export function DesktopNavigation({
   pathname,
 }: DesktopNavigationProps) {
   const [openGroup, setOpenGroup] = useState<NavigationGroupId | null>(
     null
   );
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
   const navigationRef = useRef<HTMLDivElement>(null);
   const triggerRefs = useRef<
     Partial<Record<NavigationGroupId, HTMLButtonElement>>
   >({});
+  const menuItemRefs = useRef<
+    Partial<
+      Record<NavigationGroupId, Array<HTMLAnchorElement | null>>
+    >
+  >({});
+  const pendingFocusRef = useRef<PendingMenuFocus | null>(null);
   const activeNavigationId = getActiveNavigationId(pathname);
+
+  const openMenu = (
+    groupId: NavigationGroupId,
+    itemIndex: number
+  ) => {
+    setActiveItemIndex(itemIndex);
+
+    if (openGroup === groupId) {
+      menuItemRefs.current[groupId]?.[itemIndex]?.focus();
+      return;
+    }
+
+    pendingFocusRef.current = { groupId, itemIndex };
+    setOpenGroup(groupId);
+  };
+
+  const handleTriggerClick = (groupId: NavigationGroupId) => {
+    if (openGroup === groupId) {
+      setOpenGroup(null);
+      return;
+    }
+
+    openMenu(groupId, 0);
+  };
+
+  const handleTriggerKeyDown = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+    groupId: NavigationGroupId,
+    itemCount: number
+  ) => {
+    switch (event.key) {
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        handleTriggerClick(groupId);
+        break;
+      case "ArrowDown":
+        event.preventDefault();
+        openMenu(groupId, 0);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        openMenu(groupId, itemCount - 1);
+        break;
+    }
+  };
+
+  const handleMenuItemKeyDown = (
+    event: ReactKeyboardEvent<HTMLAnchorElement>,
+    groupId: NavigationGroupId,
+    itemIndex: number,
+    itemCount: number
+  ) => {
+    if (event.key === "Tab") {
+      setOpenGroup(null);
+      return;
+    }
+
+    let nextItemIndex: number | null = null;
+
+    switch (event.key) {
+      case "ArrowDown":
+        nextItemIndex = (itemIndex + 1) % itemCount;
+        break;
+      case "ArrowUp":
+        nextItemIndex =
+          (itemIndex - 1 + itemCount) % itemCount;
+        break;
+      case "Home":
+        nextItemIndex = 0;
+        break;
+      case "End":
+        nextItemIndex = itemCount - 1;
+        break;
+      case "Escape": {
+        event.preventDefault();
+        event.stopPropagation();
+        const trigger = triggerRefs.current[groupId];
+        setOpenGroup(null);
+        trigger?.focus();
+        return;
+      }
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    setActiveItemIndex(nextItemIndex);
+    menuItemRefs.current[groupId]?.[nextItemIndex]?.focus();
+  };
 
   useEffect(() => {
     setOpenGroup(null);
   }, [pathname]);
+
+  useEffect(() => {
+    const pendingFocus = pendingFocusRef.current;
+    if (
+      openGroup === null ||
+      pendingFocus?.groupId !== openGroup ||
+      pendingFocus.itemIndex !== activeItemIndex
+    ) {
+      return;
+    }
+
+    menuItemRefs.current[openGroup]?.[activeItemIndex]?.focus();
+    pendingFocusRef.current = null;
+  }, [activeItemIndex, openGroup]);
 
   useEffect(() => {
     if (openGroup === null) return;
@@ -66,7 +183,7 @@ export function DesktopNavigation({
   return (
     <div
       ref={navigationRef}
-      className="hidden items-center gap-1 xl:flex"
+      className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex"
     >
       {PRIMARY_NAVIGATION.map((section) => {
         const isActive = activeNavigationId === section.id;
@@ -91,11 +208,13 @@ export function DesktopNavigation({
         }
 
         const isOpen = openGroup === section.id;
+        const triggerId = `desktop-navigation-${section.id}-trigger`;
         const panelId = `desktop-navigation-${section.id}-menu`;
 
         return (
           <div key={section.id} className="relative">
             <button
+              id={triggerId}
               ref={(node) => {
                 if (node) triggerRefs.current[section.id] = node;
               }}
@@ -103,9 +222,12 @@ export function DesktopNavigation({
               aria-haspopup="menu"
               aria-expanded={isOpen}
               aria-controls={panelId}
-              onClick={() =>
-                setOpenGroup((current) =>
-                  current === section.id ? null : section.id
+              onClick={() => handleTriggerClick(section.id)}
+              onKeyDown={(event) =>
+                handleTriggerKeyDown(
+                  event,
+                  section.id,
+                  section.items.length
                 )
               }
               className="group relative inline-flex h-10 items-center gap-1 rounded-lg px-3 text-sm font-semibold text-brand-charcoal/75 outline-none transition-colors hover:bg-brand-soft/70 hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
@@ -128,6 +250,7 @@ export function DesktopNavigation({
             <div
               id={panelId}
               role="menu"
+              aria-labelledby={triggerId}
               aria-hidden={!isOpen}
               className={`absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-brand-charcoal/10 bg-white p-2 shadow-xl shadow-brand-charcoal/10 transition duration-150 motion-reduce:transition-none ${
                 isOpen
@@ -135,13 +258,29 @@ export function DesktopNavigation({
                   : "invisible pointer-events-none -translate-y-1 opacity-0"
               }`}
             >
-              {section.items.map((item) => (
+              {section.items.map((item, itemIndex) => (
                 <Link
                   key={item.id}
+                  ref={(node) => {
+                    const itemRefs =
+                      menuItemRefs.current[section.id] ?? [];
+                    itemRefs[itemIndex] = node;
+                    menuItemRefs.current[section.id] = itemRefs;
+                  }}
                   href={item.href}
                   role="menuitem"
-                  tabIndex={isOpen ? 0 : -1}
+                  tabIndex={
+                    isOpen && activeItemIndex === itemIndex ? 0 : -1
+                  }
                   onClick={() => setOpenGroup(null)}
+                  onKeyDown={(event) =>
+                    handleMenuItemKeyDown(
+                      event,
+                      section.id,
+                      itemIndex,
+                      section.items.length
+                    )
+                  }
                   className="block rounded-lg px-3 py-2.5 text-sm font-medium text-brand-charcoal/80 outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none"
                 >
                   {item.label}

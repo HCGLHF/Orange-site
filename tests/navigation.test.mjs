@@ -173,25 +173,32 @@ test("desktop navigation implements the shared accessible menu contract", async 
   );
   assert.match(
     source,
-    /<Link\b(?=[^>]*href=\{item\.href\})(?=[^>]*role=["']menuitem["'])[^>]*>/
+    /<Link\b[\s\S]{0,500}?href=\{item\.href\}[\s\S]{0,120}?role=["']menuitem["']/
   );
   assert.match(source, /PRIMARY_NAVIGATION\.map\s*\(/);
   assert.match(source, /getActiveNavigationId\s*\(\s*pathname\s*\)/);
   assert.doesNotMatch(source, /const\s+navItems\s*=/);
   assert.match(source, /useState<NavigationGroupId\s*\|\s*null>/);
+  assert.match(source, /handleTriggerClick/);
   assert.match(
     source,
-    /current\s*===\s*section\.id\s*\?\s*null\s*:\s*section\.id/
+    /openGroup\s*===\s*groupId[\s\S]{0,180}setOpenGroup\s*\(\s*null\s*\)[\s\S]{0,180}openMenu\s*\(\s*groupId\s*,\s*0\s*\)/
   );
 
   assert.match(source, /aria-haspopup=["']menu["']/);
   assert.match(source, /aria-expanded=\{/);
   assert.match(source, /aria-controls=\{/);
+  assert.match(source, /const\s+triggerId\s*=\s*`[^`]*\$\{section\.id\}[^`]*`/);
+  assert.match(source, /id=\{triggerId\}/);
+  assert.match(source, /aria-labelledby=\{triggerId\}/);
   assert.match(source, /aria-current=\{/);
   assert.match(source, /role=["']menu["']/);
   assert.match(source, /role=["']menuitem["']/);
   assert.match(source, /aria-hidden=\{!isOpen\}/);
-  assert.match(source, /tabIndex=\{isOpen\s*\?\s*0\s*:\s*-1\}/);
+  assert.match(
+    source,
+    /tabIndex=\{\s*isOpen\s*&&\s*activeItemIndex\s*===\s*itemIndex\s*\?\s*0\s*:\s*-1\s*\}/
+  );
   assert.match(source, /invisible pointer-events-none/);
 
   assert.doesNotMatch(
@@ -231,6 +238,59 @@ test("desktop navigation implements the shared accessible menu contract", async 
   assert.match(source, /event\.key\s*===\s*["']Escape["']/);
   assert.match(source, /triggerRefs\.current\[openGroup\]/);
   assert.match(source, /trigger\?\.focus\s*\(\s*\)/);
+  assert.match(source, /menuItemRefs/);
+  assert.match(source, /pendingFocusRef/);
+  assert.match(source, /activeItemIndex/);
+  const triggerKeyHandler = source.match(
+    /const\s+handleTriggerKeyDown[\s\S]*?\n  };\n\n  const\s+handleMenuItemKeyDown/
+  )?.[0];
+  assert.ok(triggerKeyHandler, "trigger key handler must exist");
+  assert.match(source, /onKeyDown=\{\(event\)\s*=>\s*handleTriggerKeyDown/);
+  for (const key of ["Enter", "ArrowDown", "ArrowUp"]) {
+    assert.match(
+      triggerKeyHandler,
+      new RegExp(`case\\s+["']${key}["']`)
+    );
+  }
+  assert.match(triggerKeyHandler, /case\s+["']\s["']\s*:/);
+  assert.match(
+    triggerKeyHandler,
+    /case\s+["']ArrowDown["'][\s\S]{0,120}openMenu\s*\(\s*groupId\s*,\s*0\s*\)/
+  );
+  assert.match(
+    triggerKeyHandler,
+    /case\s+["']ArrowUp["'][\s\S]{0,120}openMenu\s*\(\s*groupId\s*,\s*itemCount\s*-\s*1\s*\)/
+  );
+  const menuItemKeyHandler = source.match(
+    /const\s+handleMenuItemKeyDown[\s\S]*?\n  };\n\n  useEffect/
+  )?.[0];
+  assert.ok(menuItemKeyHandler, "menu item key handler must exist");
+  assert.match(source, /onKeyDown=\{\(event\)\s*=>\s*handleMenuItemKeyDown/);
+  for (const key of ["ArrowDown", "ArrowUp", "Home", "End"]) {
+    assert.match(
+      menuItemKeyHandler,
+      new RegExp(`case\\s+["']${key}["']`)
+    );
+  }
+  const tabHandler = menuItemKeyHandler.match(
+    /if\s*\(\s*event\.key\s*===\s*["']Tab["']\s*\)\s*\{([^}]*)\}/
+  )?.[1];
+  assert.ok(tabHandler, "Tab must have an explicit close branch");
+  assert.match(tabHandler, /setOpenGroup\s*\(\s*null\s*\)/);
+  assert.doesNotMatch(tabHandler, /preventDefault/);
+  assert.match(
+    menuItemKeyHandler,
+    /case\s+["']Escape["'][\s\S]{0,180}triggerRefs\.current\[groupId\][\s\S]{0,120}trigger\?\.focus\s*\(\s*\)/
+  );
+  assert.match(
+    menuItemKeyHandler,
+    /\(itemIndex\s*\+\s*1\)\s*%\s*itemCount/
+  );
+  assert.match(
+    menuItemKeyHandler,
+    /\(itemIndex\s*-\s*1\s*\+\s*itemCount\)\s*%\s*itemCount/
+  );
+  assert.match(source, /\.current\[openGroup\]\?\.\[activeItemIndex\]\?\.focus/);
   assert.match(source, /["']pointerdown["']/);
   assert.match(source, /["']focusin["']/);
   assert.match(source, /addEventListener/);
@@ -241,7 +301,10 @@ test("desktop navigation implements the shared accessible menu contract", async 
     source,
     /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*setOpenGroup\s*\(\s*null\s*\)\s*;\s*\}\s*,\s*\[\s*pathname\s*\]\s*\)/
   );
-  assert.match(source, /hidden[^"']*xl:flex/);
+  assert.match(
+    source,
+    /className=["'](?=[^"']*\bhidden\b)(?=[^"']*\bmin-w-0\b)(?=[^"']*\bflex-1\b)(?=[^"']*\bjustify-center\b)(?=[^"']*\bxl:flex\b)[^"']*["']/
+  );
   assert.match(source, /focus-visible:ring-2/);
   assert.match(source, /motion-reduce:transition-none/);
   assert.equal(
