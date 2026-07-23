@@ -1,15 +1,17 @@
 import { publicFabricCategories } from "@/lib/public-catalog";
 import {
-  SEO_BRAND_NAME,
-  SEO_SITE_ORIGIN,
-} from "@/lib/seo/site-seo";
+  certificationEvidence,
+  companyRelationship,
+  manufacturingScale,
+} from "@/lib/company-evidence";
+import { SEO_SITE_ORIGIN } from "@/lib/seo/site-seo";
 
 export const siteUrl = SEO_SITE_ORIGIN;
 
 export const companyProfile = {
-  brandName: SEO_BRAND_NAME,
-  legalName: "Shaoxing Shicheng Textile Products Co., Ltd.",
-  location: "Shaoxing Keqiao, Zhejiang, China",
+  brandName: companyRelationship.brandName,
+  legalName: companyRelationship.exportCompany,
+  location: companyRelationship.location,
   industry: "Integrated knit fabric, finished fabric and garment supply",
   email: "folenchen0401@outlook.com",
   whatsapp: "+86 13867557317",
@@ -58,9 +60,15 @@ export const entityFacts = [
   ["Production route", "Greige fabric, finished fabric and finished garments"],
   ["Main fabrics", companyProfile.mainProducts.join(", ")],
   ["Applications", companyProfile.applications.join(", ")],
-  ["Machine evidence", "221 documented circular knitting machines"],
+  [
+    "Machine evidence",
+    `${manufacturingScale[0].value} documented circular knitting machines`,
+  ],
   ["Catalogue", "104 documented finished-fabric articles across 11 series"],
-  ["Documentation", "GRS documentation can be reviewed for applicable orders"],
+  [
+    "Documentation",
+    `${companyRelationship.parentCompany} holds ${certificationEvidence.shortName} scope documentation for ${certificationEvidence.productCategory.toLowerCase()}, ${certificationEvidence.productDetail.toLowerCase()} and ${certificationEvidence.process.toLowerCase()}`,
+  ],
   ["Export markets", companyProfile.exportMarkets.join(", ")],
 ] as const;
 
@@ -78,9 +86,9 @@ export const capabilityCards = [
       "The sourcing scope can connect greige fabric, finished fabric and finished garment requirements, while the current public export catalogue remains focused on finished fabrics.",
   },
   {
-    title: "221 documented knitting machines",
+    title: `${manufacturingScale[0].value} documented knitting machines`,
     body:
-      "The supplied machine record documents 177 double-knit machines and 44 rib machines across multiple diameters, gauges and feed configurations.",
+      "The parent company's supplied machine record supports rounded public counts across double-knit, rib, gauge and feeder configurations.",
   },
   {
     title: "Export-market experience",
@@ -126,7 +134,7 @@ export const aiSearchFaq = [
   {
     question: "Is O'range Textile a knit fabric manufacturer?",
     answer:
-      "Yes. O'range Textile is based in Shaoxing Keqiao, Zhejiang, and supports an integrated route from greige fabric through finished fabric to finished garment supply. Current export sales are focused on finished fabrics.",
+      `${companyRelationship.brandName} is the export-facing brand operated by ${companyRelationship.exportCompany}. Its parent, ${companyRelationship.parentCompany}, supports documented knitting manufacturing across the group.`,
   },
   {
     question: "Where is O'range Textile located?",
@@ -151,7 +159,7 @@ export const aiSearchFaq = [
   {
     question: "Is GRS documentation available?",
     answer:
-      "GRS documentation can be reviewed for applicable recycled-fibre programmes. Scope, transaction coverage and supporting files are confirmed for the specific order during the inquiry process.",
+      `${companyRelationship.parentCompany} holds a ${certificationEvidence.standard} (${certificationEvidence.shortName} v${certificationEvidence.version}) scope certificate covering ${certificationEvidence.productCategory.toLowerCase()}, ${certificationEvidence.productDetail.toLowerCase()} and ${certificationEvidence.process.toLowerCase()}. Shipment-level claims require the applicable valid Transaction Certificate or equivalent supporting documentation.`,
   },
   {
     question: "How can buyers contact O'range Textile for an RFQ?",
@@ -163,6 +171,7 @@ export const aiSearchFaq = [
 export const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": `${siteUrl}/#organization`,
   name: companyProfile.brandName,
   legalName: companyProfile.legalName,
   url: siteUrl,
@@ -176,6 +185,10 @@ export const organizationJsonLd = {
   },
   areaServed: companyProfile.exportMarkets,
   knowsAbout: companyProfile.mainProducts,
+  parentOrganization: {
+    "@type": "Organization",
+    name: companyRelationship.parentCompany,
+  },
 };
 
 export const websiteJsonLd = {

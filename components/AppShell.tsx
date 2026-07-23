@@ -1,7 +1,6 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { Navbar } from "@/components/ui/Navbar";
+import { SiteFooter } from "@/components/ui/SiteFooter";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -9,6 +8,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Navbar />
       <div className="h-[7.5rem] shrink-0 sm:h-16" aria-hidden />
       <main>{children}</main>
+      <SiteFooter />
     </>
   );
 }

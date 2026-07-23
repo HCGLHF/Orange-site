@@ -136,10 +136,6 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
       <LandingCtaBand page={page} />
       <ContactCard />
 
-      <footer className="px-6 pb-24 pt-2 text-center text-sm text-brand-charcoal/60 max-md:pb-40">
-        <p>O&apos;range Textile | Shaoxing Shicheng Textile Products Co., Ltd. | Knit fabric inquiries welcome.</p>
-      </footer>
-
       <InquiryBar />
       <BottomNav />
     </div>

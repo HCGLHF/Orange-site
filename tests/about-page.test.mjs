@@ -145,3 +145,47 @@ test("About schema identifies the parent without assigning its certificate to th
   assert.match(source, /companyRelationship\.parentCompany/);
   assert.doesNotMatch(source, /certificationEvidence|scopeCertificateNumber/);
 });
+
+test("global shell exposes About without duplicating the homepage footer", () => {
+  const shell = readFileSync(
+    path.join(root, "components", "AppShell.tsx"),
+    "utf8"
+  );
+  const footer = readFileSync(
+    path.join(root, "components", "ui", "SiteFooter.tsx"),
+    "utf8"
+  );
+  const homepage = readFileSync(
+    path.join(root, "components", "geo", "GeoHomePage.tsx"),
+    "utf8"
+  );
+
+  assert.match(shell, /<SiteFooter\s*\/>/);
+  assert.match(footer, /href:\s*["']\/about["']/);
+  assert.match(footer, /companyRelationship\.exportCompany/);
+  assert.doesNotMatch(homepage, /<footer\b/i);
+});
+
+test("existing organization and AI discovery content use shared relationship facts", () => {
+  const geo = readFileSync(
+    path.join(root, "lib", "geo-content.ts"),
+    "utf8"
+  );
+  const llms = readFileSync(
+    path.join(root, "app", "llms.txt", "route.ts"),
+    "utf8"
+  );
+
+  assert.match(geo, /companyRelationship\.exportCompany/);
+  assert.match(geo, /parentOrganization/);
+  assert.match(geo, /companyRelationship\.parentCompany/);
+  assert.doesNotMatch(geo, /\b(?:221|177|114|63|44)\b/);
+
+  assert.match(llms, /import\s*\{[\s\S]*companyRelationship[\s\S]*\}\s*from\s*["']@\/lib\/company-evidence["']/);
+  assert.match(llms, /companyRelationship\.exportCompany/);
+  assert.match(llms, /companyRelationship\.parentCompany/);
+  assert.doesNotMatch(
+    llms,
+    /O'range Textile is a Shaoxing Keqiao knit fabric manufacturer/
+  );
+});
