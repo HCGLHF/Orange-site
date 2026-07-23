@@ -1,11 +1,13 @@
 import { publicFabricCategories } from "@/lib/public-catalog";
+import {
+  SEO_BRAND_NAME,
+  SEO_SITE_ORIGIN,
+} from "@/lib/seo/site-seo";
 
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "https://orangetextiles.com";
+export const siteUrl = SEO_SITE_ORIGIN;
 
 export const companyProfile = {
-  brandName: "O'range Textile",
+  brandName: SEO_BRAND_NAME,
   legalName: "Shaoxing Shicheng Textile Products Co., Ltd.",
   location: "Shaoxing Keqiao, Zhejiang, China",
   industry: "Integrated knit fabric, finished fabric and garment supply",

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowRight } from "lucide-react";
@@ -12,15 +11,12 @@ import {
   getPublicFabricCategories,
   getPublicFabricCount,
 } from "@/lib/public-catalog";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
-export const metadata: Metadata = {
-  title: "Finished Knit Fabric Catalogue",
-  description:
-    "Review 104 finished knit fabric articles across 11 documented series, with composition, GSM and usable width references from O'range Textile.",
-  alternates: {
-    canonical: "/fabrics",
-  },
-};
+const seo = getPublicPageSeo("/fabrics");
+
+export const metadata = createPageMetadata(seo);
 
 export const dynamic = "force-static";
 

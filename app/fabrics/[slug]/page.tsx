@@ -19,6 +19,8 @@ import {
   getPublicFabricCategory,
 } from "@/lib/public-catalog";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
 type CategoryPageProps = {
   params: {
@@ -38,45 +40,18 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: CategoryPageProps): Metadata {
-  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  const path = `/fabrics/${params.slug}`;
+  const finishedPage = getFinishedFabricPage(path);
   if (finishedPage?.kind === "product") {
-    return {
-      title: { absolute: finishedPage.title },
-      description: finishedPage.description,
-      alternates: { canonical: finishedPage.url },
-      openGraph: {
-        title: finishedPage.title,
-        description: finishedPage.description,
-        url: `${siteUrl}${finishedPage.url}`,
-        siteName: companyProfile.brandName,
-        locale: "en_US",
-        type: "website",
-        images: [{ url: finishedPage.hero.src, alt: finishedPage.hero.alt }],
-      },
-    };
+    const seo = getPublicPageSeo(path);
+    return createPageMetadata(seo, {
+      image: { src: finishedPage.hero.src, alt: finishedPage.hero.alt },
+    });
   }
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) return {};
-
-  const title = `${category.name} Supplier`;
-  const path = `/fabrics/${category.slug}`;
-
-  return {
-    title,
-    description: category.metaDescription,
-    alternates: {
-      canonical: path,
-    },
-    openGraph: {
-      title: `${title} | O'range Textile`,
-      description: category.metaDescription,
-      url: `${siteUrl}${path}`,
-      siteName: companyProfile.brandName,
-      locale: "en_US",
-      type: "website",
-    },
-  };
+  return createPageMetadata(getPublicPageSeo(path));
 }
 
 function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricCategory>>) {
