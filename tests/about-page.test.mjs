@@ -100,3 +100,35 @@ test("homepage renders a compact certificate summary linked to About", () => {
   assert.doesNotMatch(section, /<h1\b/i);
   assert.doesNotMatch(section, /download|\.pdf|<img\b/i);
 });
+
+test("About route uses unified metadata and one registry-owned H1", () => {
+  const route = readFileSync(
+    path.join(root, "app", "about", "page.tsx"),
+    "utf8"
+  );
+  const component = readFileSync(
+    path.join(root, "components", "company", "AboutPage.tsx"),
+    "utf8"
+  );
+
+  assert.match(route, /getPublicPageSeo\(["']\/about["']\)/);
+  assert.match(route, /createPageMetadata\(seo\)/);
+  assert.match(route, /<AboutPage seo=\{seo\}\s*\/>/);
+  assert.equal(component.match(/<h1\b/g)?.length, 1);
+  assert.match(component, /<h1\b[^>]*>[\s\S]*?\{seo\.h1\}[\s\S]*?<\/h1>/);
+  assert.match(component, /manufacturingScale\.map/);
+  assert.match(component, /certificationEvidence\.qualification/);
+  assert.doesNotMatch(component, /<img\b|\.pdf|download/i);
+});
+
+test("About schema identifies the parent without assigning its certificate to the subsidiary", () => {
+  const source = readFileSync(
+    path.join(root, "lib", "company-schema.ts"),
+    "utf8"
+  );
+
+  assert.match(source, /["']@type["']:\s*["']AboutPage["']/);
+  assert.match(source, /parentOrganization/);
+  assert.match(source, /companyRelationship\.parentCompany/);
+  assert.doesNotMatch(source, /certificationEvidence|scopeCertificateNumber/);
+});

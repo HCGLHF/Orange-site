@@ -11,6 +11,7 @@ const readSource = async (relativePath) => {
 
 const staticRoutes = [
   "app/page.tsx",
+  "app/about/page.tsx",
   "app/fabrics/page.tsx",
   "app/ready-stock-knit-fabrics/page.tsx",
   "app/finished-double-knit-fabrics/page.tsx",
