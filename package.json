@@ -11,6 +11,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test:seo:production": "node scripts/run-production-seo-audit.mjs",
     "deploy": "vercel --prod"
   },
   "dependencies": {

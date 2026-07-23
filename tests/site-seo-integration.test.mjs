@@ -113,3 +113,28 @@ test("sitemap comes only from the unified public inventory", async () => {
     /getFinishedFabricPages|getPublicFabricCategories/
   );
 });
+
+test("production SEO audit is an automated package workflow", async () => {
+  const packageJson = JSON.parse(await readSource("package.json"));
+  const validator = await readSource(
+    "scripts/validate-production-seo.mjs"
+  );
+  const runner = await readSource(
+    "scripts/run-production-seo-audit.mjs"
+  );
+
+  assert.equal(packageJson.scripts.typecheck, "tsc --noEmit");
+  assert.equal(
+    packageJson.scripts["test:seo:production"],
+    "node scripts/run-production-seo-audit.mjs"
+  );
+  assert.match(validator, /Googlebot/);
+  assert.match(validator, /sitemap\.xml/);
+  assert.match(validator, /robots\.txt/);
+  assert.match(
+    validator,
+    /reports\/seo\/production-html-audit\.json/
+  );
+  assert.match(runner, /node_modules.*next.*dist.*bin.*next/s);
+  assert.match(runner, /"start"/);
+});
