@@ -1,7 +1,11 @@
 import type { FinishedFabricPage } from "@/lib/finished-fabric-content";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
+import type { PublicPageSeo } from "@/lib/seo/site-seo";
 
-export function buildFinishedFabricSchema(page: FinishedFabricPage) {
+export function buildFinishedFabricSchema(
+  page: FinishedFabricPage,
+  seo: PublicPageSeo
+) {
   const pageUrl = `${siteUrl}${page.url}`;
   const organization = {
     "@type": "Organization",
@@ -22,8 +26,8 @@ export function buildFinishedFabricSchema(page: FinishedFabricPage) {
       ? {
           "@context": "https://schema.org",
           "@type": "Article",
-          headline: page.h1,
-          description: page.description,
+          headline: seo.h1,
+          description: seo.metaDescription,
           url: pageUrl,
           image: `${siteUrl}${page.hero.src}`,
           datePublished: page.published,
@@ -35,21 +39,21 @@ export function buildFinishedFabricSchema(page: FinishedFabricPage) {
         ? {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: page.product?.name ?? page.h1,
-            description: page.description,
+            name: page.product?.name ?? seo.h1,
+            description: seo.metaDescription,
             url: pageUrl,
             image: `${siteUrl}${page.hero.src}`,
             provider: organization,
             about: {
               "@type": "Thing",
-              name: page.product?.category ?? page.product?.name ?? page.h1,
+              name: page.product?.category ?? page.product?.name ?? seo.h1,
             },
           }
         : {
             "@context": "https://schema.org",
             "@type": page.kind === "hub" ? "CollectionPage" : "Blog",
-            name: page.h1,
-            description: page.description,
+            name: seo.h1,
+            description: seo.metaDescription,
             url: pageUrl,
             image: `${siteUrl}${page.hero.src}`,
             provider: organization,

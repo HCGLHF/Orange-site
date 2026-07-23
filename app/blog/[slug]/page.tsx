@@ -38,7 +38,8 @@ export function generateMetadata({ params }: BlogPageProps): Metadata {
 }
 
 export default function FinishedFabricBlogPage({ params }: BlogPageProps) {
-  const page = getFinishedFabricPage(`/blog/${params.slug}`);
+  const path = `/blog/${params.slug}`;
+  const page = getFinishedFabricPage(path);
   if (!page || page.kind !== "article") notFound();
-  return <FinishedFabricPage page={page} />;
+  return <FinishedFabricPage page={page} seo={getPublicPageSeo(path)} />;
 }

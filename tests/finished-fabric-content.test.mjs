@@ -45,15 +45,10 @@ test("content registry contains every approved finished-fabric route", () => {
   );
 });
 
-test("every page has unique metadata, answer-first copy, FAQs and internal routes", () => {
+test("every page has answer-first copy, FAQs and internal routes", () => {
   const pages = loadPages();
-  assert.equal(new Set(pages.map((page) => page.title)).size, pages.length);
-  assert.equal(new Set(pages.map((page) => page.description)).size, pages.length);
 
   for (const page of pages) {
-    assert.ok(page.title.length <= 65, `${page.url} title is too long`);
-    assert.ok(page.description.length >= 120, `${page.url} description is too short`);
-    assert.ok(page.description.length <= 165, `${page.url} description is too long`);
     assert.ok(page.opening.length >= 120, `${page.url} needs an opening answer`);
     assert.ok(page.sections.length >= 3, `${page.url} needs at least three sections`);
     assert.ok(page.faq.length >= 3, `${page.url} needs at least three FAQs`);
@@ -121,7 +116,7 @@ test("Next.js exposes the hub, blog, product routes and machine-readable discove
   const sitemap = readFileSync(path.join(root, "app/sitemap.ts"), "utf8");
   const llms = readFileSync(path.join(root, "app/llms.txt/route.ts"), "utf8");
   assert.match(sitemap, /getFinishedFabricPages/);
-  assert.match(llms, /getFinishedFabricPages/);
+  assert.match(llms, /getAllPublicPageSeo/);
 });
 
 test("the native pages use the real inquiry modal and bundled visual assets", () => {

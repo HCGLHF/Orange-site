@@ -58,3 +58,47 @@ test("metadata adapter aligns descriptions and uses absolute titles", async () =
   );
   assert.match(source, /canonical:\s*page\.path/);
 });
+
+test("shared H1 components accept the SEO registry value", async () => {
+  const landingHero = await readSource("components/landing/LandingHero.tsx");
+  const fabricsIntro = await readSource("components/FabricsPageIntro.tsx");
+  const finishedPage = await readSource(
+    "components/finished-fabric/FinishedFabricPage.tsx"
+  );
+
+  assert.match(landingHero, /h1:\s*string/);
+  assert.match(landingHero, /\{h1\}/);
+  assert.match(fabricsIntro, /h1:\s*string/);
+  assert.match(fabricsIntro, /\{h1\}/);
+  assert.match(finishedPage, /seo:\s*PublicPageSeo/);
+  assert.match(finishedPage, /\{seo\.h1\}/);
+});
+
+test("finished content no longer owns metadata or H1 fields", async () => {
+  const content = JSON.parse(
+    await readSource("content/finished-fabrics.json")
+  );
+  for (const page of content) {
+    assert.equal("title" in page, false, `${page.url} title`);
+    assert.equal("description" in page, false, `${page.url} description`);
+    assert.equal("h1" in page, false, `${page.url} h1`);
+    assert.equal("primaryKeyword" in page, false, `${page.url} keyword`);
+  }
+});
+
+test("legacy categories no longer own a second meta description", async () => {
+  const source = await readSource("lib/public-catalog.ts");
+  assert.doesNotMatch(source, /metaDescription:/);
+  assert.doesNotMatch(source, /metaDescription:\s*string/);
+});
+
+test("schema and llms discovery consume the SEO registry", async () => {
+  const schema = await readSource("lib/finished-fabric-schema.ts");
+  const llms = await readSource("app/llms.txt/route.ts");
+  assert.match(schema, /seo:\s*PublicPageSeo/);
+  assert.match(schema, /seo\.h1/);
+  assert.match(schema, /seo\.metaDescription/);
+  assert.match(llms, /getAllPublicPageSeo/);
+  assert.match(llms, /page\.h1/);
+  assert.match(llms, /page\.metaDescription/);
+});

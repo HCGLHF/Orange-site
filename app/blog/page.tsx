@@ -17,5 +17,5 @@ export const metadata = page
 
 export default function BlogIndexPage() {
   if (!page) notFound();
-  return <FinishedFabricPage page={page} />;
+  return <FinishedFabricPage page={page} seo={seo} />;
 }

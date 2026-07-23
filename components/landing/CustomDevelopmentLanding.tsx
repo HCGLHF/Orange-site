@@ -8,14 +8,16 @@ import { StructuredData } from "@/components/geo/StructuredData";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
 import { buildLandingPageSchema } from "@/lib/landing-page-schema";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
 export function CustomDevelopmentLanding() {
   const page = getPublicLandingPage("customDevelopment");
+  const seo = getPublicPageSeo("/custom-knit-fabric-development");
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
       <StructuredData data={buildLandingPageSchema({ page, path: "/custom-knit-fabric-development" })} />
-      <LandingHero page={page} />
+      <LandingHero page={page} h1={seo.h1} />
       <LandingProofStrip points={page.proofPoints} />
 
       <section className="bg-white px-5 py-16 sm:px-6 md:py-20 lg:px-8">
