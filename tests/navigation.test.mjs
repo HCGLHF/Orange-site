@@ -8,6 +8,10 @@ const desktopNavigationUrl = new URL(
   "../components/ui/DesktopNavigation.tsx",
   import.meta.url
 );
+const mobileNavigationDrawerUrl = new URL(
+  "../components/ui/MobileNavigationDrawer.tsx",
+  import.meta.url
+);
 
 const loadNavigation = async () => {
   assert.ok(existsSync(navigationUrl), "lib/navigation.ts must exist");
@@ -318,4 +322,208 @@ test("desktop navigation implements the shared accessible menu contract", async 
   );
   assert.match(source, /ChevronDown/);
   assert.match(source, /aria-hidden=["']true["']/);
+});
+
+const assertMobileDrawerStructure = (source, primaryNavigation) => {
+  assert.match(source, /["']use client["']/);
+  assert.match(
+    source,
+    /import\s+Link\s+from\s+["']next\/link["'];?/
+  );
+  assert.match(
+    source,
+    /PRIMARY_NAVIGATION[\s\S]*INQUIRY_HREF[\s\S]*getActiveNavigationId/
+  );
+  assert.match(source, /PRIMARY_NAVIGATION\.map\s*\(/);
+  assert.match(source, /getActiveNavigationId\s*\(\s*pathname\s*\)/);
+  assert.doesNotMatch(source, /const\s+(?:nav|menu)Items\s*=/i);
+  assert.doesNotMatch(source, /<a(?:\s|>)/);
+
+  for (const section of primaryNavigation) {
+    if (section.kind !== "group") continue;
+    for (const item of section.items) {
+      assert.doesNotMatch(
+        source,
+        new RegExp(
+          item.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        ),
+        `${item.href} must come from PRIMARY_NAVIGATION`
+      );
+      assert.doesNotMatch(
+        source,
+        new RegExp(
+          item.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        ),
+        `${item.label} must come from PRIMARY_NAVIGATION`
+      );
+    }
+  }
+
+  assert.match(source, /if\s*\(\s*!open\s*\)\s*return\s+null/);
+  assert.match(source, /role=["']dialog["']/);
+  assert.match(source, /aria-modal=["']true["']/);
+  assert.match(source, /aria-labelledby=["']mobile-navigation-title["']/);
+  assert.match(source, /id=["']mobile-navigation-title["']/);
+  assert.match(
+    source,
+    /<h[2-6]\b[^>]*>\s*O(?:['’]|&apos;)range Textile\s*<\/h[2-6]>/
+  );
+  assert.doesNotMatch(source, /<h1\b/);
+  assert.match(source, /\bxl:hidden\b/);
+  assert.match(source, /\boverflow-y-auto\b/);
+  assert.match(source, /\bmax-w-(?:xs|sm|md|lg|\[[^\]]+\])\b/);
+  assert.match(source, /\bpb-28\b/);
+  assert.match(source, /safe-area-inset-top/);
+  assert.match(source, /onClick=\{\s*handleBackdropClick\s*\}/);
+  assert.match(source, /event\.target\s*===\s*event\.currentTarget/);
+  assert.match(source, /event\.stopPropagation\s*\(\s*\)/);
+
+  assert.match(source, /href=\{\s*INQUIRY_HREF\s*\}/);
+  assert.match(source, /totalCount\s*>\s*0\s*\?/);
+  assert.match(source, /\{\s*totalCount\s*\}/);
+  assert.match(source, />\s*Request a Quote\s*</);
+  assert.match(source, />\s*Inquiry cart\s*</);
+  assert.match(source, /onClick=\{\s*onRouteSelect\s*\}/);
+  assert.match(source, /const\s+onRouteSelect\s*=\s*\(\s*\)\s*=>\s*\{\s*onClose\s*\(\s*\)/);
+  assert.match(source, /\bborder-l-4\b/);
+  assert.match(source, /aria-current=\{/);
+};
+
+const assertMobileDrawerFocusContract = (source) => {
+  assert.match(source, /closeButtonRef/);
+  assert.match(source, /requestAnimationFrame\s*\(/);
+  assert.match(source, /closeButtonRef\.current\?\.focus\s*\(\s*\)/);
+  assert.match(source, /cancelAnimationFrame\s*\(/);
+  assert.match(source, /document\.addEventListener\s*\(\s*["']keydown["']/);
+  assert.match(source, /document\.removeEventListener\s*\(\s*["']keydown["']/);
+  assert.match(source, /event\.key\s*===\s*["']Escape["']/);
+  assert.match(source, /event\.key\s*!==\s*["']Tab["']/);
+  assert.match(source, /event\.shiftKey/);
+  assert.match(source, /event\.preventDefault\s*\(\s*\)/);
+  assert.match(source, /querySelectorAll<HTMLElement>/);
+  assert.match(source, /offsetParent\s*!==\s*null/);
+  assert.match(source, /\.closest\s*\(\s*["']\[hidden\]["']\s*\)/);
+  assert.match(source, /firstFocusable\.focus\s*\(\s*\)/);
+  assert.match(source, /lastFocusable\.focus\s*\(\s*\)/);
+  assert.match(source, /triggerRef\.current\?\.focus\s*\(\s*\)/);
+
+  assert.match(source, /const\s+previousOverflow\s*=\s*document\.body\.style\.overflow/);
+  assert.match(source, /document\.body\.style\.overflow\s*=\s*["']hidden["']/);
+  assert.match(source, /document\.body\.style\.overflow\s*=\s*previousOverflow/);
+
+  assert.match(source, /const\s+previousPathRef\s*=\s*useRef\s*\(\s*pathname\s*\)/);
+  assert.match(source, /previousPathRef\.current\s*!==\s*pathname/);
+  assert.match(source, /previousPathRef\.current\s*=\s*pathname/);
+  assert.match(
+    source,
+    /previousPathRef\.current\s*!==\s*pathname[\s\S]{0,220}if\s*\(\s*open\s*\)\s*\{[\s\S]{0,100}onClose\s*\(\s*\)/
+  );
+};
+
+const assertMobileDrawerAccordionContract = (source) => {
+  assert.match(
+    source,
+    /products\s*:\s*true[\s\S]{0,80}resources\s*:\s*false/
+  );
+  assert.match(source, /aria-expanded=\{\s*isExpanded\s*\}/);
+  assert.match(source, /aria-controls=\{\s*panelId\s*\}/);
+  assert.match(source, /id=\{\s*panelId\s*\}/);
+  assert.match(source, /hidden=\{\s*!isExpanded\s*\}/);
+  assert.match(source, /setExpandedGroups\s*\(/);
+  assert.match(source, /ChevronDown/);
+  assert.match(source, /aria-hidden=["']true["']/);
+  assert.match(source, /\bmin-h-11\b/);
+  assert.match(source, /focus-visible:ring-2/);
+  assert.match(source, /motion-reduce:transition-none/);
+};
+
+test("mobile drawer uses shared navigation data and accessible dialog semantics", async () => {
+  assert.ok(
+    existsSync(mobileNavigationDrawerUrl),
+    "components/ui/MobileNavigationDrawer.tsx must exist"
+  );
+
+  const [source, { PRIMARY_NAVIGATION }] = await Promise.all([
+    readFile(mobileNavigationDrawerUrl, "utf8"),
+    loadNavigation(),
+  ]);
+
+  assertMobileDrawerStructure(source, PRIMARY_NAVIGATION);
+
+  assert.throws(
+    () =>
+      assertMobileDrawerStructure(
+        source.replace('role="dialog"', 'role="region"'),
+        PRIMARY_NAVIGATION
+      ),
+    /dialog/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerStructure(
+        source.replace("PRIMARY_NAVIGATION.map", "copiedItems.map"),
+        PRIMARY_NAVIGATION
+      ),
+    /PRIMARY_NAVIGATION/
+  );
+});
+
+test("mobile drawer traps visible focus and restores page state", async () => {
+  assert.ok(
+    existsSync(mobileNavigationDrawerUrl),
+    "components/ui/MobileNavigationDrawer.tsx must exist"
+  );
+  const source = await readFile(mobileNavigationDrawerUrl, "utf8");
+
+  assertMobileDrawerFocusContract(source);
+
+  assert.throws(
+    () =>
+      assertMobileDrawerFocusContract(
+        source.replace("element.offsetParent !== null", "true")
+      ),
+    /offsetParent/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerFocusContract(
+        source.replace(
+          'document.body.style.overflow = previousOverflow',
+          'document.body.style.overflow = ""'
+        )
+      ),
+    /previousOverflow/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerFocusContract(
+        source.replace("triggerRef.current?.focus()", "")
+      ),
+    /triggerRef/
+  );
+});
+
+test("mobile drawer exposes touch-friendly Products and Resources accordions", async () => {
+  assert.ok(
+    existsSync(mobileNavigationDrawerUrl),
+    "components/ui/MobileNavigationDrawer.tsx must exist"
+  );
+  const source = await readFile(mobileNavigationDrawerUrl, "utf8");
+
+  assertMobileDrawerAccordionContract(source);
+
+  assert.throws(
+    () =>
+      assertMobileDrawerAccordionContract(
+        source.replace("resources: false", "resources: true")
+      ),
+    /resources/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerAccordionContract(
+        source.replace("hidden={!isExpanded}", "")
+      ),
+    /hidden/
+  );
 });
