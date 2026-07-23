@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import {
   getActiveNavigationId,
+  getCurrentNavigationItemId,
   PRIMARY_NAVIGATION,
   type NavigationGroupId,
 } from "@/lib/navigation";
@@ -37,6 +38,8 @@ export function DesktopNavigation({
   >({});
   const pendingFocusRef = useRef<PendingMenuFocus | null>(null);
   const activeNavigationId = getActiveNavigationId(pathname);
+  const currentNavigationItemId =
+    getCurrentNavigationItemId(pathname);
 
   const openMenu = (
     groupId: NavigationGroupId,
@@ -208,6 +211,8 @@ export function DesktopNavigation({
         }
 
         const isOpen = openGroup === section.id;
+        const isCurrentSectionFallback =
+          isActive && currentNavigationItemId === null;
         const triggerId = `desktop-navigation-${section.id}-trigger`;
         const panelId = `desktop-navigation-${section.id}-menu`;
 
@@ -222,6 +227,9 @@ export function DesktopNavigation({
               aria-haspopup="menu"
               aria-expanded={isOpen}
               aria-controls={panelId}
+              aria-current={
+                isCurrentSectionFallback ? "page" : undefined
+              }
               onClick={() => handleTriggerClick(section.id)}
               onKeyDown={(event) =>
                 handleTriggerKeyDown(
@@ -258,34 +266,46 @@ export function DesktopNavigation({
                   : "invisible pointer-events-none -translate-y-1 opacity-0"
               }`}
             >
-              {section.items.map((item, itemIndex) => (
-                <Link
-                  key={item.id}
-                  ref={(node) => {
-                    const itemRefs =
-                      menuItemRefs.current[section.id] ?? [];
-                    itemRefs[itemIndex] = node;
-                    menuItemRefs.current[section.id] = itemRefs;
-                  }}
-                  href={item.href}
-                  role="menuitem"
-                  tabIndex={
-                    isOpen && activeItemIndex === itemIndex ? 0 : -1
-                  }
-                  onClick={() => setOpenGroup(null)}
-                  onKeyDown={(event) =>
-                    handleMenuItemKeyDown(
-                      event,
-                      section.id,
-                      itemIndex,
-                      section.items.length
-                    )
-                  }
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-brand-charcoal/80 outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {section.items.map((item, itemIndex) => {
+                const isCurrentItem =
+                  currentNavigationItemId === item.id;
+
+                return (
+                  <Link
+                    key={item.id}
+                    ref={(node) => {
+                      const itemRefs =
+                        menuItemRefs.current[section.id] ?? [];
+                      itemRefs[itemIndex] = node;
+                      menuItemRefs.current[section.id] = itemRefs;
+                    }}
+                    href={item.href}
+                    aria-current={
+                      isCurrentItem ? "page" : undefined
+                    }
+                    role="menuitem"
+                    tabIndex={
+                      isOpen && activeItemIndex === itemIndex ? 0 : -1
+                    }
+                    onClick={() => setOpenGroup(null)}
+                    onKeyDown={(event) =>
+                      handleMenuItemKeyDown(
+                        event,
+                        section.id,
+                        itemIndex,
+                        section.items.length
+                      )
+                    }
+                    className={`block rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none ${
+                      isCurrentItem
+                        ? "bg-brand-soft text-brand-charcoal"
+                        : "text-brand-charcoal/80"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         );

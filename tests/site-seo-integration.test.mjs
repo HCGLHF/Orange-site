@@ -147,11 +147,11 @@ test("production SEO audit is an automated package workflow", async () => {
   );
   assert.match(
     validator,
-    /collectTags\(html,\s*["']a["']\)[\s\S]*?getAttribute\(tag,\s*["']href["']\)/
+    /inspectGlobalNavigation\s*\(\s*html\s*\)/
   );
   assert.match(
     validator,
-    /NAVIGATION_DISCOVERY_HREFS\.filter\([\s\S]*?!pageHrefs\.includes\(href\)/
+    /globalNavigationContainerCount/
   );
   assert.match(validator, /missing navigation links:/);
   assert.match(
@@ -168,6 +168,62 @@ test("production SEO audit is an automated package workflow", async () => {
   );
   assert.match(runner, /node_modules.*next.*dist.*bin.*next/s);
   assert.match(runner, /"start"/);
+});
+
+test("production SEO audit scopes discovery links to exactly one marked global navigation", async () => {
+  const validator = await readSource(
+    "scripts/validate-production-seo.mjs"
+  );
+  assert.match(
+    validator,
+    /export\s+function\s+inspectGlobalNavigation\s*\(/
+  );
+
+  const { inspectGlobalNavigation } = await import(
+    "../scripts/validate-production-seo.mjs"
+  );
+  const { NAVIGATION_DISCOVERY_HREFS } = await import(
+    "../lib/navigation.ts"
+  );
+  const anchors = NAVIGATION_DISCOVERY_HREFS.map(
+    (href) => `<a href="${href}">Link</a>`
+  );
+  const missingHeaderHref = NAVIGATION_DISCOVERY_HREFS[0];
+  const headerWithoutOne = anchors
+    .filter((anchor) => !anchor.includes(`"${missingHeaderHref}"`))
+    .join("");
+  const bodyDuplicate = `<main><a href="${missingHeaderHref}">Body duplicate</a></main>`;
+
+  const scoped = inspectGlobalNavigation(
+    `<nav data-global-navigation="true">${headerWithoutOne}</nav>${bodyDuplicate}`
+  );
+  assert.equal(scoped.globalNavigationContainerCount, 1);
+  assert.equal(scoped.navigationLinksPresent, false);
+  assert.deepEqual(scoped.missingNavigationLinks, [missingHeaderHref]);
+
+  const absent = inspectGlobalNavigation(
+    `<header>${anchors.join("")}</header>`
+  );
+  assert.equal(absent.globalNavigationContainerCount, 0);
+  assert.equal(absent.navigationLinksPresent, false);
+  assert.deepEqual(
+    absent.missingNavigationLinks,
+    NAVIGATION_DISCOVERY_HREFS
+  );
+
+  const duplicate = inspectGlobalNavigation(
+    `<nav data-global-navigation="true">${anchors.join("")}</nav>` +
+      `<nav data-global-navigation="true">${anchors.join("")}</nav>`
+  );
+  assert.equal(duplicate.globalNavigationContainerCount, 2);
+  assert.equal(duplicate.navigationLinksPresent, false);
+
+  const valid = inspectGlobalNavigation(
+    `<nav data-global-navigation="true">${anchors.join("")}</nav>`
+  );
+  assert.equal(valid.globalNavigationContainerCount, 1);
+  assert.equal(valid.navigationLinksPresent, true);
+  assert.deepEqual(valid.missingNavigationLinks, []);
 });
 
 test("ESLint treats this checkout as the configuration root", async () => {

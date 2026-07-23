@@ -24,6 +24,7 @@ function NavbarContent() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const brandLinkRef = useRef<HTMLAnchorElement>(null);
 
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false);
@@ -39,6 +40,7 @@ function NavbarContent() {
   return (
     <>
       <nav
+        data-global-navigation="true"
         className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 motion-reduce:transition-none ${
           isScrolled
             ? "bg-white/80 shadow-lg shadow-gray-200/20 backdrop-blur-xl"
@@ -63,6 +65,7 @@ function NavbarContent() {
             </button>
 
             <Link
+              ref={brandLinkRef}
               href="/"
               title={t("heroTitle")}
               aria-label={`${t("heroTitle")} · ${t("navHome")}`}
@@ -80,7 +83,9 @@ function NavbarContent() {
             <div className="hidden shrink-0 items-center gap-2 xl:flex">
               <Link
                 href={INQUIRY_HREF}
-                aria-label={t("navCartAria")}
+                aria-label={`Inquiry cart: ${totalCount} ${
+                  totalCount === 1 ? "item" : "items"
+                }`}
                 className="group relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-brand-charcoal/70 outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
               >
                 <ShoppingCart
@@ -118,6 +123,7 @@ function NavbarContent() {
         pathname={pathname}
         totalCount={totalCount}
         triggerRef={menuButtonRef}
+        desktopFallbackRef={brandLinkRef}
       />
     </>
   );

@@ -8,6 +8,7 @@ import {
   PRIMARY_NAVIGATION,
   INQUIRY_HREF,
   getActiveNavigationId,
+  getCurrentNavigationItemId,
   type NavigationGroupId,
 } from "@/lib/navigation";
 
@@ -17,6 +18,7 @@ type MobileNavigationDrawerProps = {
   pathname: string;
   totalCount: number;
   triggerRef: RefObject<HTMLButtonElement>;
+  desktopFallbackRef: RefObject<HTMLAnchorElement>;
 };
 
 export function MobileNavigationDrawer({
@@ -25,6 +27,7 @@ export function MobileNavigationDrawer({
   pathname,
   totalCount,
   triggerRef,
+  desktopFallbackRef,
 }: MobileNavigationDrawerProps) {
   const [expandedGroups, setExpandedGroups] = useState<
     Record<NavigationGroupId, boolean>
@@ -36,6 +39,8 @@ export function MobileNavigationDrawer({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousPathRef = useRef(pathname);
   const activeNavigationId = getActiveNavigationId(pathname);
+  const currentNavigationItemId =
+    getCurrentNavigationItemId(pathname);
 
   const closeAndRestoreFocus = useCallback(() => {
     onClose();
@@ -65,21 +70,25 @@ export function MobileNavigationDrawer({
     if (!open) return;
 
     const desktopMediaQuery = window.matchMedia("(min-width: 1280px)");
+    const closeForDesktop = () => {
+      onClose();
+      desktopFallbackRef.current?.focus();
+    };
     const handleDesktopChange = (event: MediaQueryListEvent) => {
       if (event.matches) {
-        onClose();
+        closeForDesktop();
       }
     };
 
     desktopMediaQuery.addEventListener("change", handleDesktopChange);
     if (desktopMediaQuery.matches) {
-      onClose();
+      closeForDesktop();
     }
 
     return () => {
       desktopMediaQuery.removeEventListener("change", handleDesktopChange);
     };
-  }, [onClose, open]);
+  }, [desktopFallbackRef, onClose, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -218,6 +227,8 @@ export function MobileNavigationDrawer({
               }
 
               const isExpanded = expandedGroups[section.id];
+              const isCurrentSectionFallback =
+                isActive && currentNavigationItemId === null;
               const triggerId = `mobile-navigation-${section.id}-trigger`;
               const panelId = `mobile-navigation-${section.id}-panel`;
 
@@ -228,6 +239,9 @@ export function MobileNavigationDrawer({
                     type="button"
                     aria-expanded={isExpanded}
                     aria-controls={panelId}
+                    aria-current={
+                      isCurrentSectionFallback ? "page" : undefined
+                    }
                     onClick={() =>
                       setExpandedGroups((current) => ({
                         ...current,
@@ -254,16 +268,28 @@ export function MobileNavigationDrawer({
                     hidden={!isExpanded}
                     className="ml-4 border-l border-brand-charcoal/10 pl-3"
                   >
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.id}
-                        href={item.href}
-                        onClick={onRouteSelect}
-                        className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium text-brand-charcoal/75 outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                    {section.items.map((item) => {
+                      const isCurrentItem =
+                        currentNavigationItemId === item.id;
+
+                      return (
+                        <Link
+                          key={item.id}
+                          href={item.href}
+                          aria-current={
+                            isCurrentItem ? "page" : undefined
+                          }
+                          onClick={onRouteSelect}
+                          className={`flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none ${
+                            isCurrentItem
+                              ? "bg-brand-soft text-brand-charcoal"
+                              : "text-brand-charcoal/75"
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               );

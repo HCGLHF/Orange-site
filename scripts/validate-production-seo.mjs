@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { NAVIGATION_DISCOVERY_HREFS } from "../lib/navigation.ts";
 import {
@@ -22,19 +22,6 @@ const reportUrl = new URL(
 );
 const reportPath =
   process.env.SEO_AUDIT_REPORT_PATH || fileURLToPath(reportUrl);
-const buildId = readFileSync(
-  new URL("../.next/BUILD_ID", import.meta.url),
-  "utf8"
-).trim();
-const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], {
-  encoding: "utf8",
-  windowsHide: true,
-}).trim();
-const registryHash = createHash("sha256")
-  .update(
-    readFileSync(new URL("../lib/seo/site-seo.ts", import.meta.url))
-  )
-  .digest("hex");
 
 function getBuildPublicRoutes() {
   const manifest = JSON.parse(
@@ -105,6 +92,75 @@ function collectTags(html, name) {
   return html.match(new RegExp(`<${name}\\b[^>]*>`, "gi")) ?? [];
 }
 
+function hasAttribute(tag, name) {
+  return new RegExp(
+    `(?:^|\\s)${name}(?:\\s*=\\s*(?:"[^"]*"|'[^']*'|[^\\s>]+))?(?=\\s|\\/?>)`,
+    "i"
+  ).test(tag);
+}
+
+function findMarkedGlobalNavigation(html) {
+  const navigationTagPattern = /<\/?nav\b[^>]*>/gi;
+  let depth = 0;
+  let markedDepth = null;
+  let markedStart = null;
+  let markedHtml = null;
+  let globalNavigationContainerCount = 0;
+
+  for (const match of html.matchAll(navigationTagPattern)) {
+    const tag = match[0];
+    const isClosingTag = /^<\//.test(tag);
+
+    if (!isClosingTag) {
+      depth += 1;
+      if (hasAttribute(tag, "data-global-navigation")) {
+        globalNavigationContainerCount += 1;
+        if (globalNavigationContainerCount === 1) {
+          markedDepth = depth;
+          markedStart = match.index + tag.length;
+        }
+      }
+      continue;
+    }
+
+    if (
+      markedHtml === null &&
+      markedStart !== null &&
+      depth === markedDepth
+    ) {
+      markedHtml = html.slice(markedStart, match.index);
+    }
+    depth = Math.max(0, depth - 1);
+  }
+
+  return {
+    globalNavigationContainerCount,
+    markedHtml:
+      globalNavigationContainerCount === 1 ? markedHtml : null,
+  };
+}
+
+export function inspectGlobalNavigation(html) {
+  const { globalNavigationContainerCount, markedHtml } =
+    findMarkedGlobalNavigation(html);
+  const navigationHrefs = collectTags(markedHtml ?? "", "a")
+    .map((tag) => getAttribute(tag, "href"))
+    .filter((href) => href !== null);
+  const missingNavigationLinks = NAVIGATION_DISCOVERY_HREFS.filter(
+    (href) => !navigationHrefs.includes(href)
+  );
+
+  return {
+    globalNavigationContainerCount,
+    navigationHrefs,
+    missingNavigationLinks,
+    navigationLinksPresent:
+      globalNavigationContainerCount === 1 &&
+      markedHtml !== null &&
+      missingNavigationLinks.length === 0,
+  };
+}
+
 function collectElementText(html, name) {
   return [
     ...html.matchAll(
@@ -141,6 +197,20 @@ function sorted(values) {
   return [...values].sort((a, b) => a.localeCompare(b));
 }
 
+export async function runProductionSeoAudit() {
+const buildId = readFileSync(
+  new URL("../.next/BUILD_ID", import.meta.url),
+  "utf8"
+).trim();
+const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+  encoding: "utf8",
+  windowsHide: true,
+}).trim();
+const registryHash = createHash("sha256")
+  .update(
+    readFileSync(new URL("../lib/seo/site-seo.ts", import.meta.url))
+  )
+  .digest("hex");
 const expectedPages = getAllPublicPageSeo();
 const expectedPaths = expectedPages.map((page) => page.path).sort();
 const builtPublicRoutes = getBuildPublicRoutes();
@@ -209,14 +279,11 @@ for (const page of expectedPages) {
     const imagesMissingAlt = imageTags.filter(
       (tag) => getAttribute(tag, "alt") === null
     );
-    const pageHrefs = collectTags(html, "a")
-      .map((tag) => getAttribute(tag, "href"))
-      .filter((href) => href !== null);
-    const missingNavigationLinks = NAVIGATION_DISCOVERY_HREFS.filter(
-      (href) => !pageHrefs.includes(href)
-    );
-    const navigationLinksPresent =
-      missingNavigationLinks.length === 0;
+    const {
+      globalNavigationContainerCount,
+      missingNavigationLinks,
+      navigationLinksPresent,
+    } = inspectGlobalNavigation(html);
     const robotsValues = findMetaValues(html, "name", "robots");
     const noindex = robotsValues.some((value) =>
       /\bnoindex\b/i.test(value)
@@ -269,6 +336,11 @@ for (const page of expectedPages) {
     if (!allowsGooglebot) {
       failures.push("Googlebot blocked by robots.txt");
     }
+    if (globalNavigationContainerCount !== 1) {
+      failures.push(
+        `global navigation container count ${globalNavigationContainerCount}`
+      );
+    }
     if (!navigationLinksPresent) {
       failures.push(
         `missing navigation links: ${missingNavigationLinks.join(", ")}`
@@ -296,6 +368,7 @@ for (const page of expectedPages) {
       statusCode: response.status,
       sitemapPresent,
       noindex,
+      globalNavigationContainerCount,
       navigationLinksPresent,
       missingNavigationLinks,
       inaccessible: false,
@@ -321,6 +394,7 @@ for (const page of expectedPages) {
       statusCode: null,
       sitemapPresent: sitemapUrls.includes(expectedCanonical),
       noindex: false,
+      globalNavigationContainerCount: 0,
       navigationLinksPresent: false,
       missingNavigationLinks: [...NAVIGATION_DISCOVERY_HREFS],
       inaccessible: true,
@@ -431,4 +505,13 @@ if (
   inaccessible > 0
 ) {
   process.exitCode = 1;
+}
+}
+
+const isDirectExecution =
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) === resolve(process.argv[1]);
+
+if (isDirectExecution) {
+  await runProductionSeoAudit();
 }

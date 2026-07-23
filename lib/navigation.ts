@@ -113,6 +113,41 @@ export const PRIMARY_NAVIGATION = [
   },
 ] as const satisfies readonly NavigationSection[];
 
+type ConfiguredNavigationSection = (typeof PRIMARY_NAVIGATION)[number];
+type ConfiguredNavigationGroup =
+  Extract<ConfiguredNavigationSection, { kind: "group" }>;
+type ConfiguredNavigationLink =
+  Extract<ConfiguredNavigationSection, { kind: "link" }>;
+
+export type CurrentNavigationItemId =
+  | "home"
+  | ConfiguredNavigationLink["id"]
+  | ConfiguredNavigationGroup["items"][number]["id"];
+
+const CURRENT_ITEM_BY_PATHNAME: Readonly<
+  Record<string, CurrentNavigationItemId>
+> = Object.freeze({
+  "/": "home",
+  "/ready-stock-knit-fabrics": "ready-stock",
+  "/fabrics": "finished-knit-fabrics",
+  "/finished-double-knit-fabrics": "double-knit-manufacturing",
+  "/fabrics/interlock-fabric": "interlock-fabric",
+  "/fabrics/ponte-roma-fabric": "ponte-roma-fabric",
+  "/fabrics/rib-knit-fabric": "rib-knit-fabric",
+  "/custom-knit-fabric-development": "custom-development",
+  "/blog/what-is-double-knit-fabric": "double-knit-guide",
+  "/blog/what-is-interlock-fabric": "interlock-guide",
+  "/blog/what-is-ponte-fabric": "ponte-guide",
+  "/blog": "view-all-guides",
+  "/about": "about",
+});
+
+export function getCurrentNavigationItemId(
+  pathname: string
+): CurrentNavigationItemId | null {
+  return CURRENT_ITEM_BY_PATHNAME[pathname] ?? null;
+}
+
 const configuredHrefs = PRIMARY_NAVIGATION.flatMap((section) =>
   section.kind === "group"
     ? section.items.map((item) => item.href)

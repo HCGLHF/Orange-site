@@ -164,6 +164,125 @@ test("active navigation follows the approved route families", async () => {
   assert.equal(getActiveNavigationId("/unknown"), null);
 });
 
+test("current navigation item resolver selects exact canonical destinations", async () => {
+  const { getCurrentNavigationItemId } = await loadNavigation();
+
+  assert.equal(getCurrentNavigationItemId("/"), "home");
+  assert.equal(
+    getCurrentNavigationItemId("/ready-stock-knit-fabrics"),
+    "ready-stock"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/finished-double-knit-fabrics"),
+    "double-knit-manufacturing"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/fabrics"),
+    "finished-knit-fabrics",
+    "the duplicated catalogue URL must resolve to its canonical item"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/fabrics/interlock-fabric"),
+    "interlock-fabric"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/fabrics/ponte-roma-fabric"),
+    "ponte-roma-fabric"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/fabrics/rib-knit-fabric"),
+    "rib-knit-fabric"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/blog/what-is-double-knit-fabric"),
+    "double-knit-guide"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/blog/what-is-interlock-fabric"),
+    "interlock-guide"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/blog/what-is-ponte-fabric"),
+    "ponte-guide"
+  );
+  assert.equal(getCurrentNavigationItemId("/blog"), "view-all-guides");
+  assert.equal(
+    getCurrentNavigationItemId("/custom-knit-fabric-development"),
+    "custom-development"
+  );
+  assert.equal(getCurrentNavigationItemId("/about"), "about");
+  assert.equal(
+    getCurrentNavigationItemId("/fabrics/unlisted-fabric"),
+    null,
+    "an unmatched product route must fall back to the Products trigger"
+  );
+  assert.equal(
+    getCurrentNavigationItemId("/blog/unlisted-guide"),
+    null,
+    "an unmatched resource route must fall back to the Resources trigger"
+  );
+  assert.equal(getCurrentNavigationItemId("/unknown"), null);
+});
+
+const assertItemCurrentContract = (source) => {
+  assert.match(source, /getCurrentNavigationItemId/);
+  assert.match(
+    source,
+    /const\s+currentNavigationItemId\s*=\s*getCurrentNavigationItemId\s*\(\s*pathname\s*\)/
+  );
+  assert.match(
+    source,
+    /const\s+isCurrentSectionFallback\s*=\s*isActive\s*&&\s*currentNavigationItemId\s*===\s*null/
+  );
+  assert.match(
+    source,
+    /aria-current=\{\s*isCurrentSectionFallback\s*\?\s*["']page["']\s*:\s*undefined\s*\}/
+  );
+  assert.match(
+    source,
+    /const\s+isCurrentItem\s*=\s*currentNavigationItemId\s*===\s*item\.id/
+  );
+  assert.match(
+    source,
+    /href=\{item\.href\}[\s\S]{0,180}aria-current=\{\s*isCurrentItem\s*\?\s*["']page["']\s*:\s*undefined\s*\}/
+  );
+  assert.match(
+    source,
+    /\$\{\s*isCurrentItem\s*\?[\s\S]{0,160}\b(?:bg-brand-soft|text-brand-charcoal)\b/
+  );
+};
+
+test("desktop and mobile navigation expose exact child current state with section fallback", async () => {
+  const [desktopSource, mobileSource] = await Promise.all([
+    readFile(desktopNavigationUrl, "utf8"),
+    readFile(mobileNavigationDrawerUrl, "utf8"),
+  ]);
+
+  for (const source of [desktopSource, mobileSource]) {
+    assertItemCurrentContract(source);
+    assert.throws(
+      () =>
+        assertItemCurrentContract(
+          source.replace(
+            /aria-current=\{\s*isCurrentItem\s*\?\s*["']page["']\s*:\s*undefined\s*\}/,
+            ""
+          )
+        ),
+      /aria-current/
+    );
+    assert.throws(
+      () =>
+        assertItemCurrentContract(
+          source.replace(
+            "isActive && currentNavigationItemId === null",
+            "isActive"
+          )
+        ),
+      /isCurrentSectionFallback/
+    );
+  }
+});
+
 test("desktop navigation implements the shared accessible menu contract", async () => {
   assert.ok(
     existsSync(desktopNavigationUrl),
@@ -187,7 +306,7 @@ test("desktop navigation implements the shared accessible menu contract", async 
   );
   assert.match(
     source,
-    /<Link\b[\s\S]{0,500}?href=\{item\.href\}[\s\S]{0,120}?role=["']menuitem["']/
+    /<Link\b[\s\S]{0,500}?href=\{item\.href\}[\s\S]{0,220}?role=["']menuitem["']/
   );
   assert.match(source, /PRIMARY_NAVIGATION\.map\s*\(/);
   assert.match(source, /getActiveNavigationId\s*\(\s*pathname\s*\)/);
@@ -353,7 +472,7 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
   assert.match(source, /<DesktopNavigation\s+pathname=\{pathname\}\s*\/>/);
   assert.match(
     source,
-    /<MobileNavigationDrawer[\s\S]{0,500}?open=\{drawerOpen\}[\s\S]{0,120}?onClose=\{closeDrawer\}[\s\S]{0,120}?pathname=\{pathname\}[\s\S]{0,120}?totalCount=\{totalCount\}[\s\S]{0,120}?triggerRef=\{menuButtonRef\}/
+    /<MobileNavigationDrawer[\s\S]{0,600}?open=\{drawerOpen\}[\s\S]{0,120}?onClose=\{closeDrawer\}[\s\S]{0,120}?pathname=\{pathname\}[\s\S]{0,120}?totalCount=\{totalCount\}[\s\S]{0,120}?triggerRef=\{menuButtonRef\}[\s\S]{0,120}?desktopFallbackRef=\{brandLinkRef\}/
   );
   assert.match(
     source,
@@ -372,14 +491,24 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
 test("global header exposes one accessible responsive row", async () => {
   const navbarSource = await readFile(navbarUrl, "utf8");
 
+  assert.equal(
+    [...navbarSource.matchAll(/\bdata-global-navigation\b/g)].length,
+    1,
+    "the rendered global navigation needs one stable audit marker"
+  );
   assert.match(
     navbarSource,
-    /<div\s+className=["'](?=[^"']*\bflex\b)(?=[^"']*\bh-16\b)(?=[^"']*\bitems-center\b)[^"']*["']>/
+    /<nav\b(?=[^>]*\bdata-global-navigation\b)[^>]*>[\s\S]*?<div\s+className=["'](?=[^"']*\bflex\b)(?=[^"']*\bh-16\b)(?=[^"']*\bitems-center\b)[^"']*["']>/
   );
   assert.match(navbarSource, /<Menu\b[^>]*aria-hidden=["']true["']/);
   assert.match(navbarSource, /aria-label=["']Open navigation menu["']/);
   assert.match(navbarSource, /aria-expanded=\{drawerOpen\}/);
   assert.match(navbarSource, /const\s+menuButtonRef\s*=\s*useRef/);
+  assert.match(navbarSource, /const\s+brandLinkRef\s*=\s*useRef<HTMLAnchorElement>/);
+  assert.match(
+    navbarSource,
+    /<Link\b(?=[^>]*ref=\{brandLinkRef\})(?=[^>]*href=["']\/["'])/
+  );
   assert.match(
     navbarSource,
     /const\s+closeDrawer\s*=\s*useCallback\s*\(\s*\(\s*\)\s*=>\s*\{\s*setDrawerOpen\s*\(\s*false\s*\)/
@@ -401,7 +530,10 @@ test("global header exposes one accessible responsive row", async () => {
   );
   assert.match(navbarSource, /totalCount\s*>\s*0\s*\?/);
   assert.match(navbarSource, /\{\s*totalCount\s*\}/);
-  assert.match(navbarSource, /aria-label=\{t\(["']navCartAria["']\)\}/);
+  assert.match(
+    navbarSource,
+    /aria-label=\{`Inquiry cart:\s*\$\{totalCount\}\s*\$\{\s*totalCount\s*===\s*1\s*\?\s*["']item["']\s*:\s*["']items["']\s*\}\s*`\}/
+  );
   assert.match(navbarSource, /\{\s*t\(["']navCtaInquiry["']\)\s*\}/);
   assert.match(navbarSource, /focus-visible:ring-2/);
   assert.match(navbarSource, /motion-reduce:transition-none/);
@@ -640,7 +772,7 @@ const assertMobileDrawerAccordionContract = (source) => {
 
 const assertMobileDrawerResponsiveContract = (source) => {
   const responsiveEffect = source.match(
-    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*if\s*\(\s*!open\s*\)\s*return;[\s\S]*?window\.matchMedia\s*\(\s*["']\(min-width: 1280px\)["']\s*\)[\s\S]*?\},\s*\[\s*onClose\s*,\s*open\s*\]\s*\);/
+    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*if\s*\(\s*!open\s*\)\s*return;[\s\S]*?window\.matchMedia\s*\(\s*["']\(min-width: 1280px\)["']\s*\)[\s\S]*?\},\s*\[\s*desktopFallbackRef\s*,\s*onClose\s*,\s*open\s*\]\s*\);/
   )?.[0];
   assert.ok(
     responsiveEffect,
@@ -648,11 +780,11 @@ const assertMobileDrawerResponsiveContract = (source) => {
   );
   assert.match(
     responsiveEffect,
-    /if\s*\(\s*desktopMediaQuery\.matches\s*\)\s*\{\s*onClose\s*\(\s*\)/
+    /if\s*\(\s*desktopMediaQuery\.matches\s*\)\s*\{\s*closeForDesktop\s*\(\s*\)/
   );
   assert.match(
     responsiveEffect,
-    /if\s*\(\s*event\.matches\s*\)\s*\{\s*onClose\s*\(\s*\)/
+    /if\s*\(\s*event\.matches\s*\)\s*\{\s*closeForDesktop\s*\(\s*\)/
   );
   assert.match(
     responsiveEffect,
@@ -661,6 +793,10 @@ const assertMobileDrawerResponsiveContract = (source) => {
   assert.match(
     responsiveEffect,
     /desktopMediaQuery\.removeEventListener\s*\(\s*["']change["']\s*,\s*handleDesktopChange\s*\)/
+  );
+  assert.match(
+    responsiveEffect,
+    /const\s+closeForDesktop\s*=\s*\(\s*\)\s*=>\s*\{[\s\S]{0,120}onClose\s*\(\s*\)[\s\S]{0,120}desktopFallbackRef\.current\?\.focus\s*\(\s*\)/
   );
   assert.doesNotMatch(responsiveEffect, /triggerRef|closeAndRestoreFocus/);
 
@@ -821,11 +957,11 @@ test("mobile drawer closes its lifecycle when resizing across xl", async () => {
     () =>
       assertMobileDrawerResponsiveContract(
         source.replace(
-          "if (event.matches) {\n        onClose();\n      }",
-          "if (event.matches) {\n        closeAndRestoreFocus();\n      }"
+          "desktopFallbackRef.current?.focus()",
+          "triggerRef.current?.focus()"
         )
       ),
-    /onClose/
+    /desktopFallbackRef/
   );
   assert.throws(
     () =>
