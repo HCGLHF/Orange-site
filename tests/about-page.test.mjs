@@ -17,9 +17,9 @@ test("company evidence records the verified corporate and GRS facts", async () =
   assert.equal(evidence.certificationEvidence.shortName, "GRS");
   assert.equal(evidence.certificationEvidence.version, "4.0");
   assert.equal(evidence.certificationEvidence.scopeCertificateNumber, "TRC-GRS-350849-00");
-  assert.deepEqual(evidence.certificationEvidence.productCategory, ["Greige fabrics"]);
-  assert.deepEqual(evidence.certificationEvidence.productDetail, ["Knitted fabrics"]);
-  assert.deepEqual(evidence.certificationEvidence.process, ["Knitting"]);
+  assert.equal(evidence.certificationEvidence.productCategory, "Greige fabrics");
+  assert.equal(evidence.certificationEvidence.productDetail, "Knitted fabrics");
+  assert.equal(evidence.certificationEvidence.process, "Knitting");
   assert.equal(evidence.certificationEvidence.validUntil, "2027-04-19");
   assert.equal(
     evidence.certificationEvidence.qualification,

@@ -44,9 +44,9 @@ export const certificationEvidence = {
   holder: companyRelationship.parentCompany,
   certificationBody: "TÜV Rheinland (China) Ltd.",
   scopeCertificateNumber: "TRC-GRS-350849-00",
-  productCategory: ["Greige fabrics"],
-  productDetail: ["Knitted fabrics"],
-  process: ["Knitting"],
+  productCategory: "Greige fabrics",
+  productDetail: "Knitted fabrics",
+  process: "Knitting",
   validUntil: "2027-04-19",
   qualification:
     "Scope certification does not prove that a delivered product is GRS certified. Shipment-level claims require a valid Transaction Certificate or equivalent supporting documentation for the applicable order.",
