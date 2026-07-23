@@ -163,7 +163,7 @@ const englishMessages: Messages = {
   navStockPreorder: "Custom inquiry",
   navFabricsAll: "All finished fabrics",
   navBadge24h: "104",
-  navCtaInquiry: "Request samples",
+  navCtaInquiry: "Request a quote",
   navCartAria: "Inquiry cart",
   heroBadge: "Keqiao, Shaoxing | Integrated knit supply",
   heroTitle: "O'range Textile",

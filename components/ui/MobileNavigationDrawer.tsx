@@ -168,6 +168,7 @@ export function MobileNavigationDrawer({
       onClick={handleBackdropClick}
     >
       <div
+        id="mobile-navigation-drawer"
         ref={panelRef}
         role="dialog"
         aria-modal="true"

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -12,6 +13,12 @@ const mobileNavigationDrawerUrl = new URL(
   "../components/ui/MobileNavigationDrawer.tsx",
   import.meta.url
 );
+const navbarUrl = new URL(
+  "../components/ui/Navbar.tsx",
+  import.meta.url
+);
+const appShellUrl = new URL("../components/AppShell.tsx", import.meta.url);
+const i18nUrl = new URL("../lib/i18n.ts", import.meta.url);
 
 const loadNavigation = async () => {
   assert.ok(existsSync(navigationUrl), "lib/navigation.ts must exist");
@@ -322,6 +329,127 @@ test("desktop navigation implements the shared accessible menu contract", async 
   );
   assert.match(source, /ChevronDown/);
   assert.match(source, /aria-hidden=["']true["']/);
+});
+
+test("global header composes the buyer-journey desktop and mobile navigation", async () => {
+  const source = await readFile(navbarUrl, "utf8");
+
+  assert.match(source, /["']use client["']/);
+  assert.match(source, /Suspense/);
+  assert.match(source, /usePathname\s*\(\s*\)/);
+  assert.match(source, /useLocale\s*\(\s*\)/);
+  assert.match(source, /useInquiryCart\s*\(\s*\)/);
+  assert.match(
+    source,
+    /import\s*\{\s*DesktopNavigation\s*\}\s*from\s*["']@\/components\/ui\/DesktopNavigation["']/
+  );
+  assert.match(
+    source,
+    /import\s*\{\s*MobileNavigationDrawer\s*\}\s*from\s*["']@\/components\/ui\/MobileNavigationDrawer["']/
+  );
+  assert.match(source, /<DesktopNavigation\s+pathname=\{pathname\}\s*\/>/);
+  assert.match(
+    source,
+    /<MobileNavigationDrawer[\s\S]{0,500}?open=\{drawerOpen\}[\s\S]{0,120}?onClose=\{closeDrawer\}[\s\S]{0,120}?pathname=\{pathname\}[\s\S]{0,120}?totalCount=\{totalCount\}[\s\S]{0,120}?triggerRef=\{menuButtonRef\}/
+  );
+  assert.match(
+    source,
+    /import\s*\{\s*INQUIRY_HREF\s*\}\s*from\s*["']@\/lib\/navigation["']/
+  );
+  assert.equal(
+    [...source.matchAll(/href=\{INQUIRY_HREF\}/g)].length,
+    3,
+    "desktop cart/CTA and mobile Quote must use shared inquiry hrefs"
+  );
+  assert.doesNotMatch(source, /["']\/fabrics#inquiry-form["']/);
+  assert.doesNotMatch(source, /const\s+navItems\s*=/);
+  assert.doesNotMatch(source, /\b(?:Package|Layers3|Ruler)\b/);
+});
+
+test("global header exposes one accessible responsive row", async () => {
+  const [navbarSource, drawerSource] = await Promise.all([
+    readFile(navbarUrl, "utf8"),
+    readFile(mobileNavigationDrawerUrl, "utf8"),
+  ]);
+
+  assert.match(
+    navbarSource,
+    /<div\s+className=["'](?=[^"']*\bflex\b)(?=[^"']*\bh-16\b)(?=[^"']*\bitems-center\b)[^"']*["']>/
+  );
+  assert.match(navbarSource, /<Menu\b[^>]*aria-hidden=["']true["']/);
+  assert.match(navbarSource, /aria-label=["']Open navigation menu["']/);
+  assert.match(navbarSource, /aria-expanded=\{drawerOpen\}/);
+  assert.match(
+    navbarSource,
+    /aria-controls=["']mobile-navigation-drawer["']/
+  );
+  assert.match(navbarSource, /const\s+menuButtonRef\s*=\s*useRef/);
+  assert.match(
+    navbarSource,
+    /const\s+closeDrawer\s*=\s*useCallback\s*\(\s*\(\s*\)\s*=>\s*\{\s*setDrawerOpen\s*\(\s*false\s*\)/
+  );
+  assert.match(
+    navbarSource,
+    /onClick=\{\(\)\s*=>\s*setDrawerOpen\(true\)\}/
+  );
+  assert.match(
+    navbarSource,
+    /<Link\b(?=[^>]*href=["']\/["'])(?=[^>]*aria-label=\{t\(["']navHome["']\)\})(?=[^>]*aria-current=\{pathname\s*===\s*["']\/["'])/
+  );
+  assert.match(navbarSource, /<OrangeMark\b/);
+  assert.match(navbarSource, />\s*O&apos;range Textile\s*</);
+  assert.match(navbarSource, />\s*Quote\s*</);
+  assert.match(
+    navbarSource,
+    /className=["'](?=[^"']*\bxl:hidden\b)(?=[^"']*\bmin-h-11\b)[^"']*["']/
+  );
+  assert.match(
+    navbarSource,
+    /className=["'](?=[^"']*\bhidden\b)(?=[^"']*\bxl:flex\b)[^"']*["']/
+  );
+  assert.match(navbarSource, /totalCount\s*>\s*0\s*\?/);
+  assert.match(navbarSource, /\{\s*totalCount\s*\}/);
+  assert.match(navbarSource, /aria-label=\{t\(["']navCartAria["']\)\}/);
+  assert.match(navbarSource, /\{\s*t\(["']navCtaInquiry["']\)\s*\}/);
+  assert.match(navbarSource, /focus-visible:ring-2/);
+  assert.match(navbarSource, /motion-reduce:transition-none/);
+  assert.doesNotMatch(navbarSource, /\bmb-3\b/);
+  assert.doesNotMatch(navbarSource, /\bw-full\b[^"']*sm:hidden/);
+
+  assert.match(
+    drawerSource,
+    /<div\b(?=[^>]*id=["']mobile-navigation-drawer["'])(?=[^>]*role=["']dialog["'])/
+  );
+});
+
+test("AppShell reserves exactly one header row", async () => {
+  const source = await readFile(appShellUrl, "utf8");
+
+  assert.match(
+    source,
+    /<div className=["']h-16 shrink-0["'] aria-hidden \/>/
+  );
+  assert.doesNotMatch(source, /h-\[7\.5rem\]/);
+});
+
+test("English inquiry CTA uses the approved quote wording", async () => {
+  const source = await readFile(i18nUrl, "utf8");
+
+  assert.match(source, /navCtaInquiry:\s*["']Request a quote["']/);
+  assert.doesNotMatch(source, /navCtaInquiry:\s*["']Request samples["']/);
+});
+
+test("global header integration leaves BottomNav source untouched", () => {
+  assert.doesNotThrow(() => {
+    execFileSync(
+      "git",
+      ["diff", "--exit-code", "--", "components/ui/BottomNav.tsx"],
+      {
+        cwd: new URL("..", import.meta.url),
+        stdio: "pipe",
+      }
+    );
+  });
 });
 
 const assertMobileDrawerStructure = (source, primaryNavigation) => {
