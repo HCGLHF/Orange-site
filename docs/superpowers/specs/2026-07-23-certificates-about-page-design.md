@@ -1,8 +1,8 @@
 # Certificates and About Page Design
 
-**Date:** 2026-07-23  
-**Status:** Approved for implementation planning  
-**Site:** https://orangetextiles.com  
+**Date:** 2026-07-23
+**Status:** Approved for implementation planning
+**Site:** https://orangetextiles.com
 **Audience:** Global English-speaking B2B fabric buyers, with the United States and Australia as priority markets
 
 ## 1. Objective
@@ -44,7 +44,7 @@ The site must not introduce an unsupported `50+` claim or convert machine counts
 The supplied certificate supports the following public facts:
 
 - Certificate holder: Shaoxing Jingtian Textile Technology Co., Ltd.
-- Certification body: TÜV Rheinland (China) Ltd.
+- Certification body: T脺V Rheinland (China) Ltd.
 - Standard: Global Recycled Standard (GRS) v4.0
 - Scope Certificate No.: TRC-GRS-350849-00
 - Product category: Greige fabrics
@@ -83,25 +83,25 @@ This is a content direction rather than immutable final wording. Implementation 
 
 Create a new public route at `/about` with these sections:
 
-1. **Hero and positioning**  
+1. **Hero and positioning**
    Introduce O'range Textile as an export-focused knit fabric sourcing business serving international B2B buyers.
 
-2. **Company relationship**  
+2. **Company relationship**
    Explain that Shaoxing Shicheng Textile Products Co., Ltd. is the export-focused subsidiary of Shaoxing Jingtian Textile Technology Co., Ltd. Clearly distinguish customer-facing export service from the parent company's manufacturing and certificate-holder role.
 
-3. **Documented manufacturing scale**  
+3. **Documented manufacturing scale**
    Present the rounded machine figures in accessible metric cards. Do not show the source photograph or claim unverified production output.
 
-4. **Knitting capabilities**  
+4. **Knitting capabilities**
    Describe supported directions such as Ponte Roma, air-layer, double-knit, interlock, and rib fabrics. Link to relevant existing catalogue and product-cluster pages instead of duplicating their detailed commercial content.
 
-5. **GRS scope documentation**  
+5. **GRS scope documentation**
    Summarize the certificate holder, standard, certification body, applicable scope, and validity. Include the Transaction Certificate qualification.
 
-6. **International buyer support**  
+6. **International buyer support**
    Describe specification review, sampling, quotation, colour and finish confirmation, testing requirements, and export communication for global buyers, including US and Australian sourcing teams.
 
-7. **Inquiry call to action**  
+7. **Inquiry call to action**
    Ask buyers to provide intended use, composition, GSM, usable width, colour, quantity, finish, and testing requirements.
 
 ## 5. Visual Design
@@ -137,9 +137,9 @@ The final meta description must:
 
 This keyword allocation is intentionally navigational. It does not compete with:
 
-- `/` — `double knit fabric`
-- `/finished-double-knit-fabrics` — `double knit fabric manufacturer`
-- `/fabrics` — `finished knit fabrics`
+- `/` 鈥?`double knit fabric`
+- `/finished-double-knit-fabrics` 鈥?`double knit fabric manufacturer`
+- `/fabrics` 鈥?`finished knit fabrics`
 
 The new page must receive its canonical, Open Graph metadata, Twitter metadata, sitemap entry, and server-rendered metadata from the existing unified SEO data source.
 
@@ -179,7 +179,7 @@ Implementation must begin with failing regression tests and then satisfy:
 - The page has a non-empty unique primary keyword.
 - The final title starts with the primary keyword and is no longer than 70 characters.
 - The brand appears no more than once in the title.
-- The final meta description is unique, 160–300 characters, and contains the complete primary keyword.
+- The final meta description is unique, 160鈥?00 characters, and contains the complete primary keyword.
 - The final rendered About page has exactly one `h1`.
 - The `h1` contains the complete primary keyword.
 - The homepage still has exactly one `h1`.
