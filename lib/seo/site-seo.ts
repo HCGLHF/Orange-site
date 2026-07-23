@@ -7,7 +7,12 @@ export type SearchIntent =
   | "transactional"
   | "navigational";
 
-export type SeoPageType = "homepage" | "service" | "guide" | "blog";
+export type SeoPageType =
+  | "homepage"
+  | "service"
+  | "guide"
+  | "blog"
+  | "about";
 
 export type PublicPageSeo = {
   path: string;
@@ -46,6 +51,25 @@ const publicPageSeo = [
     updatedAt: "2026-07-23",
     changeFrequency: "weekly",
     priority: 1,
+  },
+  {
+    path: "/about",
+    primaryKeyword: "O'range Textile",
+    secondaryKeywords: [
+      "Shaoxing knit fabric company",
+      "China knit fabric supplier",
+      "knit fabric export company",
+    ],
+    searchIntent: "navigational",
+    topicCluster: "company-trust",
+    targetPageType: "about",
+    metaTitle: "O'range Textile | Knit Fabric Company in Shaoxing",
+    metaDescription:
+      "O'range Textile is the export-focused knit fabric business of Shaoxing Shicheng Textile Products Co., Ltd. Explore its parent-company manufacturing network, 200+ circular knitting machines, GRS scope documentation and support for global B2B buyers.",
+    h1: "O'range Textile: Export-Focused Knit Fabric Sourcing",
+    updatedAt: "2026-07-23",
+    changeFrequency: "monthly",
+    priority: 0.7,
   },
   {
     path: "/fabrics",

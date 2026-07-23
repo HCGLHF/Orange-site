@@ -14,7 +14,13 @@ const allowedIntents = new Set([
   "transactional",
   "navigational",
 ]);
-const allowedPageTypes = new Set(["homepage", "service", "guide", "blog"]);
+const allowedPageTypes = new Set([
+  "homepage",
+  "service",
+  "guide",
+  "blog",
+  "about",
+]);
 const allowedChangeFrequencies = new Set(["daily", "weekly", "monthly"]);
 
 const includesFolded = (text, keyword) =>
@@ -22,14 +28,27 @@ const includesFolded = (text, keyword) =>
     .toLocaleLowerCase("en-US")
     .includes(keyword.toLocaleLowerCase("en-US"));
 
-test("SEO registry owns exactly 28 normalized public pages", async () => {
+test("SEO registry owns exactly 29 normalized public pages", async () => {
   const { getAllPublicPageSeo } = await loadSeo();
   const pages = getAllPublicPageSeo();
-  assert.equal(pages.length, 28);
+  assert.equal(pages.length, 29);
   assert.equal(new Set(pages.map((page) => page.path)).size, pages.length);
   for (const page of pages) {
     assert.match(page.path, /^\/(?:[a-z0-9-]+(?:\/[a-z0-9-]+)*)?$/);
   }
+});
+
+test("about page owns a navigational brand keyword without commercial cannibalization", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+  const page = getPublicPageSeo("/about");
+
+  assert.equal(page.primaryKeyword, "O'range Textile");
+  assert.equal(page.searchIntent, "navigational");
+  assert.equal(page.targetPageType, "about");
+  assert.equal(
+    page.metaTitle,
+    "O'range Textile | Knit Fabric Company in Shaoxing"
+  );
 });
 
 test("every public page has one unique keyword assignment", async () => {
