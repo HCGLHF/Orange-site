@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-23T15:33:36.461Z",
-  "gitCommit": "b9a19fd9612c2a73f3f7a7912991c0d2aa1ac885",
-  "buildId": "rGvjXbN07cDk0uB2II85Q",
+  "generatedAt": "2026-07-23T17:55:47.354Z",
+  "gitCommit": "d802a35b9fd4dcf794ad654e01b672477ed94030",
+  "buildId": "VjFEJn1jTWrLG0LR3dRKA",
   "registryHash": "0b415480754e7521cdad8cfc7d65a15f568a3f7b31b76b45a069d2332390cc11",
   "baseUrl": "http://127.0.0.1:3210",
   "productionOrigin": "https://orangetextiles.com",
@@ -55,6 +55,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -81,6 +83,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -108,6 +112,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -134,6 +140,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -160,6 +168,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -186,6 +196,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -212,6 +224,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -238,6 +252,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -264,6 +280,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -290,6 +308,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -316,6 +336,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -342,6 +364,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -368,6 +392,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -394,6 +420,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -420,6 +448,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -446,6 +476,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -472,6 +504,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -498,6 +532,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -524,6 +560,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -550,6 +588,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -576,6 +616,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -602,6 +644,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -628,6 +672,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -654,6 +700,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -680,6 +728,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -706,6 +756,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -732,6 +784,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -758,6 +812,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
@@ -784,6 +840,8 @@
       "statusCode": 200,
       "sitemapPresent": true,
       "noindex": false,
+      "navigationLinksPresent": true,
+      "missingNavigationLinks": [],
       "inaccessible": false,
       "result": "PASS",
       "failures": []
