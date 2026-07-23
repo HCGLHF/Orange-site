@@ -7,7 +7,7 @@ export const companyRelationship = {
   parentRole:
     "Knitting capability, manufacturing coordination and certificate-holder operations",
   location: "Shaoxing Keqiao, Zhejiang, China",
-};
+} as const;
 
 export const manufacturingScale = [
   {
@@ -35,7 +35,7 @@ export const manufacturingScale = [
     label: "72-feeder double-knit machines",
     detail: "Additional double-knit capacity provides flexibility across recurring buyer programs.",
   },
-];
+] as const;
 
 export const certificationEvidence = {
   standard: "Global Recycled Standard",
@@ -50,7 +50,7 @@ export const certificationEvidence = {
   validUntil: "2027-04-19",
   qualification:
     "Scope certification does not prove that a delivered product is GRS certified. Shipment-level claims require a valid Transaction Certificate or equivalent supporting documentation for the applicable order.",
-};
+} as const;
 
 export const knittingDirections = [
   {
@@ -73,4 +73,4 @@ export const knittingDirections = [
     href: "/fabrics/rib-knit-fabric",
     description: "Elastic knit direction for trims, fitted styles and texture-led programs.",
   },
-];
+] as const;
