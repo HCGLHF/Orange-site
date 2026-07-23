@@ -104,8 +104,8 @@ test("ready-stock and custom development routes have distinct buyer flows", asyn
 });
 
 test("primary buyer navigation and discovery files expose all landing routes", async () => {
-  const navbar = await readFile(
-    new URL("../components/ui/Navbar.tsx", import.meta.url),
+  const navigation = await readFile(
+    new URL("../lib/navigation.ts", import.meta.url),
     "utf8"
   );
   const finishedPage = await readFile(
@@ -120,10 +120,10 @@ test("primary buyer navigation and discovery files expose all landing routes", a
     "/finished-double-knit-fabrics",
     "/custom-knit-fabric-development",
   ]) {
-    assert.match(navbar, new RegExp(route));
+    assert.match(navigation, new RegExp(route));
   }
 
-  assert.doesNotMatch(navbar, /navBadge24h/);
+  assert.doesNotMatch(navigation, /navBadge24h/);
   assert.match(sitemap, /getAllPublicPageSeo/);
   assert.match(llms, /getAllPublicPageSeo/);
   assert.match(finishedPage, /page\.kind === "hub"/);
