@@ -12,7 +12,8 @@ const port = Number(process.env.SEO_VERIFY_PORT || 4317);
 const origin = process.env.VERIFY_BASE_URL || `http://127.0.0.1:${port}`;
 const canonicalOrigin =
   process.env.VERIFY_SITE_URL || "https://orangetextiles.com";
-const reportDirectory = process.env.SEO_REPORT_DIR;
+const reportDirectory =
+  process.env.SEO_REPORT_DIR || path.join(root, "artifacts", "seo");
 
 function gitOutput(args, encoding = "utf8") {
   return execFileSync("git", args, {

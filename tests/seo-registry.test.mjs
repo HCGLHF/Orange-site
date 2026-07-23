@@ -172,3 +172,19 @@ test("one shared SEO entry powers metadata, H1, sitemap and final HTML checks", 
     "node scripts/generate-seo-deliverables.mjs"
   );
 });
+
+test("SEO verifier and report generator share the same default output directory", () => {
+  const verifier = readFileSync(
+    path.join(root, "scripts", "verify-site-seo.mjs"),
+    "utf8"
+  );
+  const reportGenerator = readFileSync(
+    path.join(root, "scripts", "generate-seo-deliverables.mjs"),
+    "utf8"
+  );
+  const defaultOutputPattern =
+    /process\.env\.SEO_REPORT_DIR\s*\|\|\s*path\.join\(root,\s*"artifacts",\s*"seo"\)/;
+
+  assert.match(verifier, defaultOutputPattern);
+  assert.match(reportGenerator, defaultOutputPattern);
+});
