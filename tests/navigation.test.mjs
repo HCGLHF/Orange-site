@@ -437,6 +437,43 @@ const assertMobileDrawerAccordionContract = (source) => {
   assert.match(source, /motion-reduce:transition-none/);
 };
 
+const assertMobileDrawerResponsiveContract = (source) => {
+  const responsiveEffect = source.match(
+    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*if\s*\(\s*!open\s*\)\s*return;[\s\S]*?window\.matchMedia\s*\(\s*["']\(min-width: 1280px\)["']\s*\)[\s\S]*?\},\s*\[\s*onClose\s*,\s*open\s*\]\s*\);/
+  )?.[0];
+  assert.ok(
+    responsiveEffect,
+    "open drawer must observe the xl breakpoint lifecycle"
+  );
+  assert.match(
+    responsiveEffect,
+    /if\s*\(\s*desktopMediaQuery\.matches\s*\)\s*\{\s*onClose\s*\(\s*\)/
+  );
+  assert.match(
+    responsiveEffect,
+    /if\s*\(\s*event\.matches\s*\)\s*\{\s*onClose\s*\(\s*\)/
+  );
+  assert.match(
+    responsiveEffect,
+    /desktopMediaQuery\.addEventListener\s*\(\s*["']change["']\s*,\s*handleDesktopChange\s*\)/
+  );
+  assert.match(
+    responsiveEffect,
+    /desktopMediaQuery\.removeEventListener\s*\(\s*["']change["']\s*,\s*handleDesktopChange\s*\)/
+  );
+  assert.doesNotMatch(responsiveEffect, /triggerRef|closeAndRestoreFocus/);
+
+  const zeroFocusableBranch = source.match(
+    /if\s*\(\s*focusableElements\.length\s*===\s*0\s*\)\s*\{([^}]*)\}/
+  )?.[1];
+  assert.ok(
+    zeroFocusableBranch,
+    "focus trap must handle a transiently hidden drawer"
+  );
+  assert.match(zeroFocusableBranch, /\breturn\s*;/);
+  assert.doesNotMatch(zeroFocusableBranch, /preventDefault/);
+};
+
 test("mobile drawer uses shared navigation data and accessible dialog semantics", async () => {
   assert.ok(
     existsSync(mobileNavigationDrawerUrl),
@@ -525,5 +562,78 @@ test("mobile drawer exposes touch-friendly Products and Resources accordions", a
         source.replace("hidden={!isExpanded}", "")
       ),
     /hidden/
+  );
+});
+
+// Task 6 browser regression: open below xl, resize across 1280px, and verify
+// the drawer closes while body scrolling and desktop keyboard flow are restored.
+test("mobile drawer closes its lifecycle when resizing across xl", async () => {
+  assert.ok(
+    existsSync(mobileNavigationDrawerUrl),
+    "components/ui/MobileNavigationDrawer.tsx must exist"
+  );
+  const source = await readFile(mobileNavigationDrawerUrl, "utf8");
+
+  assertMobileDrawerResponsiveContract(source);
+
+  assert.throws(
+    () =>
+      assertMobileDrawerResponsiveContract(
+        source.replace(
+          'window.matchMedia("(min-width: 1280px)")',
+          'window.matchMedia("(min-width: 1279px)")'
+        )
+      ),
+    /breakpoint/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerResponsiveContract(
+        source.replace(
+          "if (desktopMediaQuery.matches)",
+          "if (false)"
+        )
+    ),
+    /desktopMediaQuery/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerResponsiveContract(
+        source.replace(
+          'desktopMediaQuery.addEventListener("change", handleDesktopChange);',
+          ""
+        )
+      ),
+    /addEventListener/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerResponsiveContract(
+        source.replace(
+          'desktopMediaQuery.removeEventListener("change", handleDesktopChange)',
+          ""
+        )
+    ),
+    /removeEventListener/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerResponsiveContract(
+        source.replace(
+          "if (event.matches) {\n        onClose();\n      }",
+          "if (event.matches) {\n        closeAndRestoreFocus();\n      }"
+        )
+      ),
+    /onClose/
+  );
+  assert.throws(
+    () =>
+      assertMobileDrawerResponsiveContract(
+        source.replace(
+          "if (focusableElements.length === 0) {\n        return;",
+          "if (focusableElements.length === 0) {\n        event.preventDefault();\n        return;"
+        )
+      ),
+    /preventDefault/
   );
 });

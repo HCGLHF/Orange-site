@@ -64,6 +64,26 @@ export function MobileNavigationDrawer({
   useEffect(() => {
     if (!open) return;
 
+    const desktopMediaQuery = window.matchMedia("(min-width: 1280px)");
+    const handleDesktopChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        onClose();
+      }
+    };
+
+    desktopMediaQuery.addEventListener("change", handleDesktopChange);
+    if (desktopMediaQuery.matches) {
+      onClose();
+    }
+
+    return () => {
+      desktopMediaQuery.removeEventListener("change", handleDesktopChange);
+    };
+  }, [onClose, open]);
+
+  useEffect(() => {
+    if (!open) return;
+
     const focusFrame = requestAnimationFrame(() => {
       closeButtonRef.current?.focus();
     });
@@ -106,7 +126,6 @@ export function MobileNavigationDrawer({
       );
 
       if (focusableElements.length === 0) {
-        event.preventDefault();
         return;
       }
 
