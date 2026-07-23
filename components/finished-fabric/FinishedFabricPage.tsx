@@ -13,7 +13,10 @@ import type {
 import { getFinishedBlogArticles } from "@/lib/finished-fabric-content";
 import { buildFinishedFabricSchema } from "@/lib/finished-fabric-schema";
 import { getPublicLandingPage } from "@/lib/landing-page-content";
-import { getSeoPage } from "@/lib/seo";
+import {
+  getPublicPageSeo,
+  type PublicPageSeo,
+} from "@/lib/seo/site-seo";
 
 function ContentTable({ table }: { table: NonNullable<FinishedFabricSection["table"]> }) {
   return (
@@ -100,14 +103,19 @@ function ContentSection({ section, index }: { section: FinishedFabricSection; in
   );
 }
 
-export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
+export function FinishedFabricPage({
+  page,
+  seo,
+}: {
+  page: FinishedFabricPageData;
+  seo: PublicPageSeo;
+}) {
   const landingPage = page.kind === "hub" ? getPublicLandingPage("finishedDoubleKnit") : null;
   const blogArticles = page.kind === "index" ? getFinishedBlogArticles() : [];
-  const seo = getSeoPage(page.url);
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
-      <StructuredData data={buildFinishedFabricSchema(page)} />
+      <StructuredData data={buildFinishedFabricSchema(page, seo)} />
 
       <article>
         {landingPage ? (
@@ -187,29 +195,32 @@ export function FinishedFabricPage({ page }: { page: FinishedFabricPageData }) {
                 Each guide connects a buyer question to specification checks, sample evidence, and a relevant finished-fabric sourcing route.
               </p>
               <div className="mt-7 grid gap-4 md:grid-cols-2">
-                {blogArticles.map((article) => (
-                  <Link
-                    key={article.url}
-                    href={article.url}
-                    className="group flex min-h-40 flex-col justify-between border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange"
-                  >
-                    <div>
-                      <h3 className="text-lg font-semibold text-brand-charcoal">
-                        {getSeoPage(article.url).h1}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
-                        {getSeoPage(article.url).metaDescription}
-                      </p>
-                    </div>
-                    <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
-                      Read the buyer guide
-                      <ArrowRight
-                        className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                        aria-hidden
-                      />
-                    </span>
-                  </Link>
-                ))}
+                {blogArticles.map((article) => {
+                  const articleSeo = getPublicPageSeo(article.url);
+                  return (
+                    <Link
+                      key={article.url}
+                      href={article.url}
+                      className="group flex min-h-40 flex-col justify-between border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange"
+                    >
+                      <div>
+                        <h3 className="text-lg font-semibold text-brand-charcoal">
+                          {articleSeo.h1}
+                        </h3>
+                        <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                          {articleSeo.metaDescription}
+                        </p>
+                      </div>
+                      <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
+                        Read the buyer guide
+                        <ArrowRight
+                          className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                          aria-hidden
+                        />
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </section>

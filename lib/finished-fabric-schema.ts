@@ -1,10 +1,12 @@
 import type { FinishedFabricPage } from "@/lib/finished-fabric-content";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
-import { getSeoPage } from "@/lib/seo";
+import type { PublicPageSeo } from "@/lib/seo/site-seo";
 
-export function buildFinishedFabricSchema(page: FinishedFabricPage) {
+export function buildFinishedFabricSchema(
+  page: FinishedFabricPage,
+  seo: PublicPageSeo
+) {
   const pageUrl = `${siteUrl}${page.url}`;
-  const seo = getSeoPage(page.url);
   const organization = {
     "@type": "Organization",
     name: companyProfile.brandName,

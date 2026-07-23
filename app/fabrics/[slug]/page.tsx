@@ -19,7 +19,8 @@ import {
   getPublicFabricCategory,
 } from "@/lib/public-catalog";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
-import { buildSeoMetadata, getSeoPage } from "@/lib/seo";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
 type CategoryPageProps = {
   params: {
@@ -28,7 +29,6 @@ type CategoryPageProps = {
 };
 
 export const dynamic = "force-static";
-export const dynamicParams = false;
 
 export function generateStaticParams() {
   const slugs = [
@@ -41,19 +41,24 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: CategoryPageProps): Metadata {
   const path = `/fabrics/${params.slug}`;
-  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  const finishedPage = getFinishedFabricPage(path);
   if (finishedPage?.kind === "product") {
-    return buildSeoMetadata(finishedPage.url);
+    const seo = getPublicPageSeo(path);
+    return createPageMetadata(seo, {
+      image: { src: finishedPage.hero.src, alt: finishedPage.hero.alt },
+    });
   }
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) return {};
-  return buildSeoMetadata(path);
+  return createPageMetadata(getPublicPageSeo(path));
 }
 
-function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricCategory>>) {
+function categoryJsonLd(
+  category: NonNullable<ReturnType<typeof getPublicFabricCategory>>,
+  seo: ReturnType<typeof getPublicPageSeo>
+) {
   const pageUrl = `${siteUrl}/fabrics/${category.slug}`;
-  const seo = getSeoPage(`/fabrics/${category.slug}`);
   return [
     {
       "@context": "https://schema.org",
@@ -85,20 +90,26 @@ function categoryJsonLd(category: NonNullable<ReturnType<typeof getPublicFabricC
 }
 
 export default function FabricCategoryPage({ params }: CategoryPageProps) {
-  const finishedPage = getFinishedFabricPage(`/fabrics/${params.slug}`);
+  const path = `/fabrics/${params.slug}`;
+  const finishedPage = getFinishedFabricPage(path);
   if (finishedPage?.kind === "product") {
-    return <FinishedFabricPage page={finishedPage} />;
+    return (
+      <FinishedFabricPage
+        page={finishedPage}
+        seo={getPublicPageSeo(path)}
+      />
+    );
   }
 
   const category = getPublicFabricCategory(params.slug);
   if (!category) notFound();
-  const seo = getSeoPage(`/fabrics/${category.slug}`);
 
+  const seo = getPublicPageSeo(path);
   const fabrics = getFabricsForCategory(category.slug);
 
   return (
     <div className="min-h-screen bg-brand-cream text-brand-charcoal">
-      <StructuredData data={categoryJsonLd(category)} />
+      <StructuredData data={categoryJsonLd(category, seo)} />
       <div className="pb-28 max-md:pb-44 md:pb-12">
         <section className="border-b border-brand-soft/40 bg-white/80">
           <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

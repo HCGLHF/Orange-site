@@ -4,8 +4,7 @@ import Script from "next/script";
 import { AppShell } from "@/components/AppShell";
 import { InquiryProvider } from "@/components/InquiryProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
-import { siteUrl } from "@/lib/geo-content";
-import { buildSeoMetadata } from "@/lib/seo";
+import { SEO_SITE_ORIGIN } from "@/lib/seo/site-seo";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -15,8 +14,7 @@ const spaceGrotesk = Space_Grotesk({
 const GA_ID = "G-LXGZLVJXNP";
 
 export const metadata: Metadata = {
-  ...buildSeoMetadata("/"),
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SEO_SITE_ORIGIN),
 };
 
 export default function RootLayout({

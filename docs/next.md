@@ -8,6 +8,9 @@
 - Connected finished-fabric sample and RFQ calls to the existing inquiry modal and added the new product directions to its selector.
 - Added finished-fabric discovery to `/fabrics`, `sitemap.xml`, and `llms.txt` without changing the primary navigation structure.
 - Added generated finished-fabric imagery, evidence-bounded Product/Article/FAQ/Breadcrumb schema, and Node-based content quality tests.
+- Consolidated the 22 indexable public routes into one keyword and SEO registry covering metadata, H1, schema, sitemap, and `llms.txt`.
+- Added an automated production-HTML audit for HTTP status, robots, sitemap membership, title, description, Open Graph, Twitter, H1, image ALT, canonical, and noindex state.
+- Verified the local production build on 2026-07-23: 22 checked, 22 passed, 0 failed, 0 unchecked, and 0 inaccessible.
 
 ## Learned
 
@@ -15,6 +18,8 @@
 - The current architecture separates public catalog/GEO content from inquiry CRM handling; this boundary should be protected.
 - The existing inquiry modal was reusable, but its fabric selector was a separate legacy list and had to be extended explicitly for new commercial routes.
 - The checked-in lockfile was out of sync with its optional `@emnapi` dependency graph; regenerating it was required before `npm ci` could be reliable.
+- Next.js normalizes the homepage canonical to the origin without a trailing slash, so the registry and sitemap now use the same exact homepage URL.
+- A nested Git worktree needs `"root": true` in `.eslintrc.json` to prevent Next.js ESLint from loading the parent checkout's duplicate plugin configuration.
 
 ## Risks
 
@@ -26,7 +31,7 @@
 
 ## Next
 
-- Merge `test/orange-finished-fabric-seo` after review and verify the production deployment.
-- Run Semrush Site Audit and keyword/content checks against the deployed Orange Textiles domain.
-- Compare Semrush findings with the new low-difficulty finished-fabric keyword cluster before the next content iteration.
+- Review and integrate `seo/full-site-seo-remediation`, deploy it, and rerun the production-HTML audit against `https://orangetextiles.com`.
+- Request GSC reindexing for the homepage, commercial hubs, and early-opportunity Interlock, Ponte Roma, and Jacquard pages; allow the remaining pages to be rediscovered through the updated sitemap.
+- Run Semrush Site Audit and keyword/content checks against the deployed Orange Textiles domain, then compare results with the low-difficulty finished-fabric keyword cluster.
 - Review whether inquiry CRM failures need clearer user-facing fallback behavior.

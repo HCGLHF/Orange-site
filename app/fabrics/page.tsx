@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowRight } from "lucide-react";
@@ -12,14 +11,16 @@ import {
   getPublicFabricCategories,
   getPublicFabricCount,
 } from "@/lib/public-catalog";
-import { buildSeoMetadata, getSeoPage } from "@/lib/seo";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
-export const metadata: Metadata = buildSeoMetadata("/fabrics");
+const seo = getPublicPageSeo("/fabrics");
+
+export const metadata = createPageMetadata(seo);
 
 export const dynamic = "force-static";
 
 export default async function FabricsPage() {
-  const seo = getSeoPage("/fabrics");
   const fabrics = getInitialPublicFabrics();
   const totalFabricCount = getPublicFabricCount();
   const finishedFabrics = getFinishedProductPages();
@@ -59,7 +60,7 @@ export default async function FabricsPage() {
                 <Link key={page.url} href={page.url} className="group flex min-h-28 items-center justify-between gap-4 rounded-lg border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange">
                   <div>
                     <h3 className="font-semibold text-brand-charcoal">
-                      {getSeoPage(page.url).h1}
+                      {getPublicPageSeo(page.url).h1}
                     </h3>
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-brand-charcoal/65">{page.opening}</p>
                   </div>

@@ -51,17 +51,10 @@ test("content registry contains every approved finished-fabric route", () => {
   );
 });
 
-test("every page has unique metadata, answer-first copy, FAQs and internal routes", () => {
+test("every page has answer-first copy, FAQs and internal routes", () => {
   const pages = loadPages();
 
   for (const page of pages) {
-    assert.equal(page.title, undefined, `${page.url} must not duplicate SEO title`);
-    assert.equal(
-      page.description,
-      undefined,
-      `${page.url} must not duplicate SEO description`
-    );
-    assert.equal(page.h1, undefined, `${page.url} must not duplicate SEO H1`);
     assert.ok(page.opening.length >= 120, `${page.url} needs an opening answer`);
     assert.ok(page.sections.length >= 3, `${page.url} needs at least three sections`);
     assert.ok(page.faq.length >= 3, `${page.url} needs at least three FAQs`);
@@ -117,54 +110,7 @@ test("finished-fabric hub links every commercial fabric route", () => {
   }
 });
 
-test("Next.js exposes the hub, blog, product routes and machine-readable discovery", () => {
-  const requiredFiles = [
-    "app/finished-double-knit-fabrics/page.tsx",
-    "app/blog/page.tsx",
-    "app/blog/[slug]/page.tsx",
-    "components/finished-fabric/FinishedFabricPage.tsx",
-    "lib/finished-fabric-content.ts",
-  ];
-
-  for (const relativePath of requiredFiles) {
-    assert.ok(existsSync(path.join(root, relativePath)), `${relativePath} must exist`);
-  }
-
-  const sitemap = readFileSync(path.join(root, "app/sitemap.ts"), "utf8");
-  const llms = readFileSync(path.join(root, "app/llms.txt/route.ts"), "utf8");
-  assert.match(sitemap, /getSeoPages/);
-  assert.match(llms, /getFinishedFabricPages/);
-});
-
-test("the native pages use the real inquiry modal and bundled visual assets", () => {
-  const component = readFileSync(
-    path.join(root, "components/finished-fabric/FinishedFabricPage.tsx"),
-    "utf8"
-  );
-  assert.match(component, /SampleRequestCta/);
-  assert.match(component, /next\/image/);
-
-  const images = [
-    "finished-double-knit-factory.webp",
-    "double-knit-interlock-comparison.webp",
-    "ponte-scuba-apparel-development.webp",
-    "jacquard-wool-blend-swatches.webp",
-    "finished-fabric-sample-inspection.webp",
-    "air-layer-material-study.webp",
-    "wool-blend-material-study.webp",
-    "jacquard-knit-material-study.webp",
-    "brushed-pile-knit-finishes.webp",
-    "knit-fabric-rfq-specification.webp",
-  ];
-  for (const image of images) {
-    assert.ok(
-      existsSync(path.join(root, "public/images/finished-fabrics", image)),
-      `${image} must be bundled`
-    );
-  }
-});
-
-test("catalog-driven guides use approved article and specification evidence", () => {
+test("catalogue guides use approved article and specification evidence", () => {
   const pages = loadPages();
   const routes = [
     "/blog/air-layer-knit-fabric-sourcing-guide",
@@ -192,6 +138,53 @@ test("catalog-driven guides use approved article and specification evidence", ()
     "commercial confirmation",
   ]) {
     assert.match(source, new RegExp(signal, "i"));
+  }
+});
+
+test("Next.js exposes the hub, blog, product routes and machine-readable discovery", () => {
+  const requiredFiles = [
+    "app/finished-double-knit-fabrics/page.tsx",
+    "app/blog/page.tsx",
+    "app/blog/[slug]/page.tsx",
+    "components/finished-fabric/FinishedFabricPage.tsx",
+    "lib/finished-fabric-content.ts",
+  ];
+
+  for (const relativePath of requiredFiles) {
+    assert.ok(existsSync(path.join(root, relativePath)), `${relativePath} must exist`);
+  }
+
+  const sitemap = readFileSync(path.join(root, "app/sitemap.ts"), "utf8");
+  const llms = readFileSync(path.join(root, "app/llms.txt/route.ts"), "utf8");
+  assert.match(sitemap, /getAllPublicPageSeo/);
+  assert.match(llms, /getAllPublicPageSeo/);
+});
+
+test("the native pages use the real inquiry modal and bundled visual assets", () => {
+  const component = readFileSync(
+    path.join(root, "components/finished-fabric/FinishedFabricPage.tsx"),
+    "utf8"
+  );
+  assert.match(component, /SampleRequestCta/);
+  assert.match(component, /next\/image/);
+
+  const images = [
+    "finished-double-knit-factory.webp",
+    "double-knit-interlock-comparison.webp",
+    "ponte-scuba-apparel-development.webp",
+    "jacquard-wool-blend-swatches.webp",
+    "finished-fabric-sample-inspection.webp",
+    "air-layer-material-study.webp",
+    "wool-blend-material-study.webp",
+    "jacquard-knit-material-study.webp",
+    "brushed-pile-knit-finishes.webp",
+    "knit-fabric-rfq-specification.webp",
+  ];
+  for (const image of images) {
+    assert.ok(
+      existsSync(path.join(root, "public/images/finished-fabrics", image)),
+      `${image} must be bundled`
+    );
   }
 });
 

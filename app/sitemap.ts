@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
-import { siteUrl } from "@/lib/geo-content";
-import { getSeoPages } from "@/lib/seo";
+import {
+  getAllPublicPageSeo,
+  toCanonicalUrl,
+} from "@/lib/seo/site-seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return getSeoPages().map((page) => ({
-    url: page.path === "/" ? siteUrl : `${siteUrl}${page.path}`,
-    lastModified: new Date(page.lastModified),
+  return getAllPublicPageSeo().map((page) => ({
+    url: toCanonicalUrl(page.path),
+    lastModified: new Date(`${page.updatedAt}T00:00:00.000Z`),
     changeFrequency: page.changeFrequency,
     priority: page.priority,
   }));

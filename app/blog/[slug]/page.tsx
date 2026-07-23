@@ -6,7 +6,8 @@ import {
   getFinishedFabricPage,
   getFinishedFabricSlug,
 } from "@/lib/finished-fabric-content";
-import { buildSeoMetadata } from "@/lib/seo";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
 type BlogPageProps = {
   params: {
@@ -15,7 +16,6 @@ type BlogPageProps = {
 };
 
 export const dynamic = "force-static";
-export const dynamicParams = false;
 
 export function generateStaticParams() {
   return getFinishedBlogArticles().map((page) => ({
@@ -24,13 +24,22 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: BlogPageProps): Metadata {
-  const page = getFinishedFabricPage(`/blog/${params.slug}`);
+  const path = `/blog/${params.slug}`;
+  const page = getFinishedFabricPage(path);
   if (!page) return {};
-  return buildSeoMetadata(page.url);
+  const seo = getPublicPageSeo(path);
+
+  return createPageMetadata(seo, {
+    type: "article",
+    image: { src: page.hero.src, alt: page.hero.alt },
+    publishedTime: page.published,
+    modifiedTime: page.updated ?? seo.updatedAt,
+  });
 }
 
 export default function FinishedFabricBlogPage({ params }: BlogPageProps) {
-  const page = getFinishedFabricPage(`/blog/${params.slug}`);
+  const path = `/blog/${params.slug}`;
+  const page = getFinishedFabricPage(path);
   if (!page || page.kind !== "article") notFound();
-  return <FinishedFabricPage page={page} />;
+  return <FinishedFabricPage page={page} seo={getPublicPageSeo(path)} />;
 }

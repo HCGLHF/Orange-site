@@ -6,7 +6,6 @@ export type FabricCategory = {
   name: string;
   shortName: string;
   description: string;
-  metaDescription: string;
   sourcingOverview: string[];
   specificationChecks: Array<{
     label: string;
@@ -66,8 +65,6 @@ export const publicFabricCategories: FabricCategory[] = [
     shortName: "Cotton jersey",
     description:
       "Soft, breathable knitted fabrics for T-shirts, base layers and everyday apparel programs.",
-    metaDescription:
-      "Source cotton jersey fabrics from O'range Textile, a Shaoxing Keqiao knit fabric manufacturer for T-shirts, basics and private-label apparel.",
     sourcingOverview: [
       "Cotton jersey is a single-knit construction selected for a soft hand, breathable wear and flexible drape. The category name alone does not define the finished result: yarn count, cotton quality, stitch density, GSM, usable width, dyeing and finishing all change how the fabric cuts, sews and performs in a garment.",
       "Use this route to prepare a cotton jersey development brief rather than to assume a fixed stock specification. O'range Textile can review a target garment, reference swatch or performance brief, then confirm which finished-fabric article, sample route and commercial discussion fit the requirement.",
@@ -144,8 +141,6 @@ export const publicFabricCategories: FabricCategory[] = [
     shortName: "Cotton spandex jersey",
     description:
       "Stretch cotton knits with recovery for fitted tees, childrenswear, loungewear and sports-inspired apparel.",
-    metaDescription:
-      "Cotton spandex jersey fabrics from O'range Textile for stretch T-shirts, childrenswear, loungewear and active-inspired apparel.",
     sourcingOverview: [
       "Cotton spandex jersey combines a cotton-rich face and hand feel with elastane-supported stretch and recovery. The useful performance comes from the complete construction and finishing route, not from a composition ratio in isolation. Stitch density, elastane quality, heat history and fabric relaxation all affect width, torque and recovery.",
       "Use this category when the garment needs closer fit or repeat movement than a conventional cotton jersey can provide. Share the intended stretch direction, fit, wash method and recovery expectation so the offered finished sample can be assessed against the real garment rather than a generic stretch claim.",
@@ -222,8 +217,6 @@ export const publicFabricCategories: FabricCategory[] = [
     shortName: "Fleece and French terry",
     description:
       "Comfort-focused sweatshirt and hoodie fabrics for casualwear, streetwear and private-label collections.",
-    metaDescription:
-      "Fleece and French terry knit fabrics for hoodies and sweatshirts, supplied by O'range Textile in Shaoxing Keqiao.",
     sourcingOverview: [
       "French terry and fleece are related sweatshirt-fabric directions but they are not interchangeable names. French terry usually retains visible loops on the back, while fleece commonly refers to a raised or brushed back. Yarn system, loop structure, brushing, shearing and finishing determine warmth, bulk, surface shedding and garment appearance.",
       "Use this page to frame a hoodie, sweatshirt or loungewear brief around the required face, back and seasonal performance. The public finished-fabric catalogue contains several structured and raised-surface directions, while the exact French terry or fleece article must be confirmed against the buyer's sample and specification.",
@@ -300,8 +293,6 @@ export const publicFabricCategories: FabricCategory[] = [
     shortName: "Scuba and air-layer",
     description:
       "Structured knitted fabrics for hoodies, jackets and garments that need body and shape retention.",
-    metaDescription:
-      "Source scuba and air-layer knit fabrics from O'range Textile for structured hoodies, jackets and shape-retaining apparel.",
     sourcingOverview: [
       "Scuba and air-layer are commercial names used for structured knit fabrics, but they do not prove one universal construction. A scuba-style double knit may have a compact smooth face and resilient body; an air-layer article may use a layered construction for volume and shape. Neither term should automatically be treated as foam-backed neoprene or as a verified spacer fabric.",
       "O'range Textile's documented finished-fabric catalogue includes air-layer articles with article-level composition, GSM and usable-width references. Buyers should choose a relevant direction, then approve the exact finished sample for thickness, compression, recovery, surface, drape and garment construction.",

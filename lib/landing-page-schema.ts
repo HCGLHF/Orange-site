@@ -1,6 +1,6 @@
 import type { LandingFaq, PublicLandingPage } from "@/lib/landing-page-content";
 import { siteUrl } from "@/lib/geo-content";
-import { getSeoPage } from "@/lib/seo";
+import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
 export function buildLandingPageSchema({
   page,
@@ -12,7 +12,7 @@ export function buildLandingPageSchema({
   faq?: LandingFaq[];
 }) {
   const canonical = `${siteUrl}${path}`;
-  const seo = getSeoPage(path);
+  const seo = getPublicPageSeo(path);
   const schema: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",

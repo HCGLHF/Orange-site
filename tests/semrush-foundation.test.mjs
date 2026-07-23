@@ -32,7 +32,7 @@ test("blog index exposes every buyer guide through server-rendered links", async
   assert.match(component, /page\.kind === "index"/);
   assert.match(component, /blogArticles\.map/);
   assert.match(component, /href=\{article\.url\}/);
-  assert.match(component, /getSeoPage\(article\.url\)\.metaDescription/);
+  assert.match(component, /articleSeo\.metaDescription/);
 });
 
 test("fabric catalogue exposes every public category through crawlable links", async () => {
