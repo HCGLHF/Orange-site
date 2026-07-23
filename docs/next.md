@@ -4,13 +4,14 @@
 
 - Created the initial project memory files required before future development: `CONTEXT.md`, `docs/architecture.md`, `docs/risks.md`, `docs/next.md`, and `docs/adr/`.
 - Recorded the project memory and architecture self-check rule as an ADR.
-- Added a native finished-fabric content registry with 14 crawlable hub, product, blog-index, and buyer-guide routes.
+- Added a native finished-fabric content registry with 20 crawlable hub, product, blog-index, and buyer-guide routes.
 - Connected finished-fabric sample and RFQ calls to the existing inquiry modal and added the new product directions to its selector.
 - Added finished-fabric discovery to `/fabrics`, `sitemap.xml`, and `llms.txt` without changing the primary navigation structure.
 - Added generated finished-fabric imagery, evidence-bounded Product/Article/FAQ/Breadcrumb schema, and Node-based content quality tests.
-- Consolidated the 22 indexable public routes into one keyword and SEO registry covering metadata, H1, schema, sitemap, and `llms.txt`.
+- Consolidated the 28 indexable public routes into one keyword and SEO registry covering metadata, H1, schema, sitemap, and `llms.txt`.
+- Added six catalogue-backed sourcing guides covering air-layer, wool-blend, jacquard specifications, brushed finishes, RFQ preparation, and sourcing questions, supported by five dedicated WebP visuals.
 - Added an automated production-HTML audit for HTTP status, robots, sitemap membership, title, description, Open Graph, Twitter, H1, image ALT, canonical, and noindex state.
-- Verified the local production build on 2026-07-23: 22 checked, 22 passed, 0 failed, 0 unchecked, and 0 inaccessible.
+- Verified the local production build on 2026-07-23: 28 checked, 28 passed, 0 failed, 0 unchecked, and 0 inaccessible.
 
 ## Learned
 
@@ -31,7 +32,7 @@
 
 ## Next
 
-- Review and integrate `seo/full-site-seo-remediation`, deploy it, and rerun the production-HTML audit against `https://orangetextiles.com`.
+- Deploy the merged 28-page catalogue and SEO update, then rerun the production-HTML audit against `https://orangetextiles.com`.
 - Request GSC reindexing for the homepage, commercial hubs, and early-opportunity Interlock, Ponte Roma, and Jacquard pages; allow the remaining pages to be rediscovered through the updated sitemap.
 - Run Semrush Site Audit and keyword/content checks against the deployed Orange Textiles domain, then compare results with the low-difficulty finished-fabric keyword cluster.
 - Review whether inquiry CRM failures need clearer user-facing fallback behavior.
