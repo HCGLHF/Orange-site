@@ -28,6 +28,17 @@ const requiredRoutes = [
   "/blog/brushed-and-pile-knit-fabric-finishes",
   "/blog/how-to-write-a-knit-fabric-rfq",
   "/blog/knit-fabric-sourcing-questions",
+  "/blog/french-terry-fabric-vs-fleece",
+  "/blog/french-terry-fabric-for-hoodies",
+  "/blog/heavyweight-french-terry-fabric",
+  "/blog/interlock-vs-jersey-fabric",
+];
+
+const procurementGuideRoutes = [
+  "/blog/french-terry-fabric-vs-fleece",
+  "/blog/french-terry-fabric-for-hoodies",
+  "/blog/heavyweight-french-terry-fabric",
+  "/blog/interlock-vs-jersey-fabric",
 ];
 
 function loadPages() {
@@ -78,6 +89,63 @@ test("every page has answer-first copy, FAQs and internal routes", () => {
     );
     assert.ok(wordCount(page) >= 650, `${page.url} needs publishable content depth`);
   }
+});
+
+test("procurement guides provide complete buyer decisions and internal routes", () => {
+  const pages = loadPages();
+  const guides = pages.filter((page) =>
+    procurementGuideRoutes.includes(page.url)
+  );
+
+  assert.equal(guides.length, procurementGuideRoutes.length);
+  for (const page of guides) {
+    assert.equal(page.kind, "article", `${page.url} must be an article`);
+    assert.ok(page.opening.length >= 140, `${page.url} opening answer`);
+    assert.ok(page.sections.length >= 4, `${page.url} needs four sections`);
+    assert.ok(page.faq.length >= 4, `${page.url} needs four FAQs`);
+    assert.ok(
+      page.relatedLinks.length >= 7,
+      `${page.url} needs seven internal routes`
+    );
+    assert.ok(page.evidenceSnapshot, `${page.url} needs evidence decisions`);
+    assert.ok(
+      page.evidenceSnapshot.summary.length >= 180,
+      `${page.url} evidence summary`
+    );
+    assert.ok(
+      page.evidenceSnapshot.items.length >= 3,
+      `${page.url} evidence items`
+    );
+    assert.ok(wordCount(page) >= 750, `${page.url} needs buyer-guide depth`);
+  }
+});
+
+test("procurement guides receive contextual inbound links", () => {
+  const pages = loadPages();
+
+  for (const target of procurementGuideRoutes) {
+    const inbound = pages.filter((page) =>
+      page.relatedLinks.some((link) => link.href === target)
+    );
+    assert.ok(
+      inbound.length >= 3,
+      `${target} needs at least three contextual inbound routes`
+    );
+    assert.ok(
+      inbound.some((page) => !procurementGuideRoutes.includes(page.url)),
+      `${target} needs an inbound route from established content`
+    );
+  }
+});
+
+test("breadcrumbs render the current page without a clickable self-link", () => {
+  const component = readFileSync(
+    path.join(root, "components/finished-fabric/FinishedFabricPage.tsx"),
+    "utf8"
+  );
+
+  assert.match(component, /aria-current="page"/);
+  assert.match(component, /index === page\.breadcrumbs\.length - 1/);
 });
 
 test("content stays inside the verified finished-fabric evidence boundary", () => {

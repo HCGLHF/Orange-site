@@ -109,7 +109,7 @@ test("every navigation destination resolves to a registered public page", async 
     NAVIGATION_DISCOVERY_HREFS.length
   );
   assert.ok(Object.isFrozen(NAVIGATION_DISCOVERY_HREFS));
-  assert.equal(publicPages.length, 29);
+  assert.equal(publicPages.length, 33);
   assert.equal(publicPaths.size, publicPages.length);
 
   for (const href of NAVIGATION_DISCOVERY_HREFS) {
