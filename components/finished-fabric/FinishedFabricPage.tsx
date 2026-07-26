@@ -20,12 +20,12 @@ import {
 
 function ContentTable({ table }: { table: NonNullable<FinishedFabricSection["table"]> }) {
   return (
-    <div className="mt-6 overflow-x-auto rounded-lg border border-brand-soft bg-white">
-      <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-        <thead className="bg-brand-soft/45 text-brand-charcoal">
+    <div className="ff-table-box">
+      <table className="ff-table">
+        <thead className="ff-table-head">
           <tr>
             {table.headers.map((header) => (
-              <th key={header} className="px-4 py-3 font-semibold">
+              <th key={header} className="ff-th">
                 {header}
               </th>
             ))}
@@ -33,9 +33,9 @@ function ContentTable({ table }: { table: NonNullable<FinishedFabricSection["tab
         </thead>
         <tbody>
           {table.rows.map((row, rowIndex) => (
-            <tr key={`${row[0]}-${rowIndex}`} className="border-t border-brand-soft/70">
+            <tr key={`${row[0]}-${rowIndex}`} className="ff-tr">
               {row.map((cell, cellIndex) => (
-                <td key={`${cell}-${cellIndex}`} className="px-4 py-3 align-top leading-relaxed text-brand-charcoal/75">
+                <td key={`${cell}-${cellIndex}`} className="ff-td">
                   {cell}
                 </td>
               ))}
@@ -49,14 +49,14 @@ function ContentTable({ table }: { table: NonNullable<FinishedFabricSection["tab
 
 function ContentSection({ section, index }: { section: FinishedFabricSection; index: number }) {
   return (
-    <section className={index % 2 === 0 ? "bg-white" : "bg-brand-cream"}>
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-        <h2 className="max-w-3xl text-2xl font-semibold text-brand-charcoal md:text-3xl">
+    <section className={index % 2 === 0 ? "ff-section" : "ff-section ff-section-alt"}>
+      <div className="ff-wrap">
+        <h2 className="ff-h2">
           {section.heading}
         </h2>
 
         {section.paragraphs?.length ? (
-          <div className="mt-5 max-w-4xl space-y-4 text-base leading-8 text-brand-charcoal/75">
+          <div className="ff-copy">
             {section.paragraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
@@ -64,20 +64,20 @@ function ContentSection({ section, index }: { section: FinishedFabricSection; in
         ) : null}
 
         {section.note ? (
-          <aside className="mt-6 flex max-w-4xl gap-3 border-l-4 border-brand-orange bg-brand-soft/35 px-5 py-4">
-            <Quote className="mt-1 h-5 w-5 shrink-0 text-brand-orange" aria-hidden />
+          <aside className="ff-note">
+            <Quote className="ff-note-icon" aria-hidden />
             <div>
-              <p className="text-sm font-semibold text-brand-charcoal">{section.note.label}</p>
-              <p className="mt-1 text-sm leading-7 text-brand-charcoal/75">{section.note.text}</p>
+              <p className="ff-note-label">{section.note.label}</p>
+              <p className="ff-note-text">{section.note.text}</p>
             </div>
           </aside>
         ) : null}
 
         {section.bullets?.length ? (
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          <ul className="ff-bullets">
             {section.bullets.map((bullet) => (
-              <li key={bullet} className="flex gap-3 rounded-lg border border-brand-soft bg-white p-4 text-sm leading-6 text-brand-charcoal/75">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" aria-hidden />
+              <li key={bullet} className="ff-bullet">
+                <Check className="ff-check" aria-hidden />
                 <span>{bullet}</span>
               </li>
             ))}
@@ -85,10 +85,10 @@ function ContentSection({ section, index }: { section: FinishedFabricSection; in
         ) : null}
 
         {section.steps?.length ? (
-          <ol className="mt-6 grid gap-4 md:grid-cols-2">
+          <ol className="ff-steps">
             {section.steps.map((step, stepIndex) => (
-              <li key={step} className="flex gap-4 border-t border-brand-soft pt-4 text-sm leading-7 text-brand-charcoal/75">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-charcoal text-xs font-semibold text-white">
+              <li key={step} className="ff-step">
+                <span className="ff-step-number">
                   {stepIndex + 1}
                 </span>
                 <span>{step}</span>
@@ -115,7 +115,7 @@ export function FinishedFabricPage({
   const evidenceSnapshot = page.evidenceSnapshot;
 
   return (
-    <div className="min-h-screen bg-brand-cream text-brand-charcoal">
+    <div className="ff-page">
       <StructuredData data={buildFinishedFabricSchema(page, seo)} />
 
       <article>
@@ -125,56 +125,56 @@ export function FinishedFabricPage({
             <LandingProofStrip points={landingPage.proofPoints} />
           </>
         ) : (
-        <header className="border-b border-brand-soft bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs text-brand-charcoal/60">
+        <header className="ff-header">
+          <div className="ff-header-inner">
+            <nav aria-label="Breadcrumb" className="ff-breadcrumb">
               {page.breadcrumbs.map((item, index) => (
-                <span key={item.href} className="flex items-center gap-2">
+                <span key={item.href} className="ff-crumb">
                   {index > 0 ? <span aria-hidden>/</span> : null}
-                  <Link href={item.href} className="hover:text-brand-orange">
+                  <Link href={item.href} className="ff-crumb-link">
                     {item.label}
                   </Link>
                 </span>
               ))}
             </nav>
 
-            <div className="mt-8 grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="ff-hero-grid">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+                <p className="ff-eyebrow">
                   {page.eyebrow}
                 </p>
-                <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight text-brand-charcoal md:text-5xl">
+                <h1 className="ff-h1">
                   {seo.h1}
                 </h1>
-                <p className="mt-5 max-w-3xl text-lg leading-8 text-brand-charcoal/75">
+                <p className="ff-opening">
                   {page.opening}
                 </p>
                 {page.kind === "article" && page.updated ? (
-                  <p className="mt-4 text-xs font-medium uppercase tracking-[0.12em] text-brand-charcoal/55">
+                  <p className="ff-updated">
                     Updated {page.updated} · Reviewed by {page.reviewer ?? "O'range Textile"}
                   </p>
                 ) : null}
-                <div className="mt-7 flex flex-wrap items-center gap-4">
+                <div className="ff-hero-actions">
                   <SampleRequestCta label="Request a finished-fabric sample" className="" />
-                  <Link href="/finished-double-knit-fabrics" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-charcoal hover:text-brand-orange">
+                  <Link href="/finished-double-knit-fabrics" className="ff-range-link">
                     View the finished-fabric range
-                    <ArrowRight className="h-4 w-4" aria-hidden />
+                    <ArrowRight className="ff-arrow" aria-hidden />
                   </Link>
                 </div>
               </div>
 
               <figure>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-brand-soft">
+                <div className="ff-image">
                   <Image
                     src={page.hero.src}
                     alt={page.hero.alt}
                     fill
                     priority
                     sizes="(min-width: 1024px) 52vw, 100vw"
-                    className="object-cover"
+                    className="ff-image-fill"
                   />
                 </div>
-                <figcaption className="mt-3 text-xs leading-5 text-brand-charcoal/55">
+                <figcaption className="ff-caption">
                   {page.hero.caption}
                 </figcaption>
               </figure>
@@ -184,38 +184,38 @@ export function FinishedFabricPage({
         )}
 
         {blogArticles.length ? (
-          <section className="border-b border-brand-soft bg-brand-cream">
-            <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+          <section className="ff-guides">
+            <div className="ff-wrap">
+              <p className="ff-eyebrow">
                 Finished-fabric buyer guides
               </p>
-              <h2 className="mt-3 text-3xl font-semibold text-brand-charcoal">
+              <h2 className="ff-guide-title">
                 Choose a construction question to investigate
               </h2>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
+              <p className="ff-guide-intro">
                 Each guide connects a buyer question to specification checks, sample evidence, and a relevant finished-fabric sourcing route.
               </p>
-              <div className="mt-7 grid gap-4 md:grid-cols-2">
+              <div className="ff-guide-grid">
                 {blogArticles.map((article) => {
                   const articleSeo = getPublicPageSeo(article.url);
                   return (
                     <Link
                       key={article.url}
                       href={article.url}
-                      className="group flex min-h-40 flex-col justify-between border border-brand-soft bg-white p-5 transition-colors hover:border-brand-orange"
+                      className="ff-guide-card"
                     >
                       <div>
-                        <h3 className="text-lg font-semibold text-brand-charcoal">
+                        <h3 className="ff-guide-card-title">
                           {articleSeo.h1}
                         </h3>
-                        <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
+                        <p className="ff-guide-card-copy">
                           {articleSeo.metaDescription}
                         </p>
                       </div>
-                      <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange">
+                      <span className="ff-guide-card-link">
                         Read the buyer guide
                         <ArrowRight
-                          className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                          className="ff-guide-arrow"
                           aria-hidden
                         />
                       </span>
@@ -232,22 +232,22 @@ export function FinishedFabricPage({
         ))}
 
         {evidenceSnapshot ? (
-          <section className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+          <section className="ff-evidence">
+            <div className="ff-wrap">
+              <p className="ff-eyebrow">
                 Article evidence snapshot
               </p>
-              <h2 className="mt-3 max-w-3xl text-2xl font-semibold text-brand-charcoal md:text-3xl">
+              <h2 className="ff-evidence-title">
                 {evidenceSnapshot.heading}
               </h2>
-              <p className="mt-5 max-w-4xl text-base leading-8 text-brand-charcoal/75">
+              <p className="ff-evidence-summary">
                 {evidenceSnapshot.summary}
               </p>
-              <dl className="mt-7 divide-y divide-brand-soft border-y border-brand-soft">
+              <dl className="ff-evidence-list">
                 {evidenceSnapshot.items.map((item) => (
-                  <div key={item.label} className="grid gap-2 py-5 md:grid-cols-[0.34fr_0.66fr] md:gap-8">
-                    <dt className="font-semibold text-brand-charcoal">{item.label}</dt>
-                    <dd className="text-sm leading-7 text-brand-charcoal/75">{item.detail}</dd>
+                  <div key={item.label} className="ff-evidence-row">
+                    <dt className="ff-evidence-label">{item.label}</dt>
+                    <dd className="ff-evidence-detail">{item.detail}</dd>
                   </div>
                 ))}
               </dl>
@@ -255,51 +255,51 @@ export function FinishedFabricPage({
           </section>
         ) : null}
 
-        <section className="border-y border-brand-soft bg-brand-charcoal text-white">
-          <div className="mx-auto grid max-w-5xl gap-6 px-4 py-10 sm:px-6 md:grid-cols-[auto_1fr] md:items-start lg:px-8">
-            <ClipboardCheck className="h-8 w-8 text-brand-orange" aria-hidden />
+        <section className="ff-boundary">
+          <div className="ff-boundary-inner">
+            <ClipboardCheck className="ff-boundary-icon" aria-hidden />
             <div>
-              <h2 className="text-xl font-semibold">Evidence boundary</h2>
-              <p className="mt-3 max-w-4xl text-sm leading-7 text-white/75">{page.evidenceBoundary}</p>
+              <h2 className="ff-boundary-title">Evidence boundary</h2>
+              <p className="ff-boundary-copy">{page.evidenceBoundary}</p>
             </div>
           </div>
         </section>
 
-        <section className="bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">Buyer questions</p>
-            <h2 className="mt-3 text-3xl font-semibold text-brand-charcoal">Frequently asked questions</h2>
-            <div className="mt-7 divide-y divide-brand-soft border-y border-brand-soft">
+        <section className="ff-faq">
+          <div className="ff-wrap">
+            <p className="ff-eyebrow">Buyer questions</p>
+            <h2 className="ff-faq-title">Frequently asked questions</h2>
+            <div className="ff-faq-list">
               {page.faq.map((item) => (
-                <details key={item.q} className="group py-5">
-                  <summary className="cursor-pointer list-none pr-8 text-base font-semibold text-brand-charcoal">
+                <details key={item.q} className="ff-faq-item">
+                  <summary className="ff-faq-question">
                     {item.q}
                   </summary>
-                  <p className="mt-3 max-w-4xl text-sm leading-7 text-brand-charcoal/75">{item.a}</p>
+                  <p className="ff-faq-answer">{item.a}</p>
                 </details>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="bg-brand-cream">
-          <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-semibold text-brand-charcoal">Continue the sourcing route</h2>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="ff-related">
+          <div className="ff-wrap">
+            <h2 className="ff-related-title">Continue the sourcing route</h2>
+            <div className="ff-related-grid">
               {page.relatedLinks.map((item) => (
-                <Link key={item.href} href={item.href} className="group flex min-h-24 items-center justify-between gap-3 rounded-lg border border-brand-soft bg-white p-4 text-sm font-semibold text-brand-charcoal transition-colors hover:border-brand-orange">
+                <Link key={item.href} href={item.href} className="ff-related-link">
                   <span>{item.label}</span>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-brand-orange transition-transform group-hover:translate-x-1" aria-hidden />
+                  <ArrowRight className="ff-related-arrow" aria-hidden />
                 </Link>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-semibold text-brand-charcoal">Move from category research to a sample brief</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-brand-charcoal/70">
+        <section className="ff-cta">
+          <div className="ff-cta-inner">
+            <h2 className="ff-cta-title">Move from category research to a sample brief</h2>
+            <p className="ff-cta-copy">
               Share the garment use, construction direction, composition, target GSM, usable width, color, finish and tests that matter. The team can then confirm the appropriate article and quotation route.
             </p>
             <SampleRequestCta label="Start the sample and RFQ process" className="mt-7" />

@@ -186,7 +186,7 @@ export function DesktopNavigation({
   return (
     <div
       ref={navigationRef}
-      className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex"
+      className="dn"
     >
       {PRIMARY_NAVIGATION.map((section) => {
         const isActive = activeNavigationId === section.id;
@@ -197,12 +197,12 @@ export function DesktopNavigation({
               key={section.id}
               href={section.href}
               aria-current={isActive ? "page" : undefined}
-              className="group relative inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold text-brand-charcoal/75 outline-none transition-colors hover:bg-brand-soft/70 hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
+              className="dn-link"
             >
               {section.label}
               <span
-                className={`pointer-events-none absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-brand-orange transition-opacity motion-reduce:transition-none ${
-                  isActive ? "opacity-100" : "opacity-0"
+                className={`dn-line ${
+                  isActive ? "dn-line-on" : "dn-line-off"
                 }`}
                 aria-hidden="true"
               />
@@ -217,7 +217,7 @@ export function DesktopNavigation({
         const panelId = `desktop-navigation-${section.id}-menu`;
 
         return (
-          <div key={section.id} className="relative">
+          <div key={section.id} className="dn-group">
             <button
               id={triggerId}
               ref={(node) => {
@@ -238,18 +238,18 @@ export function DesktopNavigation({
                   section.items.length
                 )
               }
-              className="group relative inline-flex h-10 items-center gap-1 rounded-lg px-3 text-sm font-semibold text-brand-charcoal/75 outline-none transition-colors hover:bg-brand-soft/70 hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
+              className="dn-trigger"
             >
               {section.label}
               <ChevronDown
-                className={`h-4 w-4 transition-transform motion-reduce:transition-none ${
-                  isOpen ? "rotate-180" : ""
+                className={`dn-chevron ${
+                  isOpen ? "dn-chevron-open" : ""
                 }`}
                 aria-hidden="true"
               />
               <span
-                className={`pointer-events-none absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-brand-orange transition-opacity motion-reduce:transition-none ${
-                  isActive ? "opacity-100" : "opacity-0"
+                className={`dn-line ${
+                  isActive ? "dn-line-on" : "dn-line-off"
                 }`}
                 aria-hidden="true"
               />
@@ -260,10 +260,10 @@ export function DesktopNavigation({
               role="menu"
               aria-labelledby={triggerId}
               aria-hidden={!isOpen}
-              className={`absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-brand-charcoal/10 bg-white p-2 shadow-xl shadow-brand-charcoal/10 transition duration-150 motion-reduce:transition-none ${
+              className={`dn-panel ${
                 isOpen
-                  ? "visible translate-y-0 opacity-100"
-                  : "invisible pointer-events-none -translate-y-1 opacity-0"
+                  ? "dn-panel-open"
+                  : "dn-panel-closed"
               }`}
             >
               {section.items.map((item, itemIndex) => {
@@ -296,10 +296,10 @@ export function DesktopNavigation({
                         section.items.length
                       )
                     }
-                    className={`block rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none ${
+                    className={`dn-item ${
                       isCurrentItem
-                        ? "bg-brand-soft text-brand-charcoal"
-                        : "text-brand-charcoal/80"
+                        ? "dn-item-current"
+                        : "dn-item-default"
                     }`}
                   >
                     {item.label}

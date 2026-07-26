@@ -280,6 +280,10 @@ test("global shell exposes About without duplicating the homepage footer", () =>
     path.join(root, "components", "ui", "SiteFooter.tsx"),
     "utf8"
   );
+  const styles = readFileSync(
+    path.join(root, "app", "globals.css"),
+    "utf8"
+  );
   const homepage = readFileSync(
     path.join(root, "components", "geo", "GeoHomePage.tsx"),
     "utf8"
@@ -300,8 +304,11 @@ test("global shell exposes About without duplicating the homepage footer", () =>
 
   assert.match(shell, /<SiteFooter\s*\/>/);
   assert.doesNotMatch(shell, /["']use client["']/);
-  assert.match(footer, /\bpb-40\b/);
-  assert.match(footer, /\bmd:pb-24\b/);
+  assert.match(footer, /<footer\s+className=["']sf["']/);
+  assert.match(
+    styles,
+    /\.sf\s*\{[\s\S]*?@apply[\s\S]*?\bpb-40\b[\s\S]*?\bmd:pb-24\b/
+  );
   assert.deepEqual(footerHrefs, expectedFooterHrefs);
   for (const href of footerHrefs) {
     assert.ok(

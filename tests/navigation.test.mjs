@@ -25,6 +25,7 @@ const bottomNavigationUrl = new URL(
 );
 const appShellUrl = new URL("../components/AppShell.tsx", import.meta.url);
 const i18nUrl = new URL("../lib/i18n.ts", import.meta.url);
+const globalsCssUrl = new URL("../app/globals.css", import.meta.url);
 
 const loadNavigation = async () => {
   assert.ok(existsSync(navigationUrl), "lib/navigation.ts must exist");
@@ -251,7 +252,7 @@ const assertItemCurrentContract = (source) => {
   );
   assert.match(
     source,
-    /\$\{\s*isCurrentItem\s*\?[\s\S]{0,160}\b(?:bg-brand-soft|text-brand-charcoal)\b/
+    /\$\{\s*isCurrentItem\s*\?[\s\S]{0,160}\b(?:bg-brand-soft|text-brand-charcoal|dn-item-current)\b/
   );
 };
 
@@ -292,8 +293,9 @@ test("desktop navigation implements the shared accessible menu contract", async 
     "components/ui/DesktopNavigation.tsx must exist"
   );
 
-  const [source, { PRIMARY_NAVIGATION }] = await Promise.all([
+  const [source, styles, { PRIMARY_NAVIGATION }] = await Promise.all([
     readFile(desktopNavigationUrl, "utf8"),
+    readFile(globalsCssUrl, "utf8"),
     loadNavigation(),
   ]);
 
@@ -335,7 +337,11 @@ test("desktop navigation implements the shared accessible menu contract", async 
     source,
     /tabIndex=\{\s*isOpen\s*&&\s*activeItemIndex\s*===\s*itemIndex\s*\?\s*0\s*:\s*-1\s*\}/
   );
-  assert.match(source, /invisible pointer-events-none/);
+  assert.match(source, /dn-panel-closed/);
+  assert.match(
+    styles,
+    /\.dn-panel-closed\s*\{[\s\S]*?@apply\s+invisible pointer-events-none/
+  );
 
   assert.doesNotMatch(
     source,
@@ -439,18 +445,26 @@ test("desktop navigation implements the shared accessible menu contract", async 
   );
   assert.match(
     source,
-    /className=["'](?=[^"']*\bhidden\b)(?=[^"']*\bmin-w-0\b)(?=[^"']*\bflex-1\b)(?=[^"']*\bjustify-center\b)(?=[^"']*\bxl:flex\b)[^"']*["']/
+    /className=["']dn["']/
   );
-  assert.match(source, /focus-visible:ring-2/);
-  assert.match(source, /motion-reduce:transition-none/);
+  assert.match(
+    styles,
+    /\.dn\s*\{[\s\S]*?@apply\s+hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex/
+  );
+  assert.match(styles, /\.dn-link[\s\S]*?focus-visible:ring-2/);
+  assert.match(styles, /\.dn-link[\s\S]*?motion-reduce:transition-none/);
   assert.equal(
     [
       ...source.matchAll(
-        /<span\s+className=\{`(?=[^`]*\babsolute\b)(?=[^`]*\bh-0\.5\b)[^`]*\$\{\s*isActive\s*\?\s*["']opacity-100["']\s*:\s*["']opacity-0["']\s*\}[^`]*`\}\s+aria-hidden=["']true["']\s*\/>/g
+        /<span\s+className=\{`dn-line\s+\$\{\s*isActive\s*\?\s*["']dn-line-on["']\s*:\s*["']dn-line-off["']\s*\}\s*`\}\s+aria-hidden=["']true["']\s*\/>/g
       ),
     ].length,
     2,
     "direct links and group triggers need width-stable active underlines"
+  );
+  assert.match(
+    styles,
+    /\.dn-line\s*\{[\s\S]*?@apply[\s\S]*?\babsolute\b[\s\S]*?\bh-0\.5\b/
   );
   assert.match(source, /ChevronDown/);
   assert.match(source, /aria-hidden=["']true["']/);
@@ -492,7 +506,10 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
 });
 
 test("global header exposes one accessible responsive row", async () => {
-  const navbarSource = await readFile(navbarUrl, "utf8");
+  const [navbarSource, styles] = await Promise.all([
+    readFile(navbarUrl, "utf8"),
+    readFile(globalsCssUrl, "utf8"),
+  ]);
 
   assert.equal(
     [...navbarSource.matchAll(/\bdata-global-navigation\b/g)].length,
@@ -501,7 +518,11 @@ test("global header exposes one accessible responsive row", async () => {
   );
   assert.match(
     navbarSource,
-    /<nav\b(?=[^>]*\bdata-global-navigation\b)[^>]*>[\s\S]*?<div\s+className=["'](?=[^"']*\bflex\b)(?=[^"']*\bh-16\b)(?=[^"']*\bitems-center\b)[^"']*["']>/
+    /<nav\b(?=[^>]*\bdata-global-navigation\b)[^>]*>[\s\S]*?<div\s+className=["']gn-row["']>/
+  );
+  assert.match(
+    styles,
+    /\.gn-row\s*\{[\s\S]*?@apply\s+flex h-16 items-center/
   );
   assert.match(navbarSource, /<Menu\b[^>]*aria-hidden=["']true["']/);
   assert.match(navbarSource, /aria-label=["']Open navigation menu["']/);
@@ -523,13 +544,15 @@ test("global header exposes one accessible responsive row", async () => {
   assert.match(navbarSource, /<OrangeMark\b/);
   assert.match(navbarSource, />\s*O&apos;range Textile\s*</);
   assert.match(navbarSource, />\s*Quote\s*</);
+  assert.match(navbarSource, /className=["']gn-menu["']/);
+  assert.match(navbarSource, /className=["']gn-actions["']/);
   assert.match(
-    navbarSource,
-    /className=["'](?=[^"']*\bxl:hidden\b)(?=[^"']*\bmin-h-11\b)[^"']*["']/
+    styles,
+    /\.gn-menu\s*\{[\s\S]*?@apply[\s\S]*?\bmin-h-11\b[\s\S]*?\bxl:hidden\b/
   );
   assert.match(
-    navbarSource,
-    /className=["'](?=[^"']*\bhidden\b)(?=[^"']*\bxl:flex\b)[^"']*["']/
+    styles,
+    /\.gn-actions\s*\{[\s\S]*?@apply\s+hidden[\s\S]*?\bxl:flex\b/
   );
   assert.match(navbarSource, /totalCount\s*>\s*0\s*\?/);
   assert.match(navbarSource, /\{\s*totalCount\s*\}/);
@@ -538,8 +561,8 @@ test("global header exposes one accessible responsive row", async () => {
     /aria-label=\{`Inquiry cart:\s*\$\{totalCount\}\s*\$\{\s*totalCount\s*===\s*1\s*\?\s*["']item["']\s*:\s*["']items["']\s*\}\s*`\}/
   );
   assert.match(navbarSource, /\{\s*t\(["']navCtaInquiry["']\)\s*\}/);
-  assert.match(navbarSource, /focus-visible:ring-2/);
-  assert.match(navbarSource, /motion-reduce:transition-none/);
+  assert.match(styles, /\.gn-menu[\s\S]*?focus-visible:ring-2/);
+  assert.match(styles, /\.gn-menu[\s\S]*?motion-reduce:transition-none/);
   assert.doesNotMatch(navbarSource, /\bmb-3\b/);
   assert.doesNotMatch(navbarSource, /\bw-full\b[^"']*sm:hidden/);
 });

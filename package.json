@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test:html-density": "node scripts/measure-production-density.mjs",
     "test:seo:production": "node scripts/run-production-seo-audit.mjs",
     "deploy": "vercel --prod"
   },
