@@ -41,15 +41,15 @@ function NavbarContent() {
     <>
       <nav
         data-global-navigation="true"
-        className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 motion-reduce:transition-none ${
+        className={`gn ${
           isScrolled
-            ? "bg-white/80 shadow-lg shadow-gray-200/20 backdrop-blur-xl"
-            : "border-b border-gray-100 bg-white"
+            ? "gn-scrolled"
+            : "gn-base"
         }`}
         aria-label={t("navAria")}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center gap-2 xl:gap-4">
+        <div className="gn-inner">
+          <div className="gn-row">
             <button
               ref={menuButtonRef}
               type="button"
@@ -59,9 +59,9 @@ function NavbarContent() {
                 drawerOpen ? "mobile-navigation-drawer" : undefined
               }
               onClick={() => setDrawerOpen(true)}
-              className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-brand-charcoal outline-none transition-colors hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none xl:hidden"
+              className="gn-menu"
             >
-              <Menu className="h-5 w-5" aria-hidden="true" />
+              <Menu className="gn-icon" aria-hidden="true" />
             </button>
 
             <Link
@@ -70,30 +70,30 @@ function NavbarContent() {
               title={t("heroTitle")}
               aria-label={`${t("heroTitle")} · ${t("navHome")}`}
               aria-current={pathname === "/" ? "page" : undefined}
-              className="group flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg pr-1 text-brand-charcoal outline-none transition-colors hover:text-brand-orange focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none xl:flex-none"
+              className="gn-brand"
             >
-              <OrangeMark className="h-8 w-8 shrink-0" />
-              <span className="truncate text-base font-bold tracking-tight sm:text-lg">
+              <OrangeMark className="gn-mark" />
+              <span className="gn-name">
                 O&apos;range Textile
               </span>
             </Link>
 
             <DesktopNavigation pathname={pathname} />
 
-            <div className="hidden shrink-0 items-center gap-2 xl:flex">
+            <div className="gn-actions">
               <Link
                 href={INQUIRY_HREF}
                 aria-label={`Inquiry cart: ${totalCount} ${
                   totalCount === 1 ? "item" : "items"
                 }`}
-                className="group relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-brand-charcoal/70 outline-none transition-colors hover:bg-brand-soft hover:text-brand-charcoal focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
+                className="gn-cart"
               >
                 <ShoppingCart
-                  className="h-5 w-5 transition-transform group-hover:scale-110 motion-reduce:transition-none"
+                  className="gn-cart-icon"
                   aria-hidden="true"
                 />
                 {totalCount > 0 ? (
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-brand-orange px-1 text-xs font-bold text-white shadow-sm">
+                  <span className="gn-count">
                     {totalCount}
                   </span>
                 ) : null}
@@ -101,7 +101,7 @@ function NavbarContent() {
 
               <Link
                 href={INQUIRY_HREF}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-brand-orange px-5 py-2 text-sm font-bold text-white shadow-md shadow-orange-200 outline-none transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
+                className="gn-cta"
               >
                 {t("navCtaInquiry")}
               </Link>
@@ -109,7 +109,7 @@ function NavbarContent() {
 
             <Link
               href={INQUIRY_HREF}
-              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-brand-orange px-3 py-2 text-sm font-bold text-white outline-none transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none xl:hidden"
+              className="gn-quote"
             >
               Quote
             </Link>
@@ -134,7 +134,7 @@ export function Navbar() {
     <Suspense
       fallback={
         <nav
-          className="fixed left-0 right-0 top-0 z-50 h-16 border-b border-gray-100 bg-white"
+          className="gn-fallback"
           aria-hidden
         />
       }

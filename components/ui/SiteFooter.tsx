@@ -16,25 +16,25 @@ const footerLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-brand-soft bg-white px-5 pb-40 pt-10 text-brand-charcoal sm:px-6 md:pb-24 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+    <footer className="sf">
+      <div className="sf-inner">
         <div>
-          <p className="text-base font-semibold">
+          <p className="sf-brand">
             {companyRelationship.brandName}
           </p>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-brand-charcoal/80">
+          <p className="sf-copy">
             {companyRelationship.exportCompany} · Export-focused knit fabric
             sourcing from Shaoxing Keqiao.
           </p>
         </div>
 
         <nav aria-label="Footer">
-          <ul className="flex flex-wrap gap-x-6 gap-y-3">
+          <ul className="sf-links">
             {footerLinks.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-sm font-medium text-brand-charcoal/80 underline-offset-4 transition-colors hover:text-brand-charcoal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-charcoal focus-visible:ring-offset-4"
+                  className="sf-link"
                 >
                   {item.label}
                 </Link>
