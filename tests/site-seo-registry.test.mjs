@@ -28,13 +28,51 @@ const includesFolded = (text, keyword) =>
     .toLocaleLowerCase("en-US")
     .includes(keyword.toLocaleLowerCase("en-US"));
 
-test("SEO registry owns exactly 29 normalized public pages", async () => {
+test("SEO registry owns exactly 33 normalized public pages", async () => {
   const { getAllPublicPageSeo } = await loadSeo();
   const pages = getAllPublicPageSeo();
-  assert.equal(pages.length, 29);
+  assert.equal(pages.length, 33);
   assert.equal(new Set(pages.map((page) => page.path)).size, pages.length);
   for (const page of pages) {
     assert.match(page.path, /^\/(?:[a-z0-9-]+(?:\/[a-z0-9-]+)*)?$/);
+  }
+});
+
+test("homepage owns the commercial supplier query", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+  const page = getPublicPageSeo("/");
+
+  assert.equal(page.primaryKeyword, "knit fabric supplier");
+  assert.equal(page.searchIntent, "commercial");
+  assert.equal(page.targetPageType, "homepage");
+});
+
+test("procurement guides own distinct buyer-decision queries", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+  const expected = new Map([
+    [
+      "/blog/french-terry-fabric-vs-fleece",
+      "french terry fabric vs fleece",
+    ],
+    [
+      "/blog/french-terry-fabric-for-hoodies",
+      "french terry fabric for hoodies",
+    ],
+    [
+      "/blog/heavyweight-french-terry-fabric",
+      "heavyweight french terry fabric",
+    ],
+    [
+      "/blog/interlock-vs-jersey-fabric",
+      "interlock vs jersey fabric",
+    ],
+  ]);
+
+  for (const [path, primaryKeyword] of expected) {
+    const page = getPublicPageSeo(path);
+    assert.equal(page.primaryKeyword, primaryKeyword);
+    assert.equal(page.searchIntent, "informational");
+    assert.equal(page.targetPageType, "blog");
   }
 });
 
@@ -75,6 +113,28 @@ test("every public page has one unique keyword assignment", async () => {
     assert.ok(
       allowedPageTypes.has(page.targetPageType),
       `${page.path} page type`
+    );
+  }
+});
+
+test("a primary keyword is not reused as another page secondary keyword", async () => {
+  const { getAllPublicPageSeo } = await loadSeo();
+  const pages = getAllPublicPageSeo();
+
+  for (const owner of pages) {
+    const primary = owner.primaryKeyword.toLocaleLowerCase("en-US");
+    const competingPages = pages.filter(
+      (page) =>
+        page.path !== owner.path &&
+        page.secondaryKeywords.some(
+          (keyword) => keyword.toLocaleLowerCase("en-US") === primary
+        )
+    );
+
+    assert.deepEqual(
+      competingPages.map((page) => page.path),
+      [],
+      `${owner.primaryKeyword} must belong only to ${owner.path}`
     );
   }
 });

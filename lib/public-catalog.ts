@@ -104,6 +104,12 @@ export const publicFabricCategories: FabricCategory[] = [
     relatedFabricIds: ["cotton-jersey-32s"],
     relatedLinks: [
       {
+        href: "/blog/interlock-vs-jersey-fabric",
+        label: "Compare interlock and jersey for a sourcing brief",
+        description:
+          "Use a side-by-side buyer decision covering construction, edge stability, drape, opacity and sample checks.",
+      },
+      {
         href: "/blog/what-is-interlock-fabric",
         label: "Compare jersey with interlock",
         description:
@@ -180,6 +186,12 @@ export const publicFabricCategories: FabricCategory[] = [
     relatedFabricIds: ["cotton-spandex-jersey-32s", "rib-knit-cotton-spandex"],
     relatedLinks: [
       {
+        href: "/blog/interlock-vs-jersey-fabric",
+        label: "Decide between stretch jersey and interlock",
+        description:
+          "Compare fit, recovery, surface balance and garment applications before writing the fabric specification.",
+      },
+      {
         href: "/blog/what-is-rib-knit-fabric",
         label: "Compare jersey and rib stretch",
         description:
@@ -255,6 +267,24 @@ export const publicFabricCategories: FabricCategory[] = [
     applications: ["Hoodies", "Sweatshirts", "Streetwear", "Loungewear"],
     relatedFabricIds: ["fleece-french-terry-cotton-poly"],
     relatedLinks: [
+      {
+        href: "/blog/french-terry-fabric-vs-fleece",
+        label: "Compare French terry and fleece",
+        description:
+          "Choose between a loop-back reverse and a brushed or raised finish using garment, season and test requirements.",
+      },
+      {
+        href: "/blog/french-terry-fabric-for-hoodies",
+        label: "Specify French terry for hoodies",
+        description:
+          "Turn the hoodie silhouette, season, GSM, reverse surface and trim plan into a sample-ready sourcing brief.",
+      },
+      {
+        href: "/blog/heavyweight-french-terry-fabric",
+        label: "Source heavyweight French terry",
+        description:
+          "Review weight, usable width, shrinkage, seam bulk and wash approval for substantial sweatshirt programs.",
+      },
       {
         href: "/blog/what-is-scuba-knit-fabric",
         label: "Compare fleece with structured scuba knit",

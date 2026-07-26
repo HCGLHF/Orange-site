@@ -131,9 +131,15 @@ export function FinishedFabricPage({
               {page.breadcrumbs.map((item, index) => (
                 <span key={item.href} className="ff-crumb">
                   {index > 0 ? <span aria-hidden>/</span> : null}
-                  <Link href={item.href} className="ff-crumb-link">
-                    {item.label}
-                  </Link>
+                  {index === page.breadcrumbs.length - 1 ? (
+                    <span className="ff-crumb-link" aria-current="page">
+                      {item.label}
+                    </span>
+                  ) : (
+                    <Link href={item.href} className="ff-crumb-link">
+                      {item.label}
+                    </Link>
+                  )}
                 </span>
               ))}
             </nav>

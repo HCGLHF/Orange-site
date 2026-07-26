@@ -362,6 +362,10 @@
         "label": "Read the interlock fabric guide"
       },
       {
+        "href": "/blog/interlock-vs-jersey-fabric",
+        "label": "Compare interlock and jersey fabric"
+      },
+      {
         "href": "/fabrics/ponte-roma-fabric",
         "label": "Ponte Roma fabric"
       },
@@ -1561,6 +1565,10 @@
         "label": "Interlock fabric development"
       },
       {
+        "href": "/blog/interlock-vs-jersey-fabric",
+        "label": "Compare interlock and jersey fabric"
+      },
+      {
         "href": "/fabrics/ponte-roma-fabric",
         "label": "Ponte Roma fabric"
       },
@@ -1772,6 +1780,10 @@
       {
         "href": "/blog/what-is-double-knit-fabric",
         "label": "What is double knit fabric?"
+      },
+      {
+        "href": "/blog/interlock-vs-jersey-fabric",
+        "label": "Compare interlock and jersey fabric"
       },
       {
         "href": "/blog/what-is-ponte-fabric",
@@ -3274,6 +3286,14 @@
         "label": "Read the sourcing Q&A"
       },
       {
+        "href": "/blog/heavyweight-french-terry-fabric",
+        "label": "Review heavyweight French terry specifications"
+      },
+      {
+        "href": "/blog/french-terry-fabric-vs-fleece",
+        "label": "Compare French terry and fleece finishes"
+      },
+      {
         "href": "/#contact",
         "label": "Request a sample or quotation"
       }
@@ -3677,10 +3697,732 @@
         "label": "Review the air-layer sourcing guide"
       },
       {
+        "href": "/blog/french-terry-fabric-for-hoodies",
+        "label": "Choose French terry for hoodie programs"
+      },
+      {
+        "href": "/blog/interlock-vs-jersey-fabric",
+        "label": "Compare interlock and jersey fabric"
+      },
+      {
         "href": "/#contact",
         "label": "Request a sample or quotation"
       }
     ],
     "evidenceBoundary": "Article numbers, compositions, GSM values and width references come from the owner-confirmed 104-record finished-fabric catalogue. Colour, finish, live availability, sample terms, testing, packing, quantity, lead time, price and other commercial conditions require current confirmation for the specific inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/french-terry-fabric-vs-fleece",
+    "eyebrow": "Sweatshirt fabric comparison",
+    "opening": "French terry fabric vs fleece is primarily a decision about the reverse surface and the garment result. French terry normally keeps visible loops on the back, while fleece usually adds a brushed or raised reverse for more bulk and insulation. Buyers should confirm the exact construction and finished sample instead of choosing from the category name alone.",
+    "evidenceSnapshot": {
+      "heading": "Separate the construction decision from the commercial name",
+      "summary": "A supplier may use French terry, fleece, brushed terry or sweatshirt fleece for related constructions, but the names do not establish one universal specification. A useful comparison records the face, reverse, yarn system, GSM, usable width, stretch, recovery, shrinkage and finishing route for the exact sample. The buyer then tests the garment result and keeps availability, colour, MOQ, lead time and price in the current quotation.",
+      "items": [
+        {
+          "label": "French terry decision",
+          "detail": "Choose a visible loop-back direction when the programme needs a cleaner, less raised reverse, moderate insulation and a fabric that can serve trans-seasonal hoodies, sweatshirts or casual bottoms."
+        },
+        {
+          "label": "Fleece decision",
+          "detail": "Choose a brushed or raised reverse when the programme prioritises a fuller hand, trapped air and a warmer interior, then verify shedding, pilling and appearance after the intended care route."
+        },
+        {
+          "label": "Approval evidence",
+          "detail": "Use labelled face-and-reverse images, a finished cutting large enough for wash and seam trials, measured dimensional results and one dated approval record rather than a category label or unconditioned hand swatch."
+        }
+      ]
+    },
+    "hero": {
+      "src": "/images/finished-fabrics/brushed-pile-knit-finishes.webp",
+      "alt": "French terry loop-back and brushed fleece samples compared by face and reverse",
+      "caption": "The reverse construction, not the marketing name, is the first practical difference between French terry and fleece."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/french-terry-fabric-vs-fleece",
+        "label": "French terry vs fleece"
+      }
+    ],
+    "published": "2026-07-26",
+    "updated": "2026-07-26",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Start with the reverse surface and intended garment",
+        "paragraphs": [
+          "French terry commonly has a smooth outer face and visible yarn loops on the reverse. Fleece commonly starts from a sweatshirt-knit direction whose reverse is brushed, raised or otherwise finished to create a softer pile. The brushing operation changes bulk, warmth, shedding risk and the way the inside looks after laundering. It can also affect finished GSM and width, so the buyer should compare finished goods rather than unfinished references.",
+          "The garment brief decides which route is useful. A lighter loop-back construction can suit a trans-seasonal hoodie, training layer or casual pant that needs breathability and a clean interior. A raised fleece direction can suit a colder-season sweatshirt or warm loungewear programme. Lining, garment fit, rib trims, printing, embroidery and garment washing can change the final choice."
+        ],
+        "bullets": [
+          "State whether the reverse must show loops, a brushed pile or another finish.",
+          "Name the garment, season, fit, target market and care route.",
+          "Provide a face-and-reverse reference instead of the word soft alone.",
+          "Explain whether printing, embroidery, garment washing or bonding is planned.",
+          "Identify any requirement for recycled content, testing or supporting documents."
+        ]
+      },
+      {
+        "heading": "Compare performance fields before comparing price",
+        "paragraphs": [
+          "GSM is useful for describing mass, but it does not independently prove warmth, quality or durability. Yarn type, loop length, density, brushing level, finish and trapped air all influence the hand and garment result. Ask for usable width after finishing because brushing, compacting and relaxation can change the cuttable width and consumption assumptions.",
+          "Stretch and recovery matter even when the garment is relaxed. Check whether the fabric grows at shoulders, knees or seat areas, whether the hem recovers, and whether the body twists or shrinks after care. For brushed fleece, inspect loose fibre, pilling and reverse appearance. For loop-back French terry, inspect loop regularity, snagging and the effect of seams or coverstitching."
+        ],
+        "table": {
+          "headers": [
+            "Buyer decision",
+            "French terry direction",
+            "Fleece direction"
+          ],
+          "rows": [
+            [
+              "Reverse",
+              "Visible loops or low-profile loop back",
+              "Brushed, raised or fuller pile"
+            ],
+            [
+              "Typical feel",
+              "Cleaner and often less bulky",
+              "Softer, fuller and more insulating"
+            ],
+            [
+              "Priority checks",
+              "Loop regularity, snagging, shrinkage and drape",
+              "Pilling, shedding, bulk, shrinkage and care appearance"
+            ],
+            [
+              "Garment route",
+              "Trans-seasonal hoodies, sweatshirts and casual bottoms",
+              "Cold-season hoodies, sweatshirts and warm loungewear"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Approve the same tests on the same sample state",
+        "paragraphs": [
+          "Condition both samples before comparing weight, width and hand. Record the article, colour, finish, date and sample version. Measure GSM and usable width by the agreed method, then run the intended wash or care cycle. A comparison made between an unfinished loop-back sample and a fully brushed finished sample does not provide a reliable production decision.",
+          "Sew a garment-relevant panel or prototype. Review seam bulk, needle response, edge finishing, hood drape, pocket stability and rib compatibility. Repeat the visual and dimensional review after laundering. When a fabric is brushed, photograph the reverse under consistent light and note whether the pile changes direction, pills, mats or sheds."
+        ],
+        "steps": [
+          "Confirm exact article identity, composition, face, reverse and finish.",
+          "Condition the samples and measure GSM and usable width.",
+          "Run stretch, recovery, shrinkage, pilling and colourfastness checks as required.",
+          "Sew the critical garment seams and complete the intended care trial.",
+          "Approve one dated sample and record every open production condition."
+        ]
+      },
+      {
+        "heading": "Write an RFQ that preserves the comparison decision",
+        "paragraphs": [
+          "The RFQ should state whether the approved direction is loop-back French terry or brushed fleece and should identify the sample version. Add composition, target GSM, usable width, colour, face, reverse, finish, stretch, recovery, shrinkage, pilling, colourfastness, garment use, quantity, destination and documentation needs. Mark acceptable ranges and proposal fields clearly.",
+          "Ask the supplier to confirm the proposed article against the approved reference. Current sample terms, colour availability, quantity, MOQ, lead time, packing, payment, price and shipping basis belong in the current commercial response. Keeping these fields separate prevents an evergreen guide from becoming an unsupported stock or delivery promise."
+        ],
+        "note": {
+          "label": "Selection rule",
+          "text": "Choose French terry or fleece from the finished reverse, garment need and tested sample. Do not choose from GSM or category name alone."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is French terry warmer than fleece?",
+        "a": "Usually a brushed fleece direction feels warmer because the raised reverse traps more air, but warmth also depends on density, yarn, GSM, finishing, fit and garment construction. Compare the exact finished samples."
+      },
+      {
+        "q": "Can French terry be brushed?",
+        "a": "Some suppliers use overlapping commercial names for brushed terry and fleece directions. Ask for the exact face, reverse and finishing description and approve the physical sample rather than relying on the label."
+      },
+      {
+        "q": "Which fabric is better for a trans-seasonal hoodie?",
+        "a": "A loop-back French terry can provide a cleaner, less bulky reverse for trans-seasonal use. The final decision should consider climate, fit, GSM, layering, care and the tested garment prototype."
+      },
+      {
+        "q": "What should a buyer test on sweatshirt fleece?",
+        "a": "Review pilling, shedding, shrinkage, colourfastness, surface appearance, seam bulk and garment performance after the intended care route. Record the exact article and finish used for approval."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/fleece-french-terry",
+        "label": "Review the French terry and fleece category"
+      },
+      {
+        "href": "/blog/french-terry-fabric-for-hoodies",
+        "label": "Choose French terry for a hoodie program"
+      },
+      {
+        "href": "/blog/heavyweight-french-terry-fabric",
+        "label": "Evaluate heavyweight French terry"
+      },
+      {
+        "href": "/blog/brushed-and-pile-knit-fabric-finishes",
+        "label": "Inspect brushed and raised finishes"
+      },
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "Build the finished-fabric RFQ"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Review current inquiry fabric records"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom sweatshirt brief"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request samples and a quotation"
+      }
+    ],
+    "evidenceBoundary": "This guide explains buyer decision criteria for French terry and fleece. Exact construction, composition, GSM, usable width, colour, finish, test results, live availability, sample terms, quantity, MOQ, lead time, price, packing and shipping require current confirmation for the specific article and inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/french-terry-fabric-for-hoodies",
+    "eyebrow": "Hoodie fabric sourcing guide",
+    "opening": "French terry fabric for hoodies should be selected from the hoodie brief, not from a generic weight label. Buyers need to align loop structure, face, GSM, usable width, stretch, recovery, shrinkage and finishing with the season, silhouette, trims and care route, then approve the result on a labelled finished sample.",
+    "evidenceSnapshot": {
+      "heading": "Turn a hoodie concept into measurable fabric decisions",
+      "summary": "A useful hoodie brief connects the garment silhouette and season to a finished fabric specification. It states the required reverse, composition direction, target body, usable width, recovery, shrinkage, colour and finish, then tests the critical hood, pocket, hem and seam areas. The approved sample records the material decision; the current quotation records availability and commercial conditions.",
+      "items": [
+        {
+          "label": "Garment evidence",
+          "detail": "Provide the hoodie drawing or reference garment, intended fit, hood construction, pocket type, rib plan, print or embroidery process, garment wash and destination market."
+        },
+        {
+          "label": "Fabric evidence",
+          "detail": "Record article, face, reverse, composition, GSM, usable width, stretch, recovery, shrinkage, surface finish and the test methods used on the exact finished sample."
+        },
+        {
+          "label": "Commercial evidence",
+          "detail": "Confirm colour, sample route, live quantity, MOQ, lead time, price, packing, documentation and shipping for the current order instead of treating guide copy as a supply promise."
+        }
+      ]
+    },
+    "hero": {
+      "src": "/images/finished-fabrics/finished-fabric-sample-inspection.webp",
+      "alt": "French terry hoodie fabric samples checked for loops, weight, width and shrinkage",
+      "caption": "A hoodie fabric decision becomes useful when the specification is connected to the real garment and a labelled finished sample."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/french-terry-fabric-for-hoodies",
+        "label": "French terry for hoodies"
+      }
+    ],
+    "published": "2026-07-26",
+    "updated": "2026-07-26",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Define the hoodie before choosing the fabric",
+        "paragraphs": [
+          "Begin with season, market, fit and layering. A cropped fashion hoodie, a relaxed streetwear hoodie and a training layer may use different body, drape and recovery even when all are described as French terry. State whether the hood is single or double layer, whether the garment has a kangaroo pocket, and whether the body needs to hold a boxy shape or fall more softly.",
+          "Record every process that can change the material. Screen printing, digital printing, embroidery, heat transfer, garment dyeing, washing and enzyme treatments can affect surface, shade, shrinkage and hand. Rib cuffs and waistbands need compatible recovery and colour, while drawcord channels, pocket edges and shoulder seams need enough stability."
+        ],
+        "bullets": [
+          "Hoodie silhouette, size range and intended layering",
+          "Season, destination climate and target consumer",
+          "Single- or double-layer hood and pocket construction",
+          "Rib, binding, zipper, drawcord and other trim requirements",
+          "Printing, embroidery, garment wash and care instructions"
+        ]
+      },
+      {
+        "heading": "Select GSM, width and stretch as a connected system",
+        "paragraphs": [
+          "GSM describes mass per square metre, but the hoodie result also depends on yarn, loop density, finish and pattern. A heavier number can add body, yet it may also increase seam bulk, drying time and hood weight. A lighter fabric may drape well but need more attention to opacity, pocket stability and growth. Ask for an acceptable target range and compare garment-relevant samples.",
+          "Usable width affects marker planning and consumption. Confirm it after the agreed finishing and relaxation state. Check stretch and recovery in the directions that matter to dressing, movement, cuffs and hems. If the programme needs a stable boxy shape, uncontrolled growth can be as important as insufficient stretch."
+        ],
+        "table": {
+          "headers": [
+            "Hoodie decision",
+            "What to specify",
+            "What to verify"
+          ],
+          "rows": [
+            [
+              "Body and drape",
+              "Target GSM range, loop density and finish",
+              "Panel hang, hood weight and seam bulk"
+            ],
+            [
+              "Consumption",
+              "Usable width and tolerance",
+              "Finished relaxed width and marker assumptions"
+            ],
+            [
+              "Movement",
+              "Stretch direction and recovery target",
+              "Growth at elbows, hem, pocket and shoulders"
+            ],
+            [
+              "Care",
+              "Wash route and shrinkage tolerance",
+              "Dimensional and surface result after laundering"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Inspect a sample large enough for hoodie decisions",
+        "paragraphs": [
+          "A small swatch can show colour and hand, but it may not reveal hood drape, loop consistency, seam bulk or dimensional behaviour. Request enough material for the critical pattern areas or a development garment. Label the sample with supplier, article, colour, finish, date and version so later revisions do not replace the approved reference silently.",
+          "Measure GSM and usable width after conditioning. Photograph face and reverse. Run shrinkage, spirality, pilling, colourfastness and stretch or recovery checks according to the buyer's needs. Sew the shoulder, hood seam, pocket edge and body-to-rib junction. If the garment is printed, embroidered or washed, include that process in the trial."
+        ],
+        "steps": [
+          "Match the sample to the hoodie specification and article record.",
+          "Condition and measure the finished fabric.",
+          "Inspect face, loops, shade, usable width and dimensional behaviour.",
+          "Sew and process the critical garment areas.",
+          "Approve one dated sample with recorded test and fit observations."
+        ]
+      },
+      {
+        "heading": "Send a hoodie RFQ that sales can answer precisely",
+        "paragraphs": [
+          "Include the hoodie tech pack or reference, construction direction, composition, target GSM, usable width, face, reverse, colour, finish, stretch, recovery, shrinkage, pilling and colourfastness requirements. Add size range, quantity, colour split, destination, testing, inspection, packing and documentation needs.",
+          "Ask the supplier to identify the proposed article and any variation from the brief. Sample availability, current colour and quantity, MOQ, lead time, price, payment, packing and shipping basis need a current response. This keeps the public guide useful without implying that one material, colour or delivery term is always available."
+        ],
+        "note": {
+          "label": "Hoodie sourcing rule",
+          "text": "Approve the fabric in the critical hoodie panels and processes, not only as an unsewn hand swatch."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "What GSM French terry is suitable for hoodies?",
+        "a": "There is no universal GSM. Select a target range from season, fit, layering, hood construction, drape and processing, then approve the body and seam result on the exact finished sample."
+      },
+      {
+        "q": "Should French terry for hoodies stretch?",
+        "a": "The required stretch depends on fit and dressing. Buyers should define direction, extension and recovery, then check growth at the elbows, hem, shoulders and pocket after wear and care trials."
+      },
+      {
+        "q": "How much fabric should a hoodie sample use?",
+        "a": "Request enough fabric to evaluate the hood, shoulder, pocket, hem and body-to-rib junction, or make a full development garment. A small swatch cannot validate these decisions."
+      },
+      {
+        "q": "When are hoodie fabric MOQ and lead time confirmed?",
+        "a": "They are confirmed for the current article, colour, finish, quantity and destination in the supplier's current quotation. They should not be inferred from a general sourcing guide."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/fleece-french-terry",
+        "label": "Review French terry and fleece sourcing"
+      },
+      {
+        "href": "/blog/french-terry-fabric-vs-fleece",
+        "label": "Compare French terry with fleece"
+      },
+      {
+        "href": "/blog/heavyweight-french-terry-fabric",
+        "label": "Evaluate heavyweight hoodie fabric"
+      },
+      {
+        "href": "/fabrics/rib-knit-fabric",
+        "label": "Coordinate rib cuffs and waistbands"
+      },
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "Prepare a complete hoodie fabric RFQ"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Review current inquiry fabric records"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a custom hoodie fabric brief"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a sample and quotation"
+      }
+    ],
+    "evidenceBoundary": "This guide explains how to specify and approve French terry for hoodies. Exact construction, composition, GSM, usable width, colour, finish, testing, live availability, sample terms, quantity, MOQ, lead time, price, packing and shipping require current confirmation for the selected article and inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/heavyweight-french-terry-fabric",
+    "eyebrow": "Heavyweight fabric specification guide",
+    "opening": "Heavyweight French terry fabric is a sourcing direction, not a universal GSM threshold. More mass can add body, but warmth, softness, drape and durability also depend on yarn, loop structure, density, finishing and garment construction. Buyers should define the required result and approve one finished sample instead of treating heavier as automatically better.",
+    "evidenceSnapshot": {
+      "heading": "Define heavyweight through garment performance and a recorded sample",
+      "summary": "A buyer can use GSM to shortlist heavier French terry directions, but the specification must also record face, loop back, usable width, density, stretch, recovery, shrinkage and care. A hoodie panel and wash trial reveal seam bulk, hood weight, growth and surface change that a number cannot predict. The approval record identifies the material; the quotation confirms current commercial terms.",
+      "items": [
+        {
+          "label": "Mass is one variable",
+          "detail": "GSM supports comparison and consumption planning, but it does not independently prove insulation, quality, softness, compactness or the correct body for a garment."
+        },
+        {
+          "label": "Construction creates the result",
+          "detail": "Yarn size, loop length, density, face and reverse, compacting, raising and other finishing choices influence thickness, trapped air, drape, shrinkage and seam behaviour."
+        },
+        {
+          "label": "The garment validates the choice",
+          "detail": "Test the hood, pocket, shoulder, hem and rib junction after the intended care process, then approve one labelled article, colour, finish, date and version."
+        }
+      ]
+    },
+    "hero": {
+      "src": "/images/finished-fabrics/knit-fabric-rfq-specification.webp",
+      "alt": "Heavyweight French terry specification reviewed with GSM, width and hoodie seam notes",
+      "caption": "A heavyweight approval should connect GSM to construction, usable width, seam behaviour, care and the intended hoodie."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/heavyweight-french-terry-fabric",
+        "label": "Heavyweight French terry"
+      }
+    ],
+    "published": "2026-07-26",
+    "updated": "2026-07-26",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Agree what heavyweight means for the programme",
+        "paragraphs": [
+          "The word heavyweight has no single global threshold. A buyer, mill and retailer may use different ranges, and the same GSM can feel different when yarn, density, loop size or finish changes. State the target GSM range and the garment result: structured or relaxed body, loop profile, expected warmth, layering, drape and care.",
+          "Include the destination climate and garment construction. A double-layer hood, large pocket, oversized fit or dense rib trim adds mass to the garment. A fabric that feels substantial as a flat sample may become too heavy at seam intersections or too slow to dry after washing. The brief should explain where body is valuable and where flexibility is required."
+        ],
+        "bullets": [
+          "Target GSM range and accepted tolerance",
+          "Loop size, density, face and reverse appearance",
+          "Required body, drape, warmth and layering",
+          "Hood, pocket, seam and rib construction",
+          "Care, printing, embroidery and garment-wash processes"
+        ]
+      },
+      {
+        "heading": "Read GSM with density, width and finishing",
+        "paragraphs": [
+          "Two French terry samples at a similar GSM can have different thickness, compactness and hand. A denser construction may feel firm and stable; a larger loop or bulkier yarn may feel loftier. Compacting can improve dimensional control but change width and hand. Raising or brushing the reverse moves the product towards a fleece-like surface and adds separate pilling and shedding questions.",
+          "Measure usable width after the agreed finishing and relaxation. Width affects marker efficiency and total consumption, while the heavier material affects roll handling and freight. Confirm stretch and recovery because weight does not prevent growth. Review whether the fabric returns after extension and whether elbows, pockets or hems distort during wear."
+        ],
+        "table": {
+          "headers": [
+            "Specification field",
+            "Why it matters",
+            "Approval evidence"
+          ],
+          "rows": [
+            [
+              "GSM",
+              "Describes mass and supports comparison",
+              "Conditioned measurement with tolerance"
+            ],
+            [
+              "Usable width",
+              "Changes marker efficiency and consumption",
+              "Finished relaxed cuttable width"
+            ],
+            [
+              "Loop and density",
+              "Influence body, thickness and reverse appearance",
+              "Face-and-reverse sample inspection"
+            ],
+            [
+              "Stretch and recovery",
+              "Affect fit and growth despite higher weight",
+              "Agreed test plus garment trial"
+            ],
+            [
+              "Shrinkage and care",
+              "Can change size, width, hand and surface",
+              "Measured result after intended care"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Test bulk, seams and care before approval",
+        "paragraphs": [
+          "Condition and label the finished sample before testing. Measure GSM, usable width and dimensional change by the agreed methods. Inspect loop consistency, face, shade and any raising. Run pilling, colourfastness and shrinkage tests that match the buyer's market and care label. If the garment will be printed, embroidered or garment washed, reproduce that treatment on the development material.",
+          "Sew the thickest intersections, including hood seams, pocket corners, shoulder seams and body-to-rib joins. Check skipped stitches, seam grin, press marks, edge bulk and feed balance. Make a garment or panel large enough to assess hang and recovery. Reinspect after care and record what changed."
+        ],
+        "steps": [
+          "Label and condition the exact finished sample.",
+          "Measure GSM, usable width and relevant physical fields.",
+          "Run shrinkage, pilling, colourfastness and surface checks.",
+          "Sew critical bulky intersections and process the garment trial.",
+          "Approve the dated sample and list unresolved production conditions."
+        ]
+      },
+      {
+        "heading": "Keep the heavyweight RFQ measurable",
+        "paragraphs": [
+          "State garment, season, fit, target GSM, usable width, composition, face, loop back, colour, finish, stretch, recovery, shrinkage, pilling, colourfastness and care. Add quantity, colour split, destination, packing, testing, inspection and documentation. Attach the approved sample identity and reference images under consistent light.",
+          "Ask the supplier to confirm any change from the brief. Current availability, sample timing, MOQ, lead time, price, payment, packing and shipping basis must be confirmed for the specific article, colour and order. A guide can explain how to evaluate heavyweight French terry, but it cannot replace a current commercial offer."
+        ],
+        "note": {
+          "label": "Weight rule",
+          "text": "Use GSM to shortlist. Use the finished sample, garment trial and care results to approve."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "What GSM counts as heavyweight French terry?",
+        "a": "There is no universal threshold. Buyers should agree a target range with the supplier and evaluate construction, usable width, body, seams, care and garment result on the exact finished sample."
+      },
+      {
+        "q": "Is heavier French terry always warmer?",
+        "a": "No. Warmth also depends on density, yarn, loops, trapped air, finish, fit and layering. A brushed reverse may feel warmer than a compact loop back at a similar mass."
+      },
+      {
+        "q": "Does heavyweight French terry need stretch testing?",
+        "a": "Yes when fit, movement or growth matters. Check extension and recovery in the relevant directions and review elbows, pockets, hems and shoulders during a garment trial."
+      },
+      {
+        "q": "Can the website confirm heavyweight fabric availability?",
+        "a": "The website explains sourcing and approval. Live article, colour, finish, quantity, sample route, MOQ, lead time and price require confirmation for the current inquiry."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/fleece-french-terry",
+        "label": "Review the sweatshirt fabric category"
+      },
+      {
+        "href": "/blog/french-terry-fabric-vs-fleece",
+        "label": "Compare loop-back and brushed directions"
+      },
+      {
+        "href": "/blog/french-terry-fabric-for-hoodies",
+        "label": "Plan a French terry hoodie program"
+      },
+      {
+        "href": "/blog/brushed-and-pile-knit-fabric-finishes",
+        "label": "Inspect raised surface finishes"
+      },
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "Write a measurable fabric RFQ"
+      },
+      {
+        "href": "/ready-stock-knit-fabrics",
+        "label": "Review current inquiry fabric records"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a heavyweight development brief"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request a finished sample and quotation"
+      }
+    ],
+    "evidenceBoundary": "This guide explains heavyweight French terry specification and approval. Exact construction, composition, GSM, usable width, colour, finish, testing, live availability, sample terms, quantity, MOQ, lead time, price, packing and shipping require current confirmation for the selected article and inquiry."
+  },
+  {
+    "kind": "article",
+    "url": "/blog/interlock-vs-jersey-fabric",
+    "eyebrow": "Knit construction comparison",
+    "opening": "Interlock vs jersey fabric compares a double-knit construction with a single-knit direction. Interlock normally has two smooth-looking faces, more stability and less edge curl, while single jersey is usually lighter, more flexible and more prone to curling. Buyers should compare the exact finished samples because fibre, density, GSM and finishing can change both results.",
+    "evidenceSnapshot": {
+      "heading": "Choose from construction, garment result and measured evidence",
+      "summary": "The interlock-versus-jersey decision is not a universal quality ranking. Interlock can offer coverage, stability and a smooth reverse; jersey can offer lighter weight, drape and economical simplicity. The buyer should identify the construction, record composition, GSM, usable width, stretch, recovery, shrinkage and spirality, then sew and wash the intended garment before approving one route.",
+      "items": [
+        {
+          "label": "Interlock evidence",
+          "detail": "Confirm the double-knit structure, face and reverse, edge behaviour, coverage, GSM, width and recovery when the garment needs a cleaner inside or greater stability."
+        },
+        {
+          "label": "Jersey evidence",
+          "detail": "Confirm the single-knit face and reverse, curl, drape, opacity, torque, GSM, width and recovery when the garment prioritises lighter body and flexible movement."
+        },
+        {
+          "label": "Garment evidence",
+          "detail": "Test the neckline, hem, side seam, shoulder and print or embroidery process, then measure appearance and dimensions after the intended care route."
+        }
+      ]
+    },
+    "hero": {
+      "src": "/images/finished-fabrics/double-knit-interlock-comparison.webp",
+      "alt": "Interlock and single jersey fabric samples compared by face, reverse and edge curl",
+      "caption": "Interlock and jersey should be compared by construction, edge behaviour, coverage, drape and the finished garment result."
+    },
+    "breadcrumbs": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/blog",
+        "label": "Buyer guides"
+      },
+      {
+        "href": "/blog/interlock-vs-jersey-fabric",
+        "label": "Interlock vs jersey"
+      }
+    ],
+    "published": "2026-07-26",
+    "updated": "2026-07-26",
+    "reviewer": "O'range Textile sourcing team",
+    "sections": [
+      {
+        "heading": "Identify the construction before comparing performance",
+        "paragraphs": [
+          "Single jersey is produced as a single-knit structure with a knit face and a different loop appearance on the reverse. Its edges commonly curl, and the material can show more torque or spirality depending on yarn, density and finishing. Interlock is a double-knit construction created with two needle systems. It normally presents a smoother appearance on both sides and greater edge stability.",
+          "These descriptions are useful starting points, not guarantees. A dense cotton jersey can feel firmer than a light interlock, and elastane can change stretch and recovery in either family. Finishing can change hand, width, shrinkage and surface. Ask the supplier to identify the exact construction and provide face-and-reverse evidence for the offered sample."
+        ],
+        "bullets": [
+          "Photograph and label the face and reverse.",
+          "Confirm whether the structure is single knit or interlock double knit.",
+          "Record complete composition, GSM and usable width.",
+          "Observe edge curl, stretch direction, recovery and opacity.",
+          "State any compacting, brushing, printing or other finish."
+        ]
+      },
+      {
+        "heading": "Match stability and drape to the garment",
+        "paragraphs": [
+          "Jersey is often selected for T-shirts, base layers and soft garments that benefit from lighter body and drape. Interlock can suit premium T-shirts, childrenswear, dresses, polos, lining directions or other garments that need more coverage, a smooth inside and greater stability. These are common routes, not limits.",
+          "The pattern and construction method matter. Edge curl can affect cutting and hemming on jersey. Added interlock thickness can affect seam bulk and heat transfer. Compare opacity, print surface, collar recovery, shoulder stability and side-seam behaviour for the actual garment. A material that performs well in one silhouette is not automatically the better choice for another."
+        ],
+        "table": {
+          "headers": [
+            "Buyer field",
+            "Single jersey direction",
+            "Interlock direction"
+          ],
+          "rows": [
+            [
+              "Structure",
+              "Single knit with different face and reverse",
+              "Double knit with two smooth-looking sides"
+            ],
+            [
+              "Typical body",
+              "Lighter and more fluid",
+              "Fuller, stable and more covering"
+            ],
+            [
+              "Edge behaviour",
+              "More likely to curl",
+              "Usually lies flatter"
+            ],
+            [
+              "Priority checks",
+              "Spirality, curl, opacity and drape",
+              "Thickness, seam bulk, recovery and stability"
+            ],
+            [
+              "Common route",
+              "T-shirts, base layers and soft basics",
+              "Premium basics, childrenswear and stable knit garments"
+            ]
+          ]
+        }
+      },
+      {
+        "heading": "Run the same sample checks on both candidates",
+        "paragraphs": [
+          "Condition both samples before measuring. Record article, colour, finish, date and version. Measure GSM and usable width with the same method. Compare stretch and rested recovery in the relevant directions. Review opacity under the garment's real colour and lighting conditions. Measure shrinkage and spirality after the intended laundering process.",
+          "Sew the actual neckline, shoulder, side seam and hem. Check edge handling, skipped stitches, seam grin, feed balance and press response. Add the intended print, embroidery or heat process. Evaluate drape, fit and recovery on a garment or panel rather than only by stretching a small swatch by hand."
+        ],
+        "steps": [
+          "Confirm construction and article identity for each candidate.",
+          "Condition, measure and photograph face and reverse.",
+          "Run dimensional, stretch, recovery, opacity and colourfastness checks.",
+          "Sew and process the critical garment details.",
+          "Approve one dated material and document the reasons for selection."
+        ]
+      },
+      {
+        "heading": "Keep the RFQ specific to the chosen construction",
+        "paragraphs": [
+          "The RFQ should name interlock or single jersey and attach the approved sample reference. Include complete composition, target GSM, usable width, colour, finish, stretch, recovery, shrinkage, spirality, opacity, pilling, colourfastness and care. Add garment type, quantity, destination, testing, inspection, packing and documentation.",
+          "If the supplier proposes an alternative, require the changed fields to be identified and review it as a new sample. Current availability, sample terms, MOQ, lead time, price, payment, packing and shipping basis are confirmed for the actual article and order. This protects the construction decision from being diluted during quotation."
+        ],
+        "note": {
+          "label": "Comparison rule",
+          "text": "Interlock is not automatically better than jersey. The better construction is the one that passes the garment-specific specification and sample review."
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is interlock thicker than jersey fabric?",
+        "a": "Interlock commonly has more body because it is a double-knit construction, but exact thickness depends on yarn, density, GSM and finish. Compare conditioned finished samples."
+      },
+      {
+        "q": "Does interlock fabric curl at the edges?",
+        "a": "Interlock normally has better edge stability and less curl than single jersey. Cutting and sewing trials should still confirm the behaviour of the exact article."
+      },
+      {
+        "q": "Which fabric is better for T-shirts?",
+        "a": "Jersey can suit light, drapey T-shirts; interlock can suit smoother, more covering and stable T-shirts. Fit, season, opacity, drape, price and testing determine the better route."
+      },
+      {
+        "q": "Can cotton spandex jersey replace interlock?",
+        "a": "Not automatically. Elastane can improve jersey stretch and recovery, but it does not make the structure interlock. Compare construction, coverage, curl, thickness, recovery and garment performance."
+      }
+    ],
+    "relatedLinks": [
+      {
+        "href": "/fabrics/interlock-fabric",
+        "label": "Review interlock fabric sourcing"
+      },
+      {
+        "href": "/fabrics/cotton-jersey",
+        "label": "Review cotton jersey sourcing"
+      },
+      {
+        "href": "/fabrics/cotton-spandex-jersey",
+        "label": "Review stretch jersey sourcing"
+      },
+      {
+        "href": "/blog/what-is-interlock-fabric",
+        "label": "Read the interlock construction guide"
+      },
+      {
+        "href": "/blog/what-is-double-knit-fabric",
+        "label": "Understand the double-knit family"
+      },
+      {
+        "href": "/blog/how-to-write-a-knit-fabric-rfq",
+        "label": "Prepare the comparison RFQ"
+      },
+      {
+        "href": "/custom-knit-fabric-development",
+        "label": "Send a jersey or interlock brief"
+      },
+      {
+        "href": "/#contact",
+        "label": "Request comparison samples"
+      }
+    ],
+    "evidenceBoundary": "This guide explains interlock and jersey construction decisions. Exact article identity, composition, GSM, usable width, colour, finish, testing, live availability, sample terms, quantity, MOQ, lead time, price, packing and shipping require current confirmation for the selected fabric and inquiry."
   }
 ]
