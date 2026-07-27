@@ -115,7 +115,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     eyebrow: "Finished fabrics available for inquiry",
     headline: "Finished Fabric Articles for Sample and RFQ Review",
     summary:
-      "The current catalogue contains 104 documented finished-fabric articles across 11 series. Review the listed construction, composition, GSM and usable width, then contact the sourcing team to confirm the exact article, colour and quantity. Greige fabric and finished garment requirements can also be discussed through a private inquiry.",
+      "The supplied 104-record finished-fabric catalogue documents articles across 11 series. Review the listed construction, composition, GSM and usable width, then contact the sourcing team to confirm the exact article, colour and quantity. Greige fabric and finished garment requirements can also be discussed through a private inquiry.",
     heroImage: {
       src: "/images/finished-fabrics/double-knit-interlock-comparison.webp",
       alt: "Finished knit fabric swatches prepared for stock and sample comparison",
@@ -223,7 +223,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     faq: [
       {
         question: "Are all 104 catalogue records finished fabrics?",
-        answer: "Yes. The supplied workbook is the current finished-fabric catalogue used for this page. Exact order details still require direct confirmation.",
+        answer: "Yes. The supplied 104-record finished-fabric catalogue is the evidence source used for this page. Exact order details still require direct confirmation.",
       },
       {
         question: "Can buyers ask about an article not shown on the website?",
@@ -231,7 +231,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
       },
       {
         question: "Are greige fabric and garment orders also accepted?",
-        answer: "They can be discussed through a private inquiry even though the current public export catalogue is focused on finished fabrics.",
+        answer: "They can be discussed through a private inquiry even though the public export catalogue is focused on finished fabrics.",
       },
     ],
     primaryCta: { label: "Ask about a catalogue article", href: "/fabrics#inquiry-form" },

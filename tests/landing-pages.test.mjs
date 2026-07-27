@@ -39,6 +39,52 @@ test("homepage content contract uses double knit fabric in summary and hero alt"
   assert.match(landingPages.home.heroImage.alt, /double knit fabric/i);
 });
 
+test("catalogue provenance is neutral in landing, hero, and category fallback copy", async () => {
+  const { landingPages } = await import("../content/landing-pages.ts");
+  const geoContentSource = await readFile(
+    new URL("../lib/geo-content.ts", import.meta.url),
+    "utf8"
+  );
+  const categoryRenderer = await readFile(
+    new URL("../app/fabrics/[slug]/page.tsx", import.meta.url),
+    "utf8"
+  );
+  const catalogueUiSources = await Promise.all(
+    [
+      "../components/FabricsPageIntro.tsx",
+      "../components/geo/GeoHomePage.tsx",
+      "../components/landing/ReadyStockLanding.tsx",
+    ].map((relativePath) =>
+      readFile(new URL(relativePath, import.meta.url), "utf8")
+    )
+  );
+
+  assert.match(
+    landingPages.readyStock.summary,
+    /the supplied 104-record finished-fabric catalogue/i
+  );
+  assert.match(
+    geoContentSource,
+    /the supplied 104-record finished-fabric catalogue/i
+  );
+  assert.match(categoryRenderer, />Catalogue evidence boundary<\/h2>/);
+  assert.match(
+    categoryRenderer,
+    /The supplied 104-record finished-fabric catalogue does not assign a specific article/
+  );
+
+  const buyerVisibleCopy = [
+    landingPages.readyStock.summary,
+    geoContentSource,
+    categoryRenderer,
+    ...catalogueUiSources,
+  ].join("\n");
+  assert.doesNotMatch(
+    buyerVisibleCopy,
+    /historical\/draft|(?:current\s+)?owner-confirmed|\bcurrent(?:\s+[\w-]+){0,4}\s+catalogue\b/i
+  );
+});
+
 test("landing copy reflects the supplied export, production and inquiry evidence", async () => {
   const { getPublicLandingPage, landingPages } = await import("../content/landing-pages.ts");
 

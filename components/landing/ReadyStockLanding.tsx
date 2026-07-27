@@ -136,7 +136,7 @@ export function ReadyStockLanding({
               <div>
                 <h3 className="font-semibold">2. Select the closest article record</h3>
                 <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
-                  Use the public article number, composition, GSM, usable width and series to form a shortlist. These fields are evidence from the current catalogue, but they do not establish colour, hand feel, finish or performance for a new order. Quote the exact article number in the inquiry so the buyer and sales team are discussing the same reference.
+                  Use the public article number, composition, GSM, usable width and series to form a shortlist. These fields are evidence from the supplied catalogue, but they do not establish colour, hand feel, finish or performance for a new order. Quote the exact article number in the inquiry so the buyer and sales team are discussing the same reference.
                 </p>
                 <p className="mt-3 text-sm leading-7 text-brand-charcoal/70">
                   If several records appear suitable, explain the trade-off being evaluated. For example, a buyer may be comparing lower weight with opacity, softer hand with recovery, or extra structure with seam bulk. This gives the supplier a reason to recommend one sample route over another.
@@ -189,7 +189,7 @@ export function ReadyStockLanding({
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase text-brand-orange">Current finished-fabric catalogue</p>
+              <p className="text-sm font-semibold uppercase text-brand-orange">Supplied finished-fabric catalogue</p>
               <h2 className="mt-3 text-3xl font-semibold">{totalFabricCount} articles available for inquiry</h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-charcoal/70">
                 Use the series and specification filters to identify a relevant article, add it to the inquiry, and confirm live commercial details with the sourcing team.

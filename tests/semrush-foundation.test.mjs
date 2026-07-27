@@ -362,7 +362,14 @@ test("French terry evidence and FAQs keep claims attributable and bounded", asyn
   assert.match(capability, /specification/i);
   assert.doesNotMatch(capability, /Jingtian|parent company|capacity/i);
 
-  assert.match(boundary, /historical\/draft catalogue/i);
+  assert.match(
+    boundary,
+    /the supplied 104-record finished-fabric catalogue/i
+  );
+  assert.doesNotMatch(
+    boundary,
+    /historical\/draft|(?:current\s+)?owner-confirmed/i
+  );
   assert.match(
     boundary,
     /does not verify[^.]*exact French terry article[^.]*specification/i
@@ -385,6 +392,14 @@ test("French terry evidence and FAQs keep claims attributable and bounded", asyn
 
   const answersByQuestion = new Map(
     category.faq.map((faq) => [faq.question, faq.answer])
+  );
+  assert.match(
+    category.sourcingOverview.join(" "),
+    /brushed fleece commonly has a raised reverse, with one- or two-sided brushing depending on the article/i
+  );
+  assert.match(
+    answersByQuestion.get("How is French terry different from brushed fleece?"),
+    /brushed fleece commonly has a raised reverse, with one- or two-sided brushing depending on the article/i
   );
   const boundedAnswers = {
     "Can O'range Textile support private-label hoodie fabrics?":
@@ -556,7 +571,14 @@ test("Cotton jersey evidence and FAQs keep claims attributable and bounded", asy
   assert.match(capability, /specification/i);
   assert.doesNotMatch(capability, /Jingtian|parent company|capacity/i);
 
-  assert.match(boundary, /historical\/draft catalogue/i);
+  assert.match(
+    boundary,
+    /the supplied 104-record finished-fabric catalogue/i
+  );
+  assert.doesNotMatch(
+    boundary,
+    /historical\/draft|(?:current\s+)?owner-confirmed/i
+  );
   assert.match(
     boundary,
     /does not verify[^.]*exact cotton jersey article[^.]*specification/i
@@ -802,7 +824,7 @@ test("Cotton spandex jersey evidence and FAQs stay attributable and bounded", as
   assertMatchesAll(
     boundary,
     [
-      /historical\/draft catalogue/i,
+      /the supplied 104-record finished-fabric catalogue/i,
       /current exact cotton spandex jersey article/i,
       /specification/i,
       /availability/i,
@@ -811,6 +833,10 @@ test("Cotton spandex jersey evidence and FAQs stay attributable and bounded", as
       /inquiry-specific/i,
     ],
     "Cotton spandex jersey evidence boundary"
+  );
+  assert.doesNotMatch(
+    boundary,
+    /historical\/draft|(?:current\s+)?owner-confirmed/i
   );
 
   const qualityEvidence = qualitySteps.join(" ");

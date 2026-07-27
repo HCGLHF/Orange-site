@@ -309,9 +309,9 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
         ) : (
           <section className="border-t border-brand-soft bg-brand-charcoal text-white">
             <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-              <h2 className="text-xl font-semibold">Current catalogue boundary</h2>
+              <h2 className="text-xl font-semibold">Catalogue evidence boundary</h2>
               <p className="mt-3 max-w-4xl text-sm leading-7 text-white/75">
-                The current public finished-fabric catalogue does not assign a specific article to this broad construction route. Share a reference sample or specification so the sourcing team can confirm the relevant sample and quotation path without implying unsupported live stock.
+                The supplied 104-record finished-fabric catalogue does not assign a specific article to this broad construction route. Share a reference sample or specification so the sourcing team can confirm the relevant sample and quotation path without implying unsupported live stock.
               </p>
               <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold">
                 <Link href="/fabrics" className="text-brand-orange hover:text-white">

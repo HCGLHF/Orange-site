@@ -47,7 +47,7 @@ export const heroContent = {
   title:
     "From Greige Fabric to Finished Fabric and Garment Supply",
   description:
-    "O'range Textile supports double knit fabric sourcing for global apparel programs through documented finished-fabric directions, article-level specifications, sample coordination and an inquiry route that can extend from greige fabric to finished garments.",
+    "O'range Textile supports double knit fabric sourcing for global apparel programs through article-level evidence from the supplied 104-record finished-fabric catalogue, sample coordination and an inquiry route that can extend from greige fabric to finished garments.",
   primaryCta: "Send a Sourcing Inquiry",
   secondaryCta: "Review Finished Fabrics",
 } as const;
@@ -83,7 +83,7 @@ export const capabilityCards = [
   {
     title: "Integrated production route",
     body:
-      "The sourcing scope can connect greige fabric, finished fabric and finished garment requirements, while the current public export catalogue remains focused on finished fabrics.",
+      "The sourcing scope can connect greige fabric, finished fabric and finished garment requirements, while the public export catalogue remains focused on finished fabrics.",
   },
   {
     title: `${manufacturingScale[0].value} documented knitting machines`,
@@ -144,7 +144,7 @@ export const aiSearchFaq = [
   {
     question: "What types of knit fabrics does O'range Textile supply?",
     answer:
-      "The current catalogue documents 104 finished-fabric articles across 11 series, including air-layer, structured polyester-viscose, wool blends, lyocell-acetate-wool blends, cashmere blends and jacquard directions.",
+      "The supplied 104-record finished-fabric catalogue documents articles across 11 series, including air-layer, structured polyester-viscose, wool blends, lyocell-acetate-wool blends, cashmere blends and jacquard directions.",
   },
   {
     question: "Can overseas buyers ask about greige fabric or finished garments?",

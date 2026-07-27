@@ -208,6 +208,21 @@ test("crawl fields use the production origin and stable valid values", async () 
   }
 });
 
+test("updated catalogue entry points expose the 2026-07-28 sitemap date", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+  const expectedUpdatedAt = new Map([
+    ["/", "2026-07-28"],
+    ["/fabrics/fleece-french-terry", "2026-07-28"],
+    ["/fabrics/cotton-jersey", "2026-07-28"],
+    ["/fabrics/interlock-fabric", "2026-07-28"],
+    ["/fabrics/cotton-spandex-jersey", "2026-07-28"],
+  ]);
+
+  for (const [path, updatedAt] of expectedUpdatedAt) {
+    assert.equal(getPublicPageSeo(path).updatedAt, updatedAt, path);
+  }
+});
+
 test("canonical URLs normalize the homepage and sitemap through one helper", async () => {
   const { toCanonicalUrl } = await loadSeo();
   const sitemap = readFileSync(

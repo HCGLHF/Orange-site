@@ -27,10 +27,10 @@ type GeoHomePageProps = {
 
 const buyerRoutes: LandingRoute[] = [
   {
-    title: "Current finished-fabric catalogue",
+    title: "Supplied finished-fabric catalogue",
     description: "Review 104 documented articles, then confirm the exact colour, quantity, finish and commercial terms directly with sales.",
     href: "/ready-stock-knit-fabrics",
-    action: "Review current catalogue",
+    action: "Review catalogue",
     icon: "stock",
   },
   {

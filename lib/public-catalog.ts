@@ -135,7 +135,7 @@ export const publicFabricCategories: FabricCategory[] = [
           "Record dated approval, then confirm the current quotation for the requested program.",
         ],
         boundary:
-          "The 104-product historical/draft catalogue does not verify a current exact cotton jersey article or its specification. Current availability, MOQ and lead time are inquiry-specific and must be confirmed with the offered sample and quotation.",
+          "The supplied 104-record finished-fabric catalogue does not verify a current exact cotton jersey article or its specification. Current availability, MOQ and lead time are inquiry-specific and must be confirmed with the offered sample and quotation.",
       },
       cta: {
         heading: "Review a cotton jersey brief with the sourcing team",
@@ -287,7 +287,7 @@ export const publicFabricCategories: FabricCategory[] = [
           "Record the dated sample approval and remaining exceptions, then confirm the current quotation for the requested programme.",
         ],
         boundary:
-          "The historical/draft catalogue does not verify a current exact cotton spandex jersey article or specification. Article availability, sample status, MOQ, lead time, colour, finish, testing route and commercial terms are inquiry-specific and must be confirmed in the current quotation.",
+          "The supplied 104-record finished-fabric catalogue does not verify a current exact cotton spandex jersey article or specification. Article availability, sample status, MOQ, lead time, colour, finish, testing route and commercial terms are inquiry-specific and must be confirmed in the current quotation.",
       },
       cta: {
         heading: "Review a cotton spandex jersey brief before quoting",
@@ -375,7 +375,7 @@ export const publicFabricCategories: FabricCategory[] = [
     description:
       "French terry fabric is a knitted sweatshirt fabric with a smooth face and visible loop-back reverse, commonly specified for hoodies, sweatshirts, joggers, shorts and loungewear.",
     sourcingOverview: [
-      "French terry fabric is identified by its loop-back reverse rather than by one fixed composition, weight or performance result. Brushed fleece is a comparison route with a raised reverse; buyers should confirm the actual construction and finish on the offered sample instead of treating the names as interchangeable.",
+      "French terry fabric is identified by its loop-back reverse rather than by one fixed composition, weight or performance result. For comparison, brushed fleece commonly has a raised reverse, with one- or two-sided brushing depending on the article; buyers should confirm the actual construction and finish on the offered sample instead of treating the names as interchangeable.",
       "Use this page to prepare a French terry brief for hoodies, sweatshirts, joggers, shorts or loungewear. Composition, yarn system, GSM, usable width, stretch, reverse finish, colour and test requirements should all be specified for the intended garment and confirmed against the current sample and quotation.",
     ],
     specificationChecks: [
@@ -431,7 +431,7 @@ export const publicFabricCategories: FabricCategory[] = [
           "Record dated approval, then confirm the current quotation for the requested program.",
         ],
         boundary:
-          "The 104-product historical/draft catalogue does not verify a current exact French terry article or production specification. Availability, composition, GSM, usable width, finish, test result, MOQ and lead time remain inquiry-specific.",
+          "The supplied 104-record finished-fabric catalogue does not verify a current exact French terry article or production specification. Availability, composition, GSM, usable width, finish, test result, MOQ and lead time remain inquiry-specific.",
       },
       cta: {
         heading: "Review a French terry brief before quoting",
@@ -493,7 +493,7 @@ export const publicFabricCategories: FabricCategory[] = [
       {
         question: "How is French terry different from brushed fleece?",
         answer:
-          "French terry normally retains visible loops on the reverse, while brushed fleece has a raised reverse created through additional finishing. Weight, hand, warmth and durability still depend on the exact article, so buyers should compare labeled finished samples.",
+          "French terry normally retains visible loops on the reverse; by comparison, brushed fleece commonly has a raised reverse, with one- or two-sided brushing depending on the article. Weight, hand, warmth and durability still depend on the exact article, so buyers should compare labeled finished samples.",
       },
       {
         question: "What GSM and usable width should a hoodie buyer specify?",

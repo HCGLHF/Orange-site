@@ -563,6 +563,36 @@ test("interlock catalogue ranges stay bounded as catalogue-wide evidence", () =>
   assert.match(machineContext, /not interlock-specific capacity/i);
 });
 
+test("finished-fabric catalogue provenance stays supplied and neutral", () => {
+  const pages = loadPages();
+  const buyerVisibleText = flattenText(pages).join("\n");
+  const catalogueSourceBoundaries = pages
+    .map((page) => page.evidenceBoundary)
+    .filter((boundary) => boundary?.includes("104-record"));
+
+  assert.equal(catalogueSourceBoundaries.length, 6);
+  for (const boundary of catalogueSourceBoundaries) {
+    assert.match(
+      boundary,
+      /the supplied 104-record finished-fabric catalogue/i
+    );
+  }
+
+  const recordCountFaq = pages
+    .flatMap((page) => page.faq ?? [])
+    .find((faq) => faq.q === "How many finished-fabric records are documented?");
+  assert.ok(recordCountFaq, "record-count FAQ must remain present");
+  assert.match(
+    recordCountFaq.a,
+    /the supplied 104-record finished-fabric catalogue/i
+  );
+
+  assert.doesNotMatch(
+    buyerVisibleText,
+    /historical\/draft|(?:current\s+)?owner-confirmed|\bcurrent(?:\s+[\w-]+){0,4}\s+catalogue\b/i
+  );
+});
+
 test("interlock procurement table covers the buyer approval decisions", () => {
   const interlock = loadPages().find(
     (page) => page.url === "/fabrics/interlock-fabric"

@@ -47,7 +47,7 @@ const publicPageSeo = [
     metaDescription:
       "Double knit fabric sourcing for global apparel brands covering interlock, Ponte Roma, scuba, air-layer and jacquard directions. Compare documented specifications, samples and supplier capabilities, then send composition, GSM, usable width, finish, quantity and destination for an RFQ.",
     h1: "Double Knit Fabric for Global Apparel Sourcing",
-    updatedAt: "2026-07-26",
+    updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 1,
   },
@@ -165,7 +165,7 @@ const publicPageSeo = [
     metaDescription:
       "Cotton jersey fabric sourcing for global apparel brands developing T-shirts, base layers and private-label basics. Review yarn, GSM, usable width, drape and dimensional checks, then send a sample reference or specification for confirmation.",
     h1: "Cotton Jersey Fabric for T-Shirts and Basics",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 0.75,
   },
@@ -185,7 +185,7 @@ const publicPageSeo = [
     metaDescription:
       "Cotton spandex jersey fabric for fitted T-shirts, childrenswear, loungewear and active-inspired apparel. Compare stretch, recovery, opacity, GSM and relaxed width, then provide the garment brief and testing needs for sample review.",
     h1: "Cotton Spandex Jersey Fabric for Stretch Apparel",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 0.75,
   },
@@ -204,7 +204,7 @@ const publicPageSeo = [
     metaDescription:
       "French terry fabric sourcing for hoodies, sweatshirts, streetwear and loungewear programs. Compare loop-back and brushed directions, GSM, width, shrinkage and surface durability, then send the garment specification for sample confirmation.",
     h1: "French Terry Fabric for Hoodies and Sweatshirts",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 0.75,
   },
@@ -242,7 +242,7 @@ const publicPageSeo = [
     metaDescription:
       "Interlock fabric development for global apparel brands seeking a smooth double-knit face, stability and coverage. Compare composition, GSM, usable width, stretch and recovery, then request the closest finished sample and a specification-based quotation.",
     h1: "Interlock Fabric for Stable Apparel Construction",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 0.85,
   },

@@ -15,7 +15,7 @@ function FabricsPageIntroContent({ h1 }: { h1: string }) {
       ? {
           title: "Finished fabrics available for inquiry",
           subtitle:
-            "Browse finished-fabric articles in the current sales catalogue. Confirm the exact colour, quantity, finish and commercial terms directly with the sourcing team.",
+            "Browse finished-fabric articles in the supplied catalogue. Confirm the exact colour, quantity, finish and commercial terms directly with the sourcing team.",
         }
       : stock === "preorder"
         ? {
