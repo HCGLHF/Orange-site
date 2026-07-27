@@ -87,7 +87,7 @@ const publicPageSeo = [
     metaDescription:
       "Finished knit fabrics for global B2B apparel sourcing teams. Review 104 documented articles across 11 series, compare composition, GSM and usable width, then request samples and confirm colour, finish, quantity and commercial terms.",
     h1: "Finished Knit Fabrics for Apparel Buyers",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 0.9,
   },
@@ -107,7 +107,7 @@ const publicPageSeo = [
     metaDescription:
       "Ready-stock knit fabrics for global B2B buyers seeking documented article references. Review composition, GSM and usable width, shortlist a fabric, then confirm current colour, usable quantity, finish, sample route and commercial terms.",
     h1: "Ready-Stock Knit Fabrics for B2B Buyers",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "daily",
     priority: 0.9,
   },
@@ -495,7 +495,7 @@ const publicPageSeo = [
     metaDescription:
       "Air layer knit fabric sourcing guide for comparing documented articles such as GD2515 and GD2672, with practical checks for composition, 260–300 GSM directions, usable width, structure, recovery, seams, sample approval, and commercial confirmation.",
     h1: "Air Layer Knit Fabric Sourcing Guide for Apparel Buyers",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -515,7 +515,7 @@ const publicPageSeo = [
     metaDescription:
       "How to source wool blend knit fabric using article-level composition evidence, hand and surface review, GSM, usable width, brushing, pilling, colourfastness, care, garment testing, sample approval, and commercial confirmation before production.",
     h1: "How to Source Wool Blend Knit Fabric with Verifiable Evidence",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -535,7 +535,7 @@ const publicPageSeo = [
     metaDescription:
       "Jacquard knit fabric weight and width guide using article GD2579 at 240 GSM and GD2683 at 280 GSM with 160–165 cm references, plus repeat, reverse, finish, usable width, cutting yield, sample approval, and commercial confirmation.",
     h1: "Jacquard Knit Fabric Weight and Width for RFQ Planning",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -554,7 +554,7 @@ const publicPageSeo = [
     metaDescription:
       "Brushed knit fabric finishes guide for comparing faux-cashmere, acetate-brushed, and raised-pile directions, with buyer checks for face and reverse, shedding, pilling, GSM, usable width, colour, care, sample approval, and commercial confirmation.",
     h1: "Brushed Knit Fabric Finishes and Raised-Pile Sourcing Checks",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -574,7 +574,7 @@ const publicPageSeo = [
     metaDescription:
       "Knit fabric RFQ template for apparel buyers who need to state construction, article reference, composition, GSM, usable width, colour, finish, testing, quantity, destination, sample approval, packing, documentation, and commercial confirmation.",
     h1: "Knit Fabric RFQ Template for a Complete Sourcing Brief",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -593,7 +593,7 @@ const publicPageSeo = [
     metaDescription:
       "Knit fabric sourcing questions answered for apparel buyers comparing construction, composition, GSM, usable width, finish, article evidence, testing, sample approval, live availability, order details, documentation, and commercial confirmation.",
     h1: "Knit Fabric Sourcing Questions for Faster Buyer Decisions",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -614,7 +614,7 @@ const publicPageSeo = [
     metaDescription:
       "French terry fabric vs fleece compares loop-back and brushed sweatshirt fabrics for hoodies, sweatshirts and loungewear. Review warmth, drape, shedding, GSM, shrinkage, care and sample evidence before choosing a finished fabric and requesting a quotation.",
     h1: "French Terry Fabric vs Fleece for Apparel Buyers",
-    updatedAt: "2026-07-26",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -635,7 +635,7 @@ const publicPageSeo = [
     metaDescription:
       "French terry fabric for hoodies should be selected by loop structure, face, GSM, usable width, shrinkage, stretch, recovery and care route. Use this buyer guide to define the garment brief, inspect a finished sample and request current commercial confirmation.",
     h1: "French Terry Fabric for Hoodies: Sourcing Decisions",
-    updatedAt: "2026-07-26",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },
@@ -656,7 +656,7 @@ const publicPageSeo = [
     metaDescription:
       "Heavyweight French terry fabric adds mass and body, but GSM alone does not prove warmth, softness or durability. Compare loop structure, density, usable width, shrinkage, seams, brushing and care on a labelled finished sample before approving a hoodie program.",
     h1: "Heavyweight French Terry Fabric for Hoodie Programs",
-    updatedAt: "2026-07-26",
+    updatedAt: "2026-07-28",
     changeFrequency: "monthly",
     priority: 0.7,
   },

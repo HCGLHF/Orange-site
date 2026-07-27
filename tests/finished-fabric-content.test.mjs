@@ -596,6 +596,33 @@ test("finished-fabric catalogue provenance stays supplied and neutral", () => {
   );
 });
 
+test("provenance-edited blog records align visible and registry update dates", async () => {
+  const { getPublicPageSeo } = await import("../lib/seo/site-seo.ts");
+  const pagesByUrl = new Map(loadPages().map((page) => [page.url, page]));
+  const provenanceEditedBlogRoutes = [
+    "/blog/air-layer-knit-fabric-sourcing-guide",
+    "/blog/how-to-source-wool-blend-knit-fabric",
+    "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    "/blog/brushed-and-pile-knit-fabric-finishes",
+    "/blog/how-to-write-a-knit-fabric-rfq",
+    "/blog/knit-fabric-sourcing-questions",
+    "/blog/french-terry-fabric-vs-fleece",
+    "/blog/french-terry-fabric-for-hoodies",
+    "/blog/heavyweight-french-terry-fabric",
+  ];
+
+  for (const route of provenanceEditedBlogRoutes) {
+    const page = pagesByUrl.get(route);
+    assert.ok(page, `${route} content record`);
+    assert.equal(page.updated, "2026-07-28", `${route} visible update date`);
+    assert.equal(
+      getPublicPageSeo(route).updatedAt,
+      page.updated,
+      `${route} registry date`
+    );
+  }
+});
+
 test("interlock procurement table covers the buyer approval decisions", () => {
   const interlock = loadPages().find(
     (page) => page.url === "/fabrics/interlock-fabric"

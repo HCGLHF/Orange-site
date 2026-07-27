@@ -223,6 +223,27 @@ test("updated catalogue entry points expose the 2026-07-28 sitemap date", async 
   }
 });
 
+test("provenance-normalized pages expose the 2026-07-28 sitemap date", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+  const provenanceNormalizedRoutes = [
+    "/fabrics",
+    "/ready-stock-knit-fabrics",
+    "/blog/air-layer-knit-fabric-sourcing-guide",
+    "/blog/how-to-source-wool-blend-knit-fabric",
+    "/blog/jacquard-knit-fabric-weight-and-width-guide",
+    "/blog/brushed-and-pile-knit-fabric-finishes",
+    "/blog/how-to-write-a-knit-fabric-rfq",
+    "/blog/knit-fabric-sourcing-questions",
+    "/blog/french-terry-fabric-vs-fleece",
+    "/blog/french-terry-fabric-for-hoodies",
+    "/blog/heavyweight-french-terry-fabric",
+  ];
+
+  for (const path of provenanceNormalizedRoutes) {
+    assert.equal(getPublicPageSeo(path).updatedAt, "2026-07-28", path);
+  }
+});
+
 test("canonical URLs normalize the homepage and sitemap through one helper", async () => {
   const { toCanonicalUrl } = await loadSeo();
   const sitemap = readFileSync(
