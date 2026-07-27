@@ -38,11 +38,17 @@ test("SEO registry owns exactly 33 normalized public pages", async () => {
   }
 });
 
-test("homepage owns the commercial supplier query", async () => {
+test("homepage owns the commercial double knit fabric query", async () => {
   const { getPublicPageSeo } = await loadSeo();
   const page = getPublicPageSeo("/");
 
-  assert.equal(page.primaryKeyword, "knit fabric supplier");
+  assert.equal(page.primaryKeyword, "double knit fabric");
+  assert.ok(page.secondaryKeywords.includes("knit fabric supplier"));
+  assert.equal(
+    page.metaTitle,
+    "Double Knit Fabric for Global Apparel Brands | O'range Textile"
+  );
+  assert.equal(page.h1, "Double Knit Fabric for Global Apparel Sourcing");
   assert.equal(page.searchIntent, "commercial");
   assert.equal(page.targetPageType, "homepage");
 });

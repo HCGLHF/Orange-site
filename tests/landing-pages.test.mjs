@@ -32,6 +32,13 @@ test("landing registry exposes four unique buyer purposes without editor notes",
   assert.ok(pages.every((page) => page.secondaryCta.href));
 });
 
+test("homepage content contract uses double knit fabric in summary and hero alt", async () => {
+  const { landingPages } = await import("../content/landing-pages.ts");
+
+  assert.match(landingPages.home.summary, /double knit fabric/i);
+  assert.match(landingPages.home.heroImage.alt, /double knit fabric/i);
+});
+
 test("landing copy reflects the supplied export, production and inquiry evidence", async () => {
   const { getPublicLandingPage, landingPages } = await import("../content/landing-pages.ts");
 
@@ -58,9 +65,13 @@ test("landing copy reflects the supplied export, production and inquiry evidence
   assert.match(landingPages.customDevelopment.primaryCta.href, /#contact|#inquiry-form/);
 });
 
-test("homepage uses the human-facing landing page system", async () => {
-  const source = await readFile(
+test("homepage renders its SEO H1, hero alt, sourcing route, and finished double-knit link", async () => {
+  const geoHomeSource = await readFile(
     new URL("../components/geo/GeoHomePage.tsx", import.meta.url),
+    "utf8"
+  );
+  const landingHeroSource = await readFile(
+    new URL("../components/landing/LandingHero.tsx", import.meta.url),
     "utf8"
   );
 
@@ -70,10 +81,30 @@ test("homepage uses the human-facing landing page system", async () => {
     "LandingRouteChooser",
     "LandingCtaBand",
   ]) {
-    assert.match(source, new RegExp(component));
+    assert.match(geoHomeSource, new RegExp(component));
   }
 
-  assert.doesNotMatch(source, /Entity facts for AI search/i);
+  assert.doesNotMatch(geoHomeSource, /Entity facts for AI search/i);
+  assert.match(
+    geoHomeSource,
+    /<LandingHero\s+page=\{page\}\s+h1=\{seo\.h1\}\s*\/>/
+  );
+  assert.match(
+    landingHeroSource,
+    /<h1\b[^>]*>\s*\{h1\}\s*<\/h1>/
+  );
+  assert.match(
+    landingHeroSource,
+    /<Image\b[^>]*\balt=\{page\.heroImage\.alt\}[^>]*\/>/
+  );
+  assert.match(
+    geoHomeSource,
+    /<h2\b[^>]*>\s*double knit fabric sourcing route\s*<\/h2>/i
+  );
+  assert.match(
+    geoHomeSource,
+    /\{\s*title:\s*"[^"]*double[- ]knit fabric[^"]*"[\s\S]*?href:\s*"\/finished-double-knit-fabrics"/i
+  );
 });
 
 test("ready-stock and custom development routes have distinct buyer flows", async () => {
