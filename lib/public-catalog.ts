@@ -278,63 +278,73 @@ export const publicFabricCategories: FabricCategory[] = [
   },
   {
     slug: "fleece-french-terry",
-    name: "Fleece and French terry fabrics",
-    shortName: "Fleece and French terry",
+    name: "French terry fabrics",
+    shortName: "French terry",
     description:
-      "Comfort-focused sweatshirt and hoodie fabrics for casualwear, streetwear and private-label collections.",
+      "French terry fabric is a knitted sweatshirt fabric with a smooth face and visible loop-back reverse, commonly specified for hoodies, sweatshirts, joggers, shorts and loungewear.",
     sourcingOverview: [
-      "French terry and fleece are related sweatshirt-fabric directions but they are not interchangeable names. French terry usually retains visible loops on the back, while fleece commonly refers to a raised or brushed back. Yarn system, loop structure, brushing, shearing and finishing determine warmth, bulk, surface shedding and garment appearance.",
-      "Use this page to frame a hoodie, sweatshirt or loungewear brief around the required face, back and seasonal performance. The public finished-fabric catalogue contains several structured and raised-surface directions, while the exact French terry or fleece article must be confirmed against the buyer's sample and specification.",
+      "French terry fabric is identified by its loop-back reverse rather than by one fixed composition, weight or performance result. Brushed fleece is a comparison route with a raised reverse; buyers should confirm the actual construction and finish on the offered sample instead of treating the names as interchangeable.",
+      "Use this page to prepare a French terry brief for hoodies, sweatshirts, joggers, shorts or loungewear. Composition, yarn system, GSM, usable width, stretch, reverse finish, colour and test requirements should all be specified for the intended garment and confirmed against the current sample and quotation.",
     ],
     specificationChecks: [
       {
-        label: "Back construction and finish",
+        label: "Composition and yarn system",
         detail:
-          "Specify loop-back French terry, brushed fleece or another raised-surface direction. Ask for clear face and reverse images before selecting a sample.",
+          "State the intended fibre composition and any face, ground or loop-yarn direction. Treat these as buyer requirements to be checked against the offered article rather than as fixed category availability.",
       },
       {
-        label: "Weight, warmth and drape",
+        label: "GSM and seasonal weight",
         detail:
-          "Select GSM with the garment season and silhouette in mind. A heavier number does not by itself confirm warmth, softness or finished bulk.",
+          "Give a target GSM or acceptable range together with the garment season and silhouette. Confirm the finished sample because weight alone does not establish warmth, drape or bulk.",
       },
       {
-        label: "Surface durability",
+        label: "Usable width and relaxation",
         detail:
-          "Review pilling, shedding, abrasion, colourfastness and appearance after laundering, especially when the reverse is brushed or raised.",
+          "Specify the usable-width requirement and agree when it will be measured after finishing and fabric relaxation. Confirm the quoted width against the approved article and garment marker.",
       },
       {
-        label: "Shrinkage and garment processing",
+        label: "Stretch and recovery",
         detail:
-          "Confirm dimensional stability after the intended dyeing, washing and finishing route, including any garment wash that can alter hand and measurements.",
+          "State whether the garment needs mechanical or elastane-supported stretch, the direction of stretch and the intended recovery check. Approve the result on the finished sample using an agreed method.",
+      },
+      {
+        label: "Loop-back structure and finish",
+        detail:
+          "Describe the required face and visible loop-back reverse, including loop scale, hand feel and any surface finish. Use clear face-and-reverse references so brushed fleece is considered only as a separate comparison.",
+      },
+      {
+        label: "Shrinkage, pilling and colourfastness",
+        detail:
+          "List the required test methods, tolerances and care conditions for shrinkage, pilling and colourfastness. Results remain article-, colour- and finish-specific and require current sample or production confirmation.",
       },
     ],
     developmentGuidance: [
-      "For a useful quotation, send the garment type, season, composition direction, target GSM, usable width, face and back reference, colour plan and destination. Note whether the fabric will be garment washed, printed, embroidered or combined with rib trims.",
-      "O'range Textile reviews sample and order details directly because colour, raising, finishing and commercial conditions vary by programme. The website does not present a fixed MOQ, lead time or universal stock promise for this category.",
+      "Start from one of three development paths: identify a catalogue article, send a reference sample, or submit a specification-led brief. O'range Textile can coordinate the buyer brief, closest sample and specification review; the selected composition, GSM, usable width, finish, colour, quantity, MOQ and lead time are confirmed only in the current quotation.",
+      "Include the garment type, season, target composition, GSM, usable width, stretch direction, face and loop-back reference, colour plan, destination and testing needs. Note whether the garment will be washed, printed, embroidered or paired with rib trims so the sourcing team can review the appropriate custom-development route.",
     ],
     buyerIntent: [
       "French terry fabric manufacturer China",
-      "hoodie fleece fabric supplier",
-      "sweatshirt knit fabric sourcing",
+      "French terry fabric supplier",
+      "French terry fabric for hoodies",
     ],
-    applications: ["Hoodies", "Sweatshirts", "Streetwear", "Loungewear"],
+    applications: ["Hoodies", "Sweatshirts", "Joggers", "Loungewear"],
     relatedFabricIds: [],
     procurement: {
       evidence: {
         capability:
-          "O'range Textile can review a French terry or fleece buyer brief, coordinate the closest finished sample and specification discussion with the sourcing team, and prepare an inquiry path for private confirmation.",
+          "O'range Textile can review a French terry buyer brief, coordinate the closest finished sample and specification discussion with the sourcing team, and prepare the catalogue-article, reference-sample or specification-led inquiry path for private confirmation.",
         qualitySteps: [
-          "Match the labeled finished sample to the agreed French terry or fleece specification.",
-          "Review back finish, GSM, sewing behavior and wash results for the intended garment.",
+          "Match the labeled finished sample to the agreed French terry composition, construction and finish.",
+          "Review GSM, usable width, loop-back appearance, sewing behavior and requested test results for the intended garment.",
           "Record dated approval, then confirm the current quotation for the requested program.",
         ],
         boundary:
-          "The 104-product historical/draft catalogue does not verify a current exact French terry or fleece article. Availability, specification, MOQ and lead time remain inquiry-specific.",
+          "The 104-product historical/draft catalogue does not verify a current exact French terry article or production specification. Availability, composition, GSM, usable width, finish, test result, MOQ and lead time remain inquiry-specific.",
       },
       cta: {
-        heading: "Review a French terry or fleece brief before quoting",
+        heading: "Review a French terry brief before quoting",
         body:
-          "Send the target face, reverse finish, garment use and reference material for a sample and quotation review.",
+          "Send the target composition, GSM, usable width, face, loop-back reverse, garment use and reference material for a sample and current quotation review.",
         label: "Request a French terry sample or quotation",
         inquiryOptionId: "french-terry",
       },
@@ -359,34 +369,54 @@ export const publicFabricCategories: FabricCategory[] = [
           "Review weight, usable width, shrinkage, seam bulk and wash approval for substantial sweatshirt programs.",
       },
       {
-        href: "/blog/what-is-scuba-knit-fabric",
-        label: "Compare fleece with structured scuba knit",
+        href: "/fabrics/rib-knit-fabric",
+        label: "Coordinate French terry with rib trims",
         description:
-          "Consider a smoother structured alternative when the garment needs body rather than a looped or brushed reverse.",
+          "Review rib-knit directions for cuffs, neckbands and waistbands that must be sampled with the body fabric.",
       },
       {
-        href: "/blog/what-is-double-knit-fabric",
-        label: "Understand double-knit alternatives",
+        href: "/fabrics/cotton-spandex-jersey",
+        label: "Compare a lighter stretch-knit route",
         description:
-          "Review how double-knit constructions differ from sweatshirt knits in face, stability and garment use.",
+          "Use cotton spandex jersey when the garment brief prioritizes a lighter hand, fitted silhouette and stretch recovery.",
       },
       {
-        href: "/ready-stock-knit-fabrics",
-        label: "Review raised-surface finished articles",
+        href: "/custom-knit-fabric-development",
+        label: "Send a French terry development brief",
         description:
-          "Use documented article data as a starting reference and confirm the exact surface with sales.",
+          "Share a catalogue article, reference sample or specification-led brief for sample and quotation review.",
       },
     ],
     faq: [
       {
         question: "What garments use French terry fabric?",
         answer:
-          "French terry fabric is often used for hoodies, sweatshirts, casual pants and comfort-focused apparel.",
+          "French terry fabric is often used for hoodies, sweatshirts, joggers, shorts and comfort-focused apparel. Buyers should select composition, GSM, usable width, loop-back finish and test requirements for the actual garment rather than approve by category name alone.",
       },
       {
         question: "Can O'range Textile support private-label hoodie fabrics?",
         answer:
-          "Yes. The company supports fleece and French terry sourcing for private-label hoodie and sweatshirt programs.",
+          "Yes. Buyers can submit a hoodie specification, reference sample or catalogue direction for a French terry sample review. Exact availability, MOQ, lead time and price are confirmed in the current quotation.",
+      },
+      {
+        question: "How is French terry different from brushed fleece?",
+        answer:
+          "French terry normally retains visible loops on the reverse, while brushed fleece has a raised reverse created through additional finishing. Weight, hand, warmth and durability still depend on the exact article, so buyers should compare labeled finished samples.",
+      },
+      {
+        question: "What GSM and usable width should a hoodie buyer specify?",
+        answer:
+          "Specify a target GSM or acceptable range based on the hoodie season and silhouette, plus the minimum usable width required by the marker. There is no universal hoodie value; confirm both measurements on the relaxed finished sample and current quotation.",
+      },
+      {
+        question: "Which shrinkage and pilling checks matter for French terry?",
+        answer:
+          "The brief should state the intended care cycle, length-and-width shrinkage method, pilling method and acceptance criteria. Where reverse appearance or shedding matters, add those checks and approve the actual article, colour and finish.",
+      },
+      {
+        question: "Can buyers customize composition, colour and reverse finish?",
+        answer:
+          "Buyers can submit target composition, colour and loop-back finish requirements through the custom-development route. Feasibility, sample path, MOQ, lead time, testing and price are confirmed for the specific inquiry rather than promised by the category page.",
       },
     ],
   },

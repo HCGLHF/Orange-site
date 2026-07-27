@@ -141,6 +141,224 @@ test("legacy target categories publish runtime procurement evidence and inquiry 
   }
 });
 
+test("French terry category publishes a focused procurement brief", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "fleece-french-terry"
+  );
+
+  assert.ok(category, "expected the French terry category in the public catalogue");
+  assert.equal(category.name, "French terry fabrics");
+  assert.equal(category.shortName, "French terry");
+  assert.match(category.description, /^French terry fabric\b/);
+  for (const buyerIntent of category.buyerIntent) {
+    assert.match(
+      buyerIntent,
+      /^French terry\b/i,
+      `buyer intent must keep French terry primary: ${buyerIntent}`
+    );
+  }
+
+  assert.ok(category.procurement);
+  const ctaFocus = [
+    category.procurement.cta.heading,
+    category.procurement.cta.body,
+    category.procurement.cta.label,
+  ].join(" ");
+  assert.match(category.procurement.cta.heading, /French terry/i);
+  assert.match(ctaFocus, /French terry/i);
+  assert.doesNotMatch(
+    [
+      category.name,
+      category.shortName,
+      category.description,
+      ...category.buyerIntent,
+      ctaFocus,
+    ].join(" "),
+    /\bfleece\b/i
+  );
+  assert.match(category.description, /loop-back/i);
+  assert.match(category.description, /hoodies/i);
+
+  const fleeceSourcingSentences = category.sourcingOverview.flatMap(
+    (paragraph) =>
+      paragraph.match(/[^.!?]*\bfleece\b[^.!?]*[.!?]?/gi) ?? []
+  );
+  assert.ok(
+    fleeceSourcingSentences.length > 0,
+    "the sourcing overview should retain the useful brushed-fleece comparison"
+  );
+  for (const sentence of fleeceSourcingSentences) {
+    assert.match(
+      sentence,
+      /\b(?:compar(?:e|ison)|different|rather than|not interchangeable|separate)\b/i,
+      `fleece must appear only as comparison context: ${sentence}`
+    );
+  }
+
+  assert.deepEqual(
+    category.specificationChecks.map((check) => check.label),
+    [
+      "Composition and yarn system",
+      "GSM and seasonal weight",
+      "Usable width and relaxation",
+      "Stretch and recovery",
+      "Loop-back structure and finish",
+      "Shrinkage, pilling and colourfastness",
+    ]
+  );
+
+  const guidance = category.developmentGuidance.join(" ");
+  assert.match(guidance, /catalogue article/i);
+  assert.match(guidance, /reference sample/i);
+  assert.match(guidance, /specification-led/i);
+  assert.match(guidance, /current quotation/i);
+
+  assert.equal(category.faq.length, 6);
+  const faqQuestions = new Set(category.faq.map((item) => item.question));
+  for (const question of [
+    "What garments use French terry fabric?",
+    "Can O'range Textile support private-label hoodie fabrics?",
+    "How is French terry different from brushed fleece?",
+    "What GSM and usable width should a hoodie buyer specify?",
+    "Which shrinkage and pilling checks matter for French terry?",
+    "Can buyers customize composition, colour and reverse finish?",
+  ]) {
+    assert.ok(faqQuestions.has(question), `missing French terry FAQ: ${question}`);
+  }
+
+  const relatedRoutes = new Set(category.relatedLinks.map((link) => link.href));
+  for (const route of [
+    "/fabrics/rib-knit-fabric",
+    "/fabrics/cotton-spandex-jersey",
+    "/blog/french-terry-fabric-vs-fleece",
+    "/blog/french-terry-fabric-for-hoodies",
+    "/blog/heavyweight-french-terry-fabric",
+    "/custom-knit-fabric-development",
+  ]) {
+    assert.ok(relatedRoutes.has(route), `missing French terry route: ${route}`);
+  }
+
+  assert.equal(
+    category.procurement?.cta.label,
+    "Request a French terry sample or quotation"
+  );
+  assert.equal(category.procurement?.cta.inquiryOptionId, "french-terry");
+});
+
+test("French terry evidence and FAQs keep claims attributable and bounded", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "fleece-french-terry"
+  );
+
+  assert.ok(category?.procurement);
+  const { capability, qualitySteps, boundary } =
+    category.procurement.evidence;
+
+  assert.match(capability, /O'range Textile/);
+  assert.match(capability, /buyer brief/i);
+  assert.match(capability, /sample/i);
+  assert.match(capability, /specification/i);
+  assert.doesNotMatch(capability, /Jingtian|parent company|capacity/i);
+
+  assert.match(boundary, /historical\/draft catalogue/i);
+  assert.match(
+    boundary,
+    /does not verify[^.]*exact French terry article[^.]*specification/i
+  );
+  assert.match(boundary, /\bMOQ\b[^.]*\blead time\b[^.]*inquiry-specific/i);
+  assert.doesNotMatch(
+    [capability, ...qualitySteps, boundary].join(" "),
+    /\bcapacity\b/i
+  );
+
+  assert.equal(category.faq.length, 6);
+  for (const faq of category.faq) {
+    assert.ok(faq.answer.trim().length >= 120, `${faq.question} needs a useful answer`);
+    assert.match(
+      faq.answer,
+      /\b(?:buyer|brief|specif|sample|article|confirm|approve|test|composition|requirements?)\w*/i,
+      `${faq.question} needs procurement guidance`
+    );
+  }
+
+  const answersByQuestion = new Map(
+    category.faq.map((faq) => [faq.question, faq.answer])
+  );
+  const boundedAnswers = {
+    "Can O'range Textile support private-label hoodie fabrics?":
+      /confirmed in the current quotation/i,
+    "How is French terry different from brushed fleece?":
+      /depend on the exact article|compare labeled finished samples/i,
+    "What GSM and usable width should a hoodie buyer specify?":
+      /no universal|confirm/i,
+    "Which shrinkage and pilling checks matter for French terry?":
+      /state the intended|approve the actual article/i,
+    "Can buyers customize composition, colour and reverse finish?":
+      /confirmed for the specific inquiry|rather than promised/i,
+  };
+
+  for (const [question, boundaryPattern] of Object.entries(boundedAnswers)) {
+    assert.match(
+      answersByQuestion.get(question) ?? "",
+      boundaryPattern,
+      `${question} needs explicit confirmation or evidence boundaries`
+    );
+  }
+});
+
+test("French terry category does not publish fixed values or guarantees", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "fleece-french-terry"
+  );
+
+  assert.ok(category?.procurement);
+  const claimsText = [
+    category.description,
+    ...category.sourcingOverview,
+    ...category.specificationChecks.map((check) => check.detail),
+    ...category.developmentGuidance,
+    category.procurement.evidence.capability,
+    ...category.procurement.evidence.qualitySteps,
+    category.procurement.evidence.boundary,
+    category.procurement.cta.heading,
+    category.procurement.cta.body,
+    ...category.relatedLinks.map((link) => link.description),
+    ...category.faq.map((faq) => faq.answer),
+  ].join(" ");
+
+  assert.doesNotMatch(
+    claimsText,
+    /\b\d+(?:\.\d+)?\s*(?:gsm|g\/m(?:2|²)|cm|mm|in(?:ch(?:es)?)?|%|kg|lb(?:s)?|cycles?|grade)\b/i
+  );
+  assert.doesNotMatch(
+    claimsText,
+    /\b(?:certified|certification|certificate|guarantees?|ensures?|always|never)\b/i
+  );
+  assert.doesNotMatch(claimsText, /\bcapacity\b/i);
+  for (const fixedCommercialPattern of [
+    /\bfixed\s+(?:MOQ|lead time|capacity)\b/i,
+    /(?:\bMOQ\b|\blead time\b)[^.!?]{0,25}\b\d+(?:\.\d+)?\b/i,
+    /\b\d+(?:\.\d+)?\b[^.!?]{0,25}(?:\bMOQ\b|\blead time\b)/i,
+  ]) {
+    assert.doesNotMatch(claimsText, fixedCommercialPattern);
+  }
+
+  const commercialTermSentences =
+    claimsText
+      .match(/[^.!?]*(?:\bMOQ\b|\blead time\b|\bcapacity\b)[^.!?]*[.!?]?/gi) ??
+    [];
+  for (const sentence of commercialTermSentences) {
+    assert.match(
+      sentence,
+      /\b(?:confirm|inquiry-specific|not verif|rather than promised)\w*/i,
+      `commercial terms must remain inquiry-specific: ${sentence}`
+    );
+  }
+});
+
 test("legacy category related fabric IDs resolve to a runtime public fabric record", async () => {
   const { publicFabricCategories, publicFabrics } = await loadPublicCatalog();
   const publicFabricIds = new Set(publicFabrics.map((fabric) => fabric.id));
