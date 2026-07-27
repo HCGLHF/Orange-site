@@ -11,6 +11,16 @@ const loadPublicCatalog = () =>
 const loadInquiryOptions = () =>
   import(new URL("../lib/data.ts", import.meta.url).href);
 
+const assertMatchesAll = (actual, expectedPatterns, context) => {
+  for (const expectedPattern of expectedPatterns) {
+    assert.match(
+      actual,
+      expectedPattern,
+      `${context} must match ${expectedPattern}`
+    );
+  }
+};
+
 const collectCategoryClaims = (category) =>
   [
     category.description,
@@ -609,6 +619,284 @@ test("Cotton jersey category does not publish fixed values or guarantees", async
   assertNoUnsupportedFixedClaims(category, {
     allowExactCottonComposition: true,
   });
+});
+
+test("Cotton spandex jersey category publishes a focused procurement brief", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-spandex-jersey"
+  );
+
+  assert.ok(
+    category,
+    "expected the Cotton spandex jersey category in the public catalogue"
+  );
+  assert.equal(category.name, "Cotton spandex jersey fabrics");
+  assert.equal(category.shortName, "Cotton spandex jersey");
+  assert.match(category.description, /^Cotton spandex jersey fabric\b/);
+  assert.match(category.description, /\b(?:single-knit|single jersey)\b/i);
+  assert.match(
+    category.description,
+    /\b(?:fitted tees|childrenswear|loungewear|movement-led apparel)\b/i
+  );
+  assert.ok(
+    category.buyerIntent.length >= 1,
+    "Cotton spandex jersey needs at least one focused buyer intent"
+  );
+  for (const buyerIntent of category.buyerIntent) {
+    assertMatchesAll(
+      buyerIntent,
+      [/\bcotton\b/i, /\bspandex\b/i, /\bjersey\b/i],
+      `Cotton spandex jersey buyer intent: ${buyerIntent}`
+    );
+  }
+
+  const expectedSpecificationChecks = [
+    [
+      "Cotton and spandex composition",
+      [/composition disclosure[\s\S]*does not[\s\S]*performance/i],
+    ],
+    [
+      "GSM and opacity",
+      [/GSM[\s\S]*opacity[\s\S]*(?:conditioning|relaxation)/i],
+    ],
+    [
+      "Usable width after relaxation",
+      [/usable width[\s\S]*(?:conditioning|relaxation)/i],
+    ],
+    [
+      "Stretch direction and recovery",
+      [
+        /stretch direction[\s\S]*method[\s\S]*(?:recovery|growth)[\s\S]*(?:criteria|tolerance)/i,
+      ],
+    ],
+    [
+      "Dyeing, heat history and finish",
+      [/(?:dye|dyeing)[\s\S]*heat[\s\S]*finish/i],
+    ],
+    [
+      "Shrinkage, torque, pilling and colourfastness",
+      [/garment[\s\S]*test method[\s\S]*tolerance/i],
+    ],
+  ];
+  assert.deepEqual(
+    category.specificationChecks.map((check) => check.label),
+    expectedSpecificationChecks.map(([label]) => label)
+  );
+  const specificationDetails = new Map(
+    category.specificationChecks.map((check) => [check.label, check.detail])
+  );
+  const compositionSpecification =
+    specificationDetails.get("Cotton and spandex composition") ?? "";
+  assertMatchesAll(
+    compositionSpecification,
+    [
+      /(?:fibre (?:composition|content)|composition (?:and|or) ratio)/i,
+      /(?:yarn count|linear density|yarn (?:specification|system))/i,
+      /construction/i,
+      /cotton/i,
+      /(?:spandex|elastane)/i,
+    ],
+    "Cotton and spandex composition detail"
+  );
+  for (const [label, patterns] of expectedSpecificationChecks) {
+    assertMatchesAll(
+      specificationDetails.get(label) ?? "",
+      patterns,
+      `${label} detail`
+    );
+  }
+
+  const developmentCopy = category.developmentGuidance.join(" ");
+  assertMatchesAll(
+    developmentCopy,
+    [
+      /catalogue article/i,
+      /reference sample/i,
+      /specification-led brief/i,
+      /current exact article/i,
+      /current sample/i,
+      /current quotation/i,
+    ],
+    "Cotton spandex jersey development guidance"
+  );
+
+  const relatedRoutes = new Map(
+    category.relatedLinks.map((link) => [link.href, link])
+  );
+  for (const route of [
+    "/fabrics/cotton-jersey",
+    "/fabrics/rib-knit-fabric",
+    "/blog/interlock-vs-jersey-fabric",
+    "/blog/what-is-interlock-fabric",
+    "/blog/what-is-rib-knit-fabric",
+    "/custom-knit-fabric-development",
+  ]) {
+    assert.ok(relatedRoutes.has(route), `missing Cotton spandex route: ${route}`);
+  }
+  const customDevelopmentCopy =
+    relatedRoutes.get("/custom-knit-fabric-development")?.description ?? "";
+  assertMatchesAll(
+    customDevelopmentCopy,
+    [
+      /catalogue article/i,
+      /reference sample/i,
+      /specification-led brief/i,
+      /current (?:sample|quotation)/i,
+    ],
+    "Cotton spandex jersey custom-development link"
+  );
+
+  assert.equal(
+    category.procurement?.cta.label,
+    "Request a cotton spandex jersey sample or quotation"
+  );
+  assert.equal(
+    category.procurement?.cta.inquiryOptionId,
+    "cotton-spandex-jersey"
+  );
+});
+
+test("Cotton spandex jersey uses executable RFQ terminology throughout", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-spandex-jersey"
+  );
+
+  assert.ok(category);
+  const buyerVisibleCopy = [
+    collectCategoryClaims(category),
+    ...category.buyerIntent,
+    ...category.applications,
+    ...category.specificationChecks.map((check) => check.label),
+    ...category.relatedLinks.map((link) => link.label),
+    ...category.faq.map((faq) => faq.question),
+  ].join(" ");
+  assert.doesNotMatch(
+    buyerVisibleCopy,
+    /\b(?:yarn direction|composition direction|fibre direction)\b/i
+  );
+});
+
+test("Cotton spandex jersey evidence and FAQs stay attributable and bounded", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-spandex-jersey"
+  );
+
+  assert.ok(category?.procurement);
+  const { capability, qualitySteps, boundary } =
+    category.procurement.evidence;
+  assert.doesNotMatch(
+    collectCategoryClaims(category),
+    /Jingtian|parent company|\bcapacity\b/i,
+    "Cotton spandex jersey category claims must not attribute category-specific capacity"
+  );
+  assertMatchesAll(
+    capability,
+    [/O'range Textile/, /buyer brief/i, /sample/i, /specification/i],
+    "Cotton spandex jersey capability evidence"
+  );
+  assert.doesNotMatch(capability, /Jingtian|parent company|capacity/i);
+
+  assertMatchesAll(
+    boundary,
+    [
+      /historical\/draft catalogue/i,
+      /current exact cotton spandex jersey article/i,
+      /specification/i,
+      /availability/i,
+      /\bMOQ\b/i,
+      /lead time/i,
+      /inquiry-specific/i,
+    ],
+    "Cotton spandex jersey evidence boundary"
+  );
+
+  const qualityEvidence = qualitySteps.join(" ");
+  assertMatchesAll(
+    qualityEvidence,
+    [
+      /finished sample/i,
+      /agreed (?:method|criteria|tolerance)/i,
+      /current quotation/i,
+    ],
+    "Cotton spandex jersey quality steps"
+  );
+
+  const expectedFaqQuestions = [
+    "Why use spandex in cotton jersey?",
+    "Does O'range Textile supply cotton-rich stretch knits?",
+    "How should stretch direction and recovery be specified?",
+    "Does a 95/5 composition guarantee the same performance?",
+    "When should GSM and usable width be measured?",
+    "Can buyers request custom colour, finish and testing?",
+  ];
+  assert.deepEqual(
+    category.faq.map((faq) => faq.question),
+    expectedFaqQuestions
+  );
+  for (const faq of category.faq) {
+    assert.ok(
+      faq.answer.trim().length >= 120,
+      `${faq.question} needs a useful procurement answer`
+    );
+    assert.match(
+      faq.answer,
+      /\b(?:buyer|brief|specif|sample|article|confirm|approve|test|garment|method|requirements?)\w*/i,
+      `${faq.question} needs procurement guidance`
+    );
+  }
+
+  const answersByQuestion = new Map(
+    category.faq.map((faq) => [faq.question, faq.answer])
+  );
+  const ratioAnswer =
+    answersByQuestion.get(
+      "Does a 95/5 composition guarantee the same performance?"
+    ) ?? "";
+  assertMatchesAll(
+    ratioAnswer,
+    [
+      /ratio alone does not establish/i,
+      /construction/i,
+      /yarn/i,
+      /elastane/i,
+      /density/i,
+      /heat/i,
+      /finish/i,
+      /relaxation/i,
+      /method/i,
+      /stretch/i,
+      /recovery/i,
+      /opacity/i,
+      /hand/i,
+      /dimensional/i,
+    ],
+    "Cotton spandex jersey composition-ratio answer"
+  );
+
+  const answerContracts = {
+    "How should stretch direction and recovery be specified?":
+      /direction[\s\S]*method[\s\S]*(?:recovery|growth)[\s\S]*(?:criteria|tolerance)/i,
+    "When should GSM and usable width be measured?":
+      /conditioning[\s\S]*relaxation[\s\S]*(?:sample|article)/i,
+    "Can buyers request custom colour, finish and testing?":
+      /specific inquiry|current quotation/i,
+  };
+  for (const [question, answerPattern] of Object.entries(answerContracts)) {
+    assert.match(answersByQuestion.get(question) ?? "", answerPattern);
+  }
+});
+
+test("Cotton spandex jersey category does not publish fixed values or guarantees", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-spandex-jersey"
+  );
+
+  assert.ok(category?.procurement);
+  assertNoUnsupportedFixedClaims(category);
 });
 
 test("legacy category related fabric IDs resolve to a runtime public fabric record", async () => {

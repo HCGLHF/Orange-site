@@ -229,40 +229,50 @@ export const publicFabricCategories: FabricCategory[] = [
     name: "Cotton spandex jersey fabrics",
     shortName: "Cotton spandex jersey",
     description:
-      "Stretch cotton knits with recovery for fitted tees, childrenswear, loungewear and sports-inspired apparel.",
+      "Cotton spandex jersey fabric is a single-knit construction combining cotton and spandex for fitted tees, childrenswear, loungewear and other movement-led apparel, subject to exact article and finished-sample review.",
     sourcingOverview: [
-      "Cotton spandex jersey combines a cotton-rich face and hand feel with elastane-supported stretch and recovery. The useful performance comes from the complete construction and finishing route, not from a composition ratio in isolation. Stitch density, elastane quality, heat history and fabric relaxation all affect width, torque and recovery.",
-      "Use this category when the garment needs closer fit or repeat movement than a conventional cotton jersey can provide. Share the intended stretch direction, fit, wash method and recovery expectation so the offered finished sample can be assessed against the real garment rather than a generic stretch claim.",
+      "Cotton spandex jersey fabric combines a single-jersey construction with disclosed cotton and spandex content. Composition records the disclosed fibre content and ratio; it is not a performance result. Construction, yarn and elastane selection, stitch density, dyeing, heat history, finish and relaxation influence the measured fabric behaviour.",
+      "Use this category to prepare a brief for fitted tees, childrenswear, loungewear or other movement-led apparel. State the garment use, opacity, stretch direction, recovery criteria, usable width, colour, finish and test methods so the current finished sample can be assessed against the intended garment.",
     ],
     specificationChecks: [
       {
-        label: "Stretch and recovery target",
+        label: "Cotton and spandex composition",
         detail:
-          "Define the required stretch direction and test method, then compare immediate and rested recovery on the finished sample before approving bulk production.",
+          "Specify the target cotton and spandex fibre composition and ratio, the yarn count or linear density and yarn specification or system where relevant, the intended jersey construction, and any relevant elastane incorporation or arrangement details. Composition disclosure does not establish a performance result, so confirm hand, coverage, stretch and dimensional behaviour on the offered finished sample.",
       },
       {
-        label: "Cotton-to-elastane balance",
+        label: "GSM and opacity",
         detail:
-          "A common percentage reference is useful, but the hand, coverage and growth depend on yarn, loop length, density and finishing as well as fibre content.",
+          "State the target GSM range and garment opacity or coverage requirement, including colour and layering context. Agree the conditioning and relaxation stage before measurement, then confirm both points on the current finished sample.",
       },
       {
-        label: "GSM, width and relaxation",
+        label: "Usable width after relaxation",
         detail:
-          "Confirm weight and usable width after the fabric has relaxed. Stretch knits can change dimensions after finishing, packing and garment processing.",
+          "Specify the usable width target and how usable width excludes edges or unstable areas. Agree the conditioning and relaxation procedure, then confirm the measured width against the current article and garment marker.",
       },
       {
-        label: "End-use testing",
+        label: "Stretch direction and recovery",
         detail:
-          "For fitted tops, childrenswear or sports-inspired apparel, align pilling, colourfastness, shrinkage, seam recovery and wash testing with the intended market.",
+          "Define the required stretch direction and test method, then state recovery or growth criteria and tolerance after the agreed rest period. Approve the measured result on the finished sample for the intended garment.",
+      },
+      {
+        label: "Dyeing, heat history and finish",
+        detail:
+          "Specify the dyeing route, colour and hand target, then review the elastane-relevant heat history and finishing sequence for the offered article. Confirm the final appearance, hand and dimensional response on the current sample.",
+      },
+      {
+        label: "Shrinkage, torque, pilling and colourfastness",
+        detail:
+          "List the garment-relevant checks and state each test method, conditioning or wash-and-dry route, measurement points and acceptance tolerance. Confirm the results for the exact finished article rather than applying a category-level result.",
       },
     ],
     developmentGuidance: [
-      "A sourcing brief should include the garment silhouette, required extension, recovery tolerance, target opacity, colour, finish and care route. These details help separate a comfort-stretch jersey from a firmer performance-oriented construction.",
-      "Exact sample availability, colour, quantity and commercial terms are confirmed privately. If the buyer has a benchmark garment, send its fabric specification or a reference swatch so the team can compare stretch, hand and finished appearance.",
+      "Start from one of three development paths: a catalogue article, a reference sample or a specification-led brief. For each path, share the garment use, target fibre composition, relevant yarn specification or system, GSM, opacity, usable width, stretch and recovery criteria, colour, finish and testing requirements.",
+      "O'range Textile reviews the selected path and compares the buyer brief with the offered fabric evidence. Any current exact article, current sample and current quotation are confirmed for the specific inquiry before the buyer approves a sourcing direction.",
     ],
     buyerIntent: [
       "cotton spandex jersey fabric supplier",
-      "stretch cotton knit fabric manufacturer",
+      "cotton spandex jersey fabric manufacturer",
       "95 cotton 5 spandex jersey fabric",
     ],
     applications: ["Fitted T-shirts", "Childrenswear", "Sportswear", "Loungewear"],
@@ -270,24 +280,36 @@ export const publicFabricCategories: FabricCategory[] = [
     procurement: {
       evidence: {
         capability:
-          "O'range Textile can review a cotton spandex jersey buyer brief, coordinate sample, stretch and specification checks with the sourcing team, and prepare an inquiry path for private confirmation.",
+          "O'range Textile can review a cotton spandex jersey buyer brief, compare a reference sample or specification-led request, coordinate the requested sample and article checks, and return documented points for buyer approval before quotation.",
         qualitySteps: [
-          "Match the labeled finished sample to the agreed cotton spandex jersey specification.",
-          "Review stretch, recovery, sewing behavior and wash results for the intended garment.",
-          "Record dated approval, then confirm the current quotation for the requested program.",
+          "Match the labelled finished sample and article reference to the agreed cotton spandex jersey specification.",
+          "Review composition, GSM, usable width, stretch, recovery and garment-relevant checks under the agreed method, criteria and tolerance.",
+          "Record the dated sample approval and remaining exceptions, then confirm the current quotation for the requested programme.",
         ],
         boundary:
-          "The 104-product historical/draft catalogue does not verify a current exact cotton spandex jersey article. Availability, specification, MOQ and lead time remain inquiry-specific.",
+          "The historical/draft catalogue does not verify a current exact cotton spandex jersey article or specification. Article availability, sample status, MOQ, lead time, colour, finish, testing route and commercial terms are inquiry-specific and must be confirmed in the current quotation.",
       },
       cta: {
-        heading: "Review a stretch-jersey brief before quoting",
+        heading: "Review a cotton spandex jersey brief before quoting",
         body:
-          "Share the required extension, recovery, garment use and reference material for a sample and quotation review.",
+          "Share the garment use, target fibre composition, relevant yarn specification or system, stretch and recovery criteria, opacity, usable width, colour, finish and testing requirements for current sample and quotation review.",
         label: "Request a cotton spandex jersey sample or quotation",
         inquiryOptionId: "cotton-spandex-jersey",
       },
     },
     relatedLinks: [
+      {
+        href: "/fabrics/cotton-jersey",
+        label: "Compare with cotton jersey fabric",
+        description:
+          "Review a cotton jersey route when the garment brief prioritises a conventional single-knit construction, then compare the exact finished samples for fit, opacity, hand and dimensional behaviour.",
+      },
+      {
+        href: "/fabrics/rib-knit-fabric",
+        label: "Compare with rib knit fabric",
+        description:
+          "Review rib geometry as a separate stretch-fabric direction, then compare the labelled samples using the garment's required extension, recovery, edge and surface criteria.",
+      },
       {
         href: "/blog/interlock-vs-jersey-fabric",
         label: "Decide between stretch jersey and interlock",
@@ -308,21 +330,41 @@ export const publicFabricCategories: FabricCategory[] = [
       },
       {
         href: "/custom-knit-fabric-development",
-        label: "Send a stretch-fabric development brief",
+        label: "Choose a cotton spandex jersey development path",
         description:
-          "Share the garment, stretch, GSM, width, finish and testing requirements for direct review.",
+          "Start from a catalogue article, reference sample or specification-led brief, then have the current sample and quotation reviewed against the garment requirements.",
       },
     ],
     faq: [
       {
         question: "Why use spandex in cotton jersey?",
         answer:
-          "Spandex improves stretch and recovery, making cotton jersey suitable for fitted tops and comfort apparel.",
+          "Spandex is specified when a cotton jersey garment brief calls for a stretch-and-recovery direction, such as a closer fit or repeated movement. Buyers should still define the direction, test method and recovery criteria, then approve the current finished sample because fibre content alone does not establish garment performance.",
       },
       {
         question: "Does O'range Textile supply cotton-rich stretch knits?",
         answer:
-          "Yes. O'range Textile supplies cotton spandex jersey and rib knit fabrics for overseas apparel programs.",
+          "O'range Textile can review a cotton-rich stretch-knit buyer brief against a catalogue article, reference sample or specification-led request. The exact cotton spandex jersey article, sample status, specification and quotation are confirmed for the specific inquiry rather than assumed from this category page.",
+      },
+      {
+        question: "How should stretch direction and recovery be specified?",
+        answer:
+          "State the required stretch direction, the extension test method and the recovery or growth criteria and tolerance after an agreed rest period. Include the garment fit and use, then compare the measured current sample with the brief before article approval.",
+      },
+      {
+        question: "Does a 95/5 composition guarantee the same performance?",
+        answer:
+          "A 95/5 ratio alone does not establish stretch, recovery, opacity, hand or dimensional behaviour. Construction, yarn and elastane selection, stitch density, dye and heat history, finish, relaxation and the test method all affect the measured sample, so approve the exact article against the garment brief.",
+      },
+      {
+        question: "When should GSM and usable width be measured?",
+        answer:
+          "Agree the conditioning and relaxation procedure before measurement, including the stage after finishing at which the fabric will be assessed. Record GSM and usable width on the labelled current sample or article, then compare them with the garment marker and agreed specification.",
+      },
+      {
+        question: "Can buyers request custom colour, finish and testing?",
+        answer:
+          "Buyers can include colour, hand, surface finish and garment-relevant test requirements in a catalogue, reference-sample or specification-led brief. O'range Textile can review the requested combination, while the sampling route, test scope and commercial terms are confirmed for the specific inquiry in the current quotation.",
       },
     ],
   },
