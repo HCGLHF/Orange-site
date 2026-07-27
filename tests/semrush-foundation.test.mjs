@@ -5,6 +5,12 @@ import test from "node:test";
 const readSource = (relativePath) =>
   readFile(new URL(`../${relativePath}`, import.meta.url), "utf8");
 
+const loadPublicCatalog = () =>
+  import(new URL("../lib/public-catalog.ts", import.meta.url).href);
+
+const loadInquiryOptions = () =>
+  import(new URL("../lib/data.ts", import.meta.url).href);
+
 test("commercial fabric pages emit evidence-aligned WebPage schema", async () => {
   const schema = await readSource("lib/finished-fabric-schema.ts");
 
@@ -95,6 +101,101 @@ test("legacy category pages render sourcing evidence and contextual routes", asy
   assert.match(categoryPage, /category\.specificationChecks\.map/);
   assert.match(categoryPage, /category\.developmentGuidance/);
   assert.match(categoryPage, /category\.relatedLinks\.map/);
+});
+
+test("legacy target categories publish runtime procurement evidence and inquiry mappings", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const expectedCtas = {
+    "fleece-french-terry": {
+      label: "Request a French terry sample or quotation",
+      inquiryOptionId: "french-terry",
+    },
+    "cotton-jersey": {
+      label: "Request a cotton jersey sample or quotation",
+      inquiryOptionId: "cotton-jersey",
+    },
+    "cotton-spandex-jersey": {
+      label: "Request a cotton spandex jersey sample or quotation",
+      inquiryOptionId: "cotton-spandex-jersey",
+    },
+  };
+
+  for (const [slug, expectedCta] of Object.entries(expectedCtas)) {
+    const category = publicFabricCategories.find((item) => item.slug === slug);
+    assert.ok(category, `expected ${slug} in the public category catalogue`);
+    assert.ok(category.procurement, `${slug} needs procurement support`);
+    assert.equal(category.procurement.cta.label, expectedCta.label);
+    assert.equal(category.procurement.cta.inquiryOptionId, expectedCta.inquiryOptionId);
+    assert.ok(category.procurement.cta.heading.trim());
+    assert.ok(category.procurement.cta.body.trim());
+    assert.ok(category.procurement.evidence.capability.length >= 120);
+    assert.ok(category.procurement.evidence.boundary.length >= 120);
+    assert.ok(category.procurement.evidence.qualitySteps.length >= 3);
+    assert.ok(
+      category.procurement.evidence.qualitySteps.every(
+        (step) => typeof step === "string" && step.trim().length > 0
+      ),
+      `${slug} quality steps must be strings`
+    );
+    assert.doesNotMatch(category.procurement.evidence.capability, /Jingtian/i);
+  }
+});
+
+test("legacy category related fabric IDs resolve to a runtime public fabric record", async () => {
+  const { publicFabricCategories, publicFabrics } = await loadPublicCatalog();
+  const publicFabricIds = new Set(publicFabrics.map((fabric) => fabric.id));
+
+  for (const category of publicFabricCategories) {
+    for (const id of category.relatedFabricIds) {
+      assert.ok(
+        publicFabricIds.has(id),
+        `related fabric ID ${id} must exist in publicFabrics`
+      );
+    }
+  }
+});
+
+test("category CTAs forward a valid fabric option through the inquiry flow", async () => {
+  const [categoryPage, sampleRequestCta, inquiryProvider, inquiryModal] = await Promise.all([
+    readSource("app/fabrics/[slug]/page.tsx"),
+    readSource("components/SampleRequestCta.tsx"),
+    readSource("components/InquiryProvider.tsx"),
+    readSource("components/ui/InquiryModal.tsx"),
+  ]);
+  const { finishedFabricInquiryOptions } = await loadInquiryOptions();
+  const expectedInquiryOptions = {
+    "french-terry": "French terry fabric",
+    "cotton-jersey": "Cotton jersey fabric",
+    "cotton-spandex-jersey": "Cotton spandex jersey fabric",
+  };
+
+  assert.match(categoryPage, /import \{ SampleRequestCta \} from "@\/components\/SampleRequestCta"/);
+  assert.match(categoryPage, /companyRelationship,\s*manufacturingScale/);
+  assert.match(categoryPage, /category\.procurement\.evidence\.capability/);
+  assert.match(categoryPage, /category\.procurement\.evidence\.qualitySteps\.map/);
+  assert.match(categoryPage, /category\.procurement\.evidence\.boundary/);
+  assert.match(categoryPage, /category\.procurement\.cta\.heading/);
+  assert.match(categoryPage, /category\.procurement\.cta\.body/);
+  assert.match(categoryPage, /<SampleRequestCta[\s\S]*?label=\{category\.procurement\.cta\.label\}/);
+  assert.match(categoryPage, /fabricId=\{category\.procurement\.cta\.inquiryOptionId\}/);
+  assert.match(categoryPage, /href="\/custom-knit-fabric-development"/);
+  assert.match(sampleRequestCta, /fabricId\?: string/);
+  assert.match(sampleRequestCta, /openInquiry\(fabricId\)/);
+  assert.match(inquiryProvider, /openInquiry: \(initialFabricId\?: string\) => void/);
+  assert.match(inquiryProvider, /setInitialFabricId\(fabricId\)/);
+  assert.match(inquiryProvider, /<InquiryModal[\s\S]*?initialFabricId=\{initialFabricId\}/);
+  assert.match(inquiryModal, /initialFabricId\?: string/);
+  assert.match(inquiryModal, /inquiryOptions\.some\(\(option\) => option\.id === initialFabricId\)/);
+  assert.match(inquiryModal, /setFabricId\(.*initialFabricId.*finished-range/s);
+  assert.match(inquiryModal, /value=\{fabricId\}/);
+
+  for (const [id, name] of Object.entries(expectedInquiryOptions)) {
+    assert.equal(
+      finishedFabricInquiryOptions.find((option) => option.id === id)?.name,
+      name,
+      `inquiry options must include ${id}`
+    );
+  }
 });
 
 test("ready-stock page provides a second crawlable entry to legacy categories", async () => {

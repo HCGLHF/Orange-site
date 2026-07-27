@@ -13,7 +13,7 @@ import { InquiryCartProvider } from "@/components/InquiryCartProvider";
 import { InquiryModal } from "@/components/ui/InquiryModal";
 
 type InquiryContextValue = {
-  openInquiry: () => void;
+  openInquiry: (initialFabricId?: string) => void;
   closeInquiry: () => void;
 };
 
@@ -21,8 +21,15 @@ const InquiryContext = createContext<InquiryContextValue | null>(null);
 
 export function InquiryProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const openInquiry = useCallback(() => setOpen(true), []);
-  const closeInquiry = useCallback(() => setOpen(false), []);
+  const [initialFabricId, setInitialFabricId] = useState<string | undefined>();
+  const openInquiry = useCallback((fabricId?: string) => {
+    setInitialFabricId(fabricId);
+    setOpen(true);
+  }, []);
+  const closeInquiry = useCallback(() => {
+    setOpen(false);
+    setInitialFabricId(undefined);
+  }, []);
 
   const value = useMemo(
     () => ({ openInquiry, closeInquiry }),
@@ -34,7 +41,11 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
       <InquiryCartProvider>
         {children}
         <StickyInquiryBar />
-        <InquiryModal open={open} onClose={closeInquiry} />
+        <InquiryModal
+          open={open}
+          onClose={closeInquiry}
+          initialFabricId={initialFabricId}
+        />
       </InquiryCartProvider>
     </InquiryContext.Provider>
   );

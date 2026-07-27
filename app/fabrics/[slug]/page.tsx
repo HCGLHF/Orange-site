@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FinishedFabricPage } from "@/components/finished-fabric/FinishedFabricPage";
 import { FabricsCatalog } from "@/components/FabricsCatalog";
 import { FabricsInquiryAnchor } from "@/components/FabricsInquiryAnchor";
+import { SampleRequestCta } from "@/components/SampleRequestCta";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { StructuredData } from "@/components/geo/StructuredData";
 import {
@@ -19,6 +20,7 @@ import {
   getPublicFabricCategory,
 } from "@/lib/public-catalog";
 import { companyProfile, siteUrl } from "@/lib/geo-content";
+import { companyRelationship, manufacturingScale } from "@/lib/company-evidence";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { getPublicPageSeo } from "@/lib/seo/site-seo";
 
@@ -238,6 +240,59 @@ export default function FabricCategoryPage({ params }: CategoryPageProps) {
             </div>
           </div>
         </section>
+
+        {category.procurement ? (
+          <section className="border-y border-brand-soft bg-brand-cream">
+            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-orange">
+                Production and quality context
+              </p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-semibold text-brand-charcoal">
+                Review the finished sample against the brief
+              </h2>
+              <div className="mt-5 max-w-4xl space-y-4 text-base leading-8 text-brand-charcoal/75">
+                <p>{category.procurement.evidence.capability}</p>
+                <p>
+                  {companyRelationship.parentCompany} documents {manufacturingScale[0].value}{" "}
+                  {manufacturingScale[0].label} as manufacturing context for review and coordination;
+                  it is not category-specific capacity.
+                </p>
+              </div>
+              <ol className="mt-7 grid gap-3 md:grid-cols-3">
+                {category.procurement.evidence.qualitySteps.map((step, index) => (
+                  <li key={step} className="rounded-lg border border-brand-soft bg-white p-5 text-sm leading-7 text-brand-charcoal/75">
+                    <span className="font-semibold text-brand-orange">0{index + 1}</span>
+                    <p className="mt-2">{step}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-6 max-w-4xl border-l-2 border-brand-orange pl-4 text-sm leading-7 text-brand-charcoal/70">
+                {category.procurement.evidence.boundary}
+              </p>
+            </div>
+          </section>
+        ) : null}
+
+        {category.procurement ? (
+          <section className="bg-brand-charcoal text-white">
+            <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+              <div className="max-w-3xl">
+                <h2 className="text-2xl font-semibold">{category.procurement.cta.heading}</h2>
+                <p className="mt-3 text-sm leading-7 text-white/75">{category.procurement.cta.body}</p>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-4">
+                <SampleRequestCta
+                  label={category.procurement.cta.label}
+                  fabricId={category.procurement.cta.inquiryOptionId}
+                  className="mt-0"
+                />
+                <Link href="/custom-knit-fabric-development" className="text-sm font-semibold text-brand-orange hover:text-white">
+                  Send a development brief
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {fabrics.length ? (
           <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">

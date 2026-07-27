@@ -20,6 +20,19 @@ export type FabricCategory = {
     label: string;
     description: string;
   }>;
+  procurement?: {
+    evidence: {
+      capability: string;
+      qualitySteps: string[];
+      boundary: string;
+    };
+    cta: {
+      heading: string;
+      body: string;
+      label: string;
+      inquiryOptionId: string;
+    };
+  };
   faq: Array<{
     question: string;
     answer: string;
@@ -101,7 +114,27 @@ export const publicFabricCategories: FabricCategory[] = [
       "combed cotton single jersey for apparel brands",
     ],
     applications: ["T-shirts", "Base layers", "Loungewear", "Private-label basics"],
-    relatedFabricIds: ["cotton-jersey-32s"],
+    relatedFabricIds: [],
+    procurement: {
+      evidence: {
+        capability:
+          "O'range Textile can review a cotton jersey buyer brief, coordinate the closest finished sample and specification discussion with the sourcing team, and prepare an inquiry path for private confirmation.",
+        qualitySteps: [
+          "Match the labeled finished sample to the agreed cotton jersey specification.",
+          "Review GSM, usable width, sewing behavior and wash results for the intended garment.",
+          "Record dated approval, then confirm the current quotation for the requested program.",
+        ],
+        boundary:
+          "The 104-product historical/draft catalogue does not verify a current exact cotton jersey article. Availability, specification, MOQ and lead time remain inquiry-specific.",
+      },
+      cta: {
+        heading: "Review a cotton jersey brief with the sourcing team",
+        body:
+          "Send a target sample, garment use or specification so the closest finished-sample and quotation path can be reviewed.",
+        label: "Request a cotton jersey sample or quotation",
+        inquiryOptionId: "cotton-jersey",
+      },
+    },
     relatedLinks: [
       {
         href: "/blog/interlock-vs-jersey-fabric",
@@ -183,7 +216,27 @@ export const publicFabricCategories: FabricCategory[] = [
       "95 cotton 5 spandex jersey fabric",
     ],
     applications: ["Fitted T-shirts", "Childrenswear", "Sportswear", "Loungewear"],
-    relatedFabricIds: ["cotton-spandex-jersey-32s", "rib-knit-cotton-spandex"],
+    relatedFabricIds: [],
+    procurement: {
+      evidence: {
+        capability:
+          "O'range Textile can review a cotton spandex jersey buyer brief, coordinate sample, stretch and specification checks with the sourcing team, and prepare an inquiry path for private confirmation.",
+        qualitySteps: [
+          "Match the labeled finished sample to the agreed cotton spandex jersey specification.",
+          "Review stretch, recovery, sewing behavior and wash results for the intended garment.",
+          "Record dated approval, then confirm the current quotation for the requested program.",
+        ],
+        boundary:
+          "The 104-product historical/draft catalogue does not verify a current exact cotton spandex jersey article. Availability, specification, MOQ and lead time remain inquiry-specific.",
+      },
+      cta: {
+        heading: "Review a stretch-jersey brief before quoting",
+        body:
+          "Share the required extension, recovery, garment use and reference material for a sample and quotation review.",
+        label: "Request a cotton spandex jersey sample or quotation",
+        inquiryOptionId: "cotton-spandex-jersey",
+      },
+    },
     relatedLinks: [
       {
         href: "/blog/interlock-vs-jersey-fabric",
@@ -265,7 +318,27 @@ export const publicFabricCategories: FabricCategory[] = [
       "sweatshirt knit fabric sourcing",
     ],
     applications: ["Hoodies", "Sweatshirts", "Streetwear", "Loungewear"],
-    relatedFabricIds: ["fleece-french-terry-cotton-poly"],
+    relatedFabricIds: [],
+    procurement: {
+      evidence: {
+        capability:
+          "O'range Textile can review a French terry or fleece buyer brief, coordinate the closest finished sample and specification discussion with the sourcing team, and prepare an inquiry path for private confirmation.",
+        qualitySteps: [
+          "Match the labeled finished sample to the agreed French terry or fleece specification.",
+          "Review back finish, GSM, sewing behavior and wash results for the intended garment.",
+          "Record dated approval, then confirm the current quotation for the requested program.",
+        ],
+        boundary:
+          "The 104-product historical/draft catalogue does not verify a current exact French terry or fleece article. Availability, specification, MOQ and lead time remain inquiry-specific.",
+      },
+      cta: {
+        heading: "Review a French terry or fleece brief before quoting",
+        body:
+          "Send the target face, reverse finish, garment use and reference material for a sample and quotation review.",
+        label: "Request a French terry sample or quotation",
+        inquiryOptionId: "french-terry",
+      },
+    },
     relatedLinks: [
       {
         href: "/blog/french-terry-fabric-vs-fleece",

@@ -17,9 +17,10 @@ export type { InquiryRecord };
 type InquiryModalProps = {
   open: boolean;
   onClose: () => void;
+  initialFabricId?: string;
 };
 
-export function InquiryModal({ open, onClose }: InquiryModalProps) {
+export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalProps) {
   const { locale, t } = useLocale();
   const titleId = useId();
   void locale;
@@ -54,8 +55,13 @@ export function InquiryModal({ open, onClose }: InquiryModalProps) {
     if (open) {
       setSubmitted(false);
       setError(null);
+      setFabricId(
+        initialFabricId && inquiryOptions.some((option) => option.id === initialFabricId)
+          ? initialFabricId
+          : "finished-range"
+      );
     }
-  }, [open]);
+  }, [initialFabricId, inquiryOptions, open]);
 
   if (!open) return null;
 

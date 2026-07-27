@@ -20,6 +20,9 @@ export type Fabric = {
 
 export const finishedFabricInquiryOptions = [
   { id: "finished-range", name: "Specific finished-fabric article" },
+  { id: "french-terry", name: "French terry fabric" },
+  { id: "cotton-jersey", name: "Cotton jersey fabric" },
+  { id: "cotton-spandex-jersey", name: "Cotton spandex jersey fabric" },
   { id: "finished-air-layer", name: "Air-layer finished knit fabric" },
   { id: "finished-yarn-dyed-wool", name: "Yarn-dyed wool-blend air-layer fabric" },
   { id: "finished-structured", name: "Structured polyester-viscose knit fabric" },
