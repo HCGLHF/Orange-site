@@ -74,6 +74,10 @@ test("homepage renders its SEO H1, hero alt, sourcing route, and finished double
     new URL("../components/landing/LandingHero.tsx", import.meta.url),
     "utf8"
   );
+  const landingRouteChooserSource = await readFile(
+    new URL("../components/landing/LandingRouteChooser.tsx", import.meta.url),
+    "utf8"
+  );
 
   for (const component of [
     "LandingHero",
@@ -98,8 +102,8 @@ test("homepage renders its SEO H1, hero alt, sourcing route, and finished double
     /<Image\b[^>]*\balt=\{page\.heroImage\.alt\}[^>]*\/>/
   );
   assert.match(
-    geoHomeSource,
-    /<h2\b[^>]*>\s*double knit fabric sourcing route\s*<\/h2>/i
+    landingRouteChooserSource,
+    /<h2\b[^>]*>\s*choose a double knit fabric sourcing route\s*<\/h2>/i
   );
   assert.match(
     geoHomeSource,

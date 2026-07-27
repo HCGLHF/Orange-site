@@ -34,7 +34,7 @@ const buyerRoutes: LandingRoute[] = [
     icon: "stock",
   },
   {
-    title: "Finished double-knit directions",
+    title: "Double knit fabric manufacturing and finished-fabric directions",
     description: "Compare 11 documented air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard series.",
     href: "/finished-double-knit-fabrics",
     action: "Compare finished fabrics",

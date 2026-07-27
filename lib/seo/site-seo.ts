@@ -32,9 +32,10 @@ export type PublicPageSeo = {
 const publicPageSeo = [
   {
     path: "/",
-    primaryKeyword: "knit fabric supplier",
+    primaryKeyword: "double knit fabric",
     secondaryKeywords: [
       "double knit fabric supplier",
+      "knit fabric supplier",
       "finished knit fabric",
       "custom knit fabric",
       "wholesale knit fabric",
@@ -42,10 +43,10 @@ const publicPageSeo = [
     searchIntent: "commercial",
     topicCluster: "core-category",
     targetPageType: "homepage",
-    metaTitle: "Knit Fabric Supplier for Apparel Brands | O'range Textile",
+    metaTitle: "Double Knit Fabric for Global Apparel Brands | O'range Textile",
     metaDescription:
-      "Knit fabric supplier for global apparel brands sourcing finished jersey, rib, interlock, Ponte Roma, scuba, jacquard and other knitted fabrics. Compare documented specifications, sample routes and production support before sending an RFQ to O'range Textile.",
-    h1: "Knit Fabric Supplier for Global Apparel Programs",
+      "Double knit fabric sourcing for global apparel brands covering interlock, Ponte Roma, scuba, air-layer and jacquard directions. Compare documented specifications, samples and supplier capabilities, then send composition, GSM, usable width, finish, quantity and destination for an RFQ.",
+    h1: "Double Knit Fabric for Global Apparel Sourcing",
     updatedAt: "2026-07-26",
     changeFrequency: "weekly",
     priority: 1,

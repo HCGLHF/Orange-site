@@ -71,10 +71,10 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     eyebrow: "Integrated knit fabric and garment supply in Shaoxing Keqiao",
     headline: "From Greige Fabric to Finished Fabric and Garment Supply",
     summary:
-      "Current export sales are centered on finished fabrics, while the production route can continue from greige fabric through finished fabric to finished garment supply. Overseas fabric buyers, apparel teams and sourcing companies can begin with a documented article, a reference sample or a specification-led inquiry.",
+      "Source double knit fabric through a documented finished-fabric route spanning interlock, Ponte Roma, scuba, air-layer, jacquard and other structured knit directions. Start from a catalogue article, reference sample or specification-led brief, then confirm composition, GSM, usable width, finish, colour, quantity and testing in the current quotation.",
     heroImage: {
       src: "/images/finished-fabrics/finished-double-knit-factory.webp",
-      alt: "Finished double-knit fabric rolls and swatches in front of circular knitting machines",
+      alt: "Finished double knit fabric rolls and swatches in front of circular knitting machines",
     },
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },

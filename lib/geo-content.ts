@@ -47,7 +47,7 @@ export const heroContent = {
   title:
     "From Greige Fabric to Finished Fabric and Garment Supply",
   description:
-    "O'range Textile's current export offer is centred on 104 documented finished-fabric articles, supported by an integrated sourcing route that can extend from greige fabric through finishing to finished garments.",
+    "O'range Textile supports double knit fabric sourcing for global apparel programs through documented finished-fabric directions, article-level specifications, sample coordination and an inquiry route that can extend from greige fabric to finished garments.",
   primaryCta: "Send a Sourcing Inquiry",
   secondaryCta: "Review Finished Fabrics",
 } as const;
