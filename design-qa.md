@@ -4,7 +4,7 @@
 
 - Approved concept: option B, “电影感大画幅”.
 - Source mock:
-  `D:\GEO-ALPHA\orange-textile\orange-site\.superpowers\brainstorm\aboutus-hero-20260728\content\hero-layout-options.html`
+  `.superpowers/brainstorm/aboutus-hero-20260728/content/hero-layout-options.html`
 - Source capture:
   `tmp/about-cinematic-preview/about-cinematic-source.png`
 - Source capture pixels: 1265 × 712.
