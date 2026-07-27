@@ -253,8 +253,8 @@
       {
         "heading": "Documented range and manufacturing fit",
         "paragraphs": [
-          "O'range Textile's supplied workbook contains 104 finished-fabric records across 11 series, with documented entries spanning approximately 210-510 GSM and 133-185 cm usable width. These are catalogue-level ranges, not a promise that every interlock fabric article covers every value. The parent company's supplied machine record documents 200+ circular knitting machines across double-knit and rib configurations.",
-          "The parent company's machine record groups double-knit machines across multiple configurations. The record provides context for development review rather than an order specification. A buyer should request the current article sheet, a labeled cutting, and a quotation for the precise construction under review."
+          "O'range Textile's supplied workbook records an approximate 210-510 GSM and 133-185 cm usable-width span across the entire supplied 104-record finished-fabric catalogue. This is not an interlock-specific range, not a promise of available values, and not an article specification. Buyers still need the current article sheet, labeled sample, and quotation for the precise construction under review.",
+          "The parent company's supplied record documents 200+ circular knitting machines across double-knit and rib configurations. This manufacturing context is not an order specification and not interlock-specific capacity. A buyer should use it only as background for development review, then confirm the exact offered article and order terms in current documents."
         ],
         "table": {
           "headers": [
@@ -264,29 +264,49 @@
           ],
           "rows": [
             [
-              "Product family",
-              "Interlock and smooth double-knit finished fabric development",
-              "Exact construction and article code"
+              "Article identity and sample version",
+              "This route supports interlock and adjacent smooth double-knit development; category wording does not identify an approved article.",
+              "Article code, current article sheet, and approved sample version"
             ],
             [
-              "Catalogue evidence",
-              "Finished double-knit, air-layer, wool-blend and related series",
-              "Current availability and sample version"
+              "Construction and composition",
+              "A smooth, double-sided appearance does not establish exact construction or fibre content.",
+              "Exact construction and fibre composition on the current article sheet"
             ],
             [
-              "Weight and width",
-              "Documented catalogue spans 210-510 GSM and 133-185 cm",
-              "Article-specific GSM and usable width"
+              "GSM",
+              "No article-specific weight is published on this page.",
+              "Article-specific GSM, tolerance, test method, and point of measurement"
             ],
             [
-              "Finish",
-              "Smooth double-sided surface or order-specific finish",
-              "Face, reverse, brushing, hand and color"
+              "Usable width",
+              "No article-specific width is published on this page.",
+              "Article-specific usable width after the agreed conditioning or relaxation method"
             ],
             [
-              "Compliance",
-              "Buyer requirements can be included in the inquiry",
-              "Applicable test method, report and acceptance rule"
+              "Stretch and recovery",
+              "Direction and performance depend on the proposed article and buyer method.",
+              "Stretch direction, extension, and recovery or growth criteria with the applicable method"
+            ],
+            [
+              "Face, reverse and finish",
+              "Both sides and the requested finish need sample-level review.",
+              "Approved face, reverse, and finish, including any brushing, surface, or hand requirement"
+            ],
+            [
+              "Colour approval",
+              "No stock colour or approval result is represented here.",
+              "Colour reference and approval route for the exact offered article"
+            ],
+            [
+              "Testing and acceptance",
+              "Buyer requirements can be included in the inquiry, but this page reports no outcome.",
+              "Test methods, reports, and acceptance rules for the order"
+            ],
+            [
+              "Catalogue-wide reference only",
+              "The approximate 210-510 GSM and 133-185 cm usable-width span belongs to the entire supplied 104-record finished-fabric catalogue, not an interlock-specific range and not a promise of available values.",
+              "Use the current article sheet, approved sample, and quotation for article-specific values"
             ]
           ]
         }
@@ -306,7 +326,7 @@
         ]
       },
       {
-        "heading": "How to evaluate a interlock fabric sample",
+        "heading": "How to evaluate an interlock fabric sample",
         "paragraphs": [
           "Start with identity. Match the sample label to the article code and supplier sheet, then check the face, reverse, edge, color, width presentation, and several positions across the cutting. For interlock fabric, pay particular attention to construction identity, face-to-face balance, edge behavior, stretch direction, recovery, opacity, and seam response.",
           "Next move from the loose swatch to the buyer's real process. Cut and sew a representative panel, apply the planned decoration if relevant, and review the agreed care-development result. Record measurements and observations by sample version instead of approving a fabric through an untracked message."
@@ -344,12 +364,20 @@
         "a": "Its smooth surface can be useful for selected print routes, but print compatibility depends on fibre, finish, color, ink system, curing, and buyer requirements. Test the actual article and process."
       },
       {
-        "q": "Can buyers request a interlock fabric sample?",
+        "q": "Can buyers request an interlock fabric sample?",
         "a": "Yes. Buyers can request a finished-fabric sample for evaluation. The request should identify the target construction, composition, GSM, usable width, color, finish, quantity, application, and destination so the supplier can confirm a relevant article."
       },
       {
         "q": "What should be confirmed before ordering interlock fabric?",
         "a": "Confirm the article code, exact construction, composition, GSM, usable width, face and reverse, color, finish, stretch or recovery requirements, testing, approved sample, quantity, lead time, packing, and commercial terms in writing."
+      },
+      {
+        "q": "How does interlock differ from cotton jersey and Ponte Roma?",
+        "a": "Compare construction identity first: cotton jersey is a single-knit category, while interlock and Ponte Roma are double-knit sourcing directions, but those names alone do not establish the exact loop structure, composition, GSM, usable width, stretch, or recovery of an offered article. Review labeled cuttings and current article sheets side by side, then confirm the selected construction and sample version in the quotation."
+      },
+      {
+        "q": "Which GSM, usable width and recovery fields should an interlock RFQ include?",
+        "a": "State the target GSM and tolerance, usable width after the agreed conditioning or relaxation method, stretch direction and requested extension, and the recovery or growth method and acceptance rule relevant to the garment. Ask the supplier to return article-specific values on the current article sheet, labeled sample, and quotation rather than applying the catalogue-wide span to interlock."
       }
     ],
     "relatedLinks": [
@@ -372,6 +400,14 @@
       {
         "href": "/fabrics/scuba-air-layer-fabric",
         "label": "Scuba and air-layer fabric"
+      },
+      {
+        "href": "/fabrics/cotton-jersey",
+        "label": "Cotton jersey fabric"
+      },
+      {
+        "href": "/fabrics/cotton-spandex-jersey",
+        "label": "Cotton spandex jersey fabric"
       },
       {
         "href": "/blog",
