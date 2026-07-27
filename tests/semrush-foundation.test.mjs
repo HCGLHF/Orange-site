@@ -11,6 +11,96 @@ const loadPublicCatalog = () =>
 const loadInquiryOptions = () =>
   import(new URL("../lib/data.ts", import.meta.url).href);
 
+const collectCategoryClaims = (category) =>
+  [
+    category.description,
+    ...category.sourcingOverview,
+    ...category.specificationChecks.map((check) => check.detail),
+    ...category.developmentGuidance,
+    category.procurement.evidence.capability,
+    ...category.procurement.evidence.qualitySteps,
+    category.procurement.evidence.boundary,
+    category.procurement.cta.heading,
+    category.procurement.cta.body,
+    ...category.relatedLinks.map((link) => link.description),
+    ...category.faq.map((faq) => faq.answer),
+  ].join(" ");
+
+const findUnsupportedFixedClaim = (
+  claimsText,
+  { allowExactCottonComposition = false } = {}
+) => {
+  const textToInspect = allowExactCottonComposition
+    ? claimsText.replace(
+        /\b100(?:\.0+)?\s*%\s+cotton\b/gi,
+        "all-cotton fibre composition"
+      )
+    : claimsText;
+
+  for (const unsupportedClaimPattern of [
+    /\b\d+(?:\.\d+)?\s*(?:gsm|g\/m(?:2|²)|cm|mm|in(?:ch(?:es)?)?|kg|lb(?:s)?|cycles?|grade)\b/i,
+    /\b\d+(?:\.\d+)?\s*%/i,
+    /\b(?:certified|certification|certificate|guarantee(?:s|d|ing)?|ensur(?:e(?:s|d)?|ing)|always|never)\b/i,
+    /\bcapacity\b/i,
+    /\bfixed\s+(?:MOQ|lead time|capacity)\b/i,
+    /(?:\bMOQ\b|\blead time\b)[^.!?]{0,25}\b\d+(?:\.\d+)?\b/i,
+    /\b\d+(?:\.\d+)?\b[^.!?]{0,25}(?:\bMOQ\b|\blead time\b)/i,
+  ]) {
+    const match = textToInspect.match(unsupportedClaimPattern);
+    if (match) return match[0];
+  }
+
+  return null;
+};
+
+const assertNoUnsupportedFixedClaims = (
+  category,
+  { allowExactCottonComposition = false } = {}
+) => {
+  const claimsText = collectCategoryClaims(category);
+  assert.equal(
+    findUnsupportedFixedClaim(claimsText, { allowExactCottonComposition }),
+    null,
+    "category copy contains an unsupported fixed value or guarantee"
+  );
+
+  const commercialTermSentences =
+    claimsText
+      .match(/[^.!?]*(?:\bMOQ\b|\blead time\b|\bcapacity\b)[^.!?]*[.!?]?/gi) ??
+    [];
+  for (const sentence of commercialTermSentences) {
+    assert.match(
+      sentence,
+      /\b(?:confirm|inquiry-specific|not verif|rather than promised|not category-specific)\w*/i,
+      `commercial terms must remain inquiry-specific: ${sentence}`
+    );
+  }
+};
+
+test("unsupported claim detection scopes composition percentages and guarantee inflections", () => {
+  assert.equal(
+    findUnsupportedFixedClaim("Specify 100% cotton as the fibre composition.", {
+      allowExactCottonComposition: true,
+    }),
+    null
+  );
+
+  for (const unsafeClaim of [
+    "The fabric delivers 95% recovery.",
+    "The article has 30% shrinkage.",
+    "The finish provides guaranteed recovery.",
+    "The finish is guaranteeing recovery.",
+    "The finish is ensuring recovery.",
+  ]) {
+    assert.ok(
+      findUnsupportedFixedClaim(unsafeClaim, {
+        allowExactCottonComposition: true,
+      }),
+      `expected unsupported-claim detection for: ${unsafeClaim}`
+    );
+  }
+});
+
 test("commercial fabric pages emit evidence-aligned WebPage schema", async () => {
   const schema = await readSource("lib/finished-fabric-schema.ts");
 
@@ -315,48 +405,210 @@ test("French terry category does not publish fixed values or guarantees", async 
   );
 
   assert.ok(category?.procurement);
-  const claimsText = [
-    category.description,
-    ...category.sourcingOverview,
-    ...category.specificationChecks.map((check) => check.detail),
-    ...category.developmentGuidance,
-    category.procurement.evidence.capability,
-    ...category.procurement.evidence.qualitySteps,
-    category.procurement.evidence.boundary,
-    category.procurement.cta.heading,
-    category.procurement.cta.body,
-    ...category.relatedLinks.map((link) => link.description),
-    ...category.faq.map((faq) => faq.answer),
-  ].join(" ");
+  assertNoUnsupportedFixedClaims(category);
+});
 
-  assert.doesNotMatch(
-    claimsText,
-    /\b\d+(?:\.\d+)?\s*(?:gsm|g\/m(?:2|²)|cm|mm|in(?:ch(?:es)?)?|%|kg|lb(?:s)?|cycles?|grade)\b/i
+test("Cotton jersey category publishes a focused procurement brief", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-jersey"
   );
-  assert.doesNotMatch(
-    claimsText,
-    /\b(?:certified|certification|certificate|guarantees?|ensures?|always|never)\b/i
-  );
-  assert.doesNotMatch(claimsText, /\bcapacity\b/i);
-  for (const fixedCommercialPattern of [
-    /\bfixed\s+(?:MOQ|lead time|capacity)\b/i,
-    /(?:\bMOQ\b|\blead time\b)[^.!?]{0,25}\b\d+(?:\.\d+)?\b/i,
-    /\b\d+(?:\.\d+)?\b[^.!?]{0,25}(?:\bMOQ\b|\blead time\b)/i,
+
+  assert.ok(category, "expected the Cotton jersey category in the public catalogue");
+  assert.equal(category.name, "Cotton jersey fabrics");
+  assert.equal(category.shortName, "Cotton jersey");
+  assert.match(category.description, /^Cotton jersey fabric\b/);
+  assert.match(category.description, /single-knit/i);
+  assert.match(category.description, /vertical V-shaped stitch legs/i);
+  assert.match(category.description, /horizontal stitch crowns/i);
+  assert.doesNotMatch(category.description, /\breverse loops?\b|\bloop-back\b/i);
+  for (const application of [
+    "T-shirts",
+    "Base layers",
+    "Loungewear",
+    "Private-label basics",
   ]) {
-    assert.doesNotMatch(claimsText, fixedCommercialPattern);
-  }
-
-  const commercialTermSentences =
-    claimsText
-      .match(/[^.!?]*(?:\bMOQ\b|\blead time\b|\bcapacity\b)[^.!?]*[.!?]?/gi) ??
-    [];
-  for (const sentence of commercialTermSentences) {
-    assert.match(
-      sentence,
-      /\b(?:confirm|inquiry-specific|not verif|rather than promised)\w*/i,
-      `commercial terms must remain inquiry-specific: ${sentence}`
+    assert.ok(
+      category.applications.includes(application),
+      `missing Cotton jersey application: ${application}`
     );
   }
+  for (const buyerIntent of category.buyerIntent) {
+    assert.match(
+      buyerIntent,
+      /^(?=.*\bcotton\b)(?=.*\bjersey\b).+$/i,
+      `buyer intent must keep Cotton jersey primary: ${buyerIntent}`
+    );
+  }
+
+  const sourcingOverview = category.sourcingOverview.join(" ");
+  assert.doesNotMatch(sourcingOverview, /\byarn direction\b/i);
+  assert.match(sourcingOverview, /\byarn (?:specification|system|count)\b/i);
+
+  assert.deepEqual(
+    category.specificationChecks.map((check) => check.label),
+    [
+      "Composition and yarn direction",
+      "GSM and opacity",
+      "Usable width",
+      "Stretch and recovery",
+      "Dyeing and surface finish",
+      "Shrinkage, spirality, pilling and colourfastness",
+    ]
+  );
+  const specificationByLabel = new Map(
+    category.specificationChecks.map((check) => [check.label, check.detail])
+  );
+  const compositionDetail =
+    specificationByLabel.get("Composition and yarn direction") ?? "";
+  assert.match(compositionDetail, /fibre composition/i);
+  assert.match(compositionDetail, /yarn count|linear density/i);
+  assert.match(compositionDetail, /carded or combed preparation/i);
+  assert.match(compositionDetail, /relevant spinning system/i);
+  assert.match(compositionDetail, /twist|torque/i);
+  assert.doesNotMatch(
+    compositionDetail,
+    /\bfibre direction\b|\bspinning direction\b/i
+  );
+
+  const stretchDetail =
+    specificationByLabel.get("Stretch and recovery") ?? "";
+  assert.match(stretchDetail, /construction-led stretch/i);
+  assert.match(stretchDetail, /residual growth/i);
+  assert.match(stretchDetail, /non-elastane/i);
+  assert.match(stretchDetail, /elastane-supported stretch/i);
+  assert.match(stretchDetail, /confirm/i);
+
+  for (const check of category.specificationChecks) {
+    assert.ok(
+      check.detail.trim().length >= 100,
+      `${check.label} needs enough detail to guide a buyer`
+    );
+    assert.match(
+      check.detail,
+      /\b(?:specify|state|provide|confirm|agree|define|share)\w*/i,
+      `${check.label} must tell the buyer what to specify or confirm`
+    );
+  }
+
+  const guidance = category.developmentGuidance.join(" ");
+  assert.match(guidance, /catalogue article/i);
+  assert.match(guidance, /reference sample/i);
+  assert.match(guidance, /specification-led brief/i);
+  assert.match(guidance, /current sample/i);
+  assert.match(guidance, /current quotation/i);
+
+  assert.equal(category.faq.length, 6);
+  const faqQuestions = new Set(category.faq.map((item) => item.question));
+  for (const question of [
+    "What is cotton jersey fabric used for?",
+    "Can overseas buyers request cotton jersey samples?",
+    "How should buyers specify GSM and opacity for a cotton jersey T-shirt?",
+    "What is the difference between 100% cotton and cotton-rich jersey?",
+    "How should shrinkage and spirality be checked?",
+    "Can buyers request custom colour, finish and usable width?",
+  ]) {
+    assert.ok(faqQuestions.has(question), `missing Cotton jersey FAQ: ${question}`);
+  }
+
+  const relatedRoutes = new Set(category.relatedLinks.map((link) => link.href));
+  for (const route of [
+    "/fabrics/cotton-spandex-jersey",
+    "/fabrics/interlock-fabric",
+    "/blog/interlock-vs-jersey-fabric",
+    "/blog/what-is-interlock-fabric",
+    "/blog/what-is-rib-knit-fabric",
+    "/custom-knit-fabric-development",
+  ]) {
+    assert.ok(relatedRoutes.has(route), `missing Cotton jersey route: ${route}`);
+  }
+
+  assert.equal(
+    category.procurement?.cta.label,
+    "Request a cotton jersey sample or quotation"
+  );
+  assert.equal(category.procurement?.cta.inquiryOptionId, "cotton-jersey");
+});
+
+test("Cotton jersey evidence and FAQs keep claims attributable and bounded", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-jersey"
+  );
+
+  assert.ok(category?.procurement);
+  const { capability, qualitySteps, boundary } =
+    category.procurement.evidence;
+
+  assert.match(capability, /O'range Textile/);
+  assert.match(capability, /buyer brief/i);
+  assert.match(capability, /sample/i);
+  assert.match(capability, /specification/i);
+  assert.doesNotMatch(capability, /Jingtian|parent company|capacity/i);
+
+  assert.match(boundary, /historical\/draft catalogue/i);
+  assert.match(
+    boundary,
+    /does not verify[^.]*exact cotton jersey article[^.]*specification/i
+  );
+  assert.match(
+    boundary,
+    /\bavailability\b[^.]*\bMOQ\b[^.]*\blead time\b[^.]*inquiry-specific/i
+  );
+  assert.doesNotMatch(
+    [capability, ...qualitySteps, boundary].join(" "),
+    /\bcapacity\b/i
+  );
+  const qualityEvidence = qualitySteps.join(" ");
+  assert.match(qualityEvidence, /sewing trial/i);
+  assert.match(qualityEvidence, /spirality/i);
+  assert.match(qualityEvidence, /agreed wash(?:\/| and )dry method/i);
+
+  assert.equal(category.faq.length, 6);
+  for (const faq of category.faq) {
+    assert.ok(faq.answer.trim().length >= 120, `${faq.question} needs a useful answer`);
+    assert.match(
+      faq.answer,
+      /\b(?:buyer|brief|specif|sample|article|confirm|approve|test|garment|requirements?)\w*/i,
+      `${faq.question} needs procurement guidance`
+    );
+  }
+
+  const answersByQuestion = new Map(
+    category.faq.map((faq) => [faq.question, faq.answer])
+  );
+  const boundedAnswers = {
+    "Can overseas buyers request cotton jersey samples?":
+      /catalogue article|reference sample|specification-led brief/i,
+    "How should buyers specify GSM and opacity for a cotton jersey T-shirt?":
+      /no universal|confirm/i,
+    "What is the difference between 100% cotton and cotton-rich jersey?":
+      /does not by itself|confirm/i,
+    "How should shrinkage and spirality be checked?":
+      /test method|approve/i,
+    "Can buyers request custom colour, finish and usable width?":
+      /confirmed for the (?:specific )?inquiry|not assumed/i,
+  };
+
+  for (const [question, boundaryPattern] of Object.entries(boundedAnswers)) {
+    assert.match(
+      answersByQuestion.get(question) ?? "",
+      boundaryPattern,
+      `${question} needs explicit confirmation or evidence boundaries`
+    );
+  }
+});
+
+test("Cotton jersey category does not publish fixed values or guarantees", async () => {
+  const { publicFabricCategories } = await loadPublicCatalog();
+  const category = publicFabricCategories.find(
+    (item) => item.slug === "cotton-jersey"
+  );
+
+  assert.ok(category?.procurement);
+  assertNoUnsupportedFixedClaims(category, {
+    allowExactCottonComposition: true,
+  });
 });
 
 test("legacy category related fabric IDs resolve to a runtime public fabric record", async () => {

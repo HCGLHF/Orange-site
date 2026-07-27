@@ -77,60 +77,70 @@ export const publicFabricCategories: FabricCategory[] = [
     name: "Cotton jersey fabrics",
     shortName: "Cotton jersey",
     description:
-      "Soft, breathable knitted fabrics for T-shirts, base layers and everyday apparel programs.",
+      "Cotton jersey fabric is a single-knit construction with vertical V-shaped stitch legs on the smooth technical face and horizontal stitch crowns on the more textured technical back, commonly specified for T-shirts, base layers, loungewear and private-label basics.",
     sourcingOverview: [
-      "Cotton jersey is a single-knit construction selected for a soft hand, breathable wear and flexible drape. The category name alone does not define the finished result: yarn count, cotton quality, stitch density, GSM, usable width, dyeing and finishing all change how the fabric cuts, sews and performs in a garment.",
-      "Use this route to prepare a cotton jersey development brief rather than to assume a fixed stock specification. O'range Textile can review a target garment, reference swatch or performance brief, then confirm which finished-fabric article, sample route and commercial discussion fit the requirement.",
+      "Cotton jersey fabric is a single-knit construction often considered for soft, flexible apparel. The category name alone does not define the finished result: fibre composition, yarn count and yarn system, stitch density, GSM, usable width, dyeing and finishing can all change how the fabric looks, cuts, sews and behaves in a garment.",
+      "Use this page to prepare a cotton jersey fabric brief for T-shirts, base layers, loungewear or private-label basics rather than to assume a stock specification. Share the garment, colour, finish, care route and testing requirements so the offered article can be reviewed against its intended application.",
     ],
     specificationChecks: [
       {
         label: "Composition and yarn direction",
         detail:
-          "State whether the programme needs 100% cotton, a cotton-rich blend or another fibre direction, and provide the preferred yarn count or reference hand feel when known.",
+          "Within this sourcing field, provide the requested yarn specification rather than a fibre orientation: specify the fibre composition, yarn count or linear density, carded or combed preparation, the relevant spinning system, and twist or torque where spirality matters; confirm each field on the offered article.",
       },
       {
-        label: "GSM and usable width",
+        label: "GSM and opacity",
         detail:
-          "Give target weight and usable width as ranges when possible. The approved finished sample should be measured after the intended dyeing and finishing route.",
+          "State the target GSM or acceptable range together with garment colour, season, layering and opacity expectations, then confirm weight and coverage on the finished sample because dyeing and finishing can change its appearance.",
       },
       {
-        label: "Surface and dimensional behaviour",
+        label: "Usable width",
         detail:
-          "Review skew, spirality, shrinkage, pilling, colourfastness and recovery against the garment pattern and care requirements instead of relying on the word jersey alone.",
+          "Provide the required usable width and garment-marker context, agree when width will be measured after dyeing, finishing and relaxation, and confirm it against the current finished sample and quotation.",
       },
       {
-        label: "Garment and order context",
+        label: "Stretch and recovery",
         detail:
-          "Include the garment type, colour direction, quantity, destination, testing needs and required documentation so sales can evaluate the correct sourcing path.",
+          "Specify whether a non-elastane jersey brief is assessing construction-led stretch and residual growth or whether elastane-supported stretch and recovery are required, then define the direction and agreed test method and confirm the result on the finished sample.",
+      },
+      {
+        label: "Dyeing and surface finish",
+        detail:
+          "State the colour reference, target hand and requested surface finish together with any garment-wash context, then confirm the approved shade and finish on the current sample using agreed review methods.",
+      },
+      {
+        label: "Shrinkage, spirality, pilling and colourfastness",
+        detail:
+          "Specify the intended care route, test methods and tolerances for shrinkage, spirality, pilling and colourfastness, then confirm and approve the results for the exact finished article before a bulk decision.",
       },
     ],
     developmentGuidance: [
-      "For T-shirts and private-label basics, compare opacity, drape, seam appearance and wash stability on the actual colour and finish. A fabric that feels suitable in an unwashed swatch may behave differently after garment washing or repeated laundering.",
-      "The public catalogue is a reference for current finished-fabric directions, not a promise that every cotton jersey specification is held in every colour. Send the closest article, a swatch image or the target specification for private sample and RFQ confirmation.",
+      "Choose one of three development paths: start from a catalogue article, send a reference sample, or submit a specification-led brief covering the garment, composition, GSM, usable width, opacity, finish, colour and testing requirements.",
+      "For each path, O'range Textile can review the brief and coordinate the closest finished-fabric direction. The exact article, current sample route, availability and commercial terms must be confirmed in the current quotation rather than assumed from this category page.",
     ],
     buyerIntent: [
       "cotton jersey fabric manufacturer China",
-      "T-shirt fabric supplier Shaoxing",
-      "combed cotton single jersey for apparel brands",
+      "cotton jersey fabric supplier Shaoxing",
+      "combed cotton jersey for apparel brands",
     ],
     applications: ["T-shirts", "Base layers", "Loungewear", "Private-label basics"],
     relatedFabricIds: [],
     procurement: {
       evidence: {
         capability:
-          "O'range Textile can review a cotton jersey buyer brief, coordinate the closest finished sample and specification discussion with the sourcing team, and prepare an inquiry path for private confirmation.",
+          "O'range Textile can review a cotton jersey buyer brief, reference sample or requested specification, coordinate the closest finished-sample discussion with the sourcing team, and prepare the current sample and quotation path for private confirmation.",
         qualitySteps: [
           "Match the labeled finished sample to the agreed cotton jersey specification.",
-          "Review GSM, usable width, sewing behavior and wash results for the intended garment.",
+          "Run a sewing trial and review spirality after the agreed wash/dry method, alongside GSM, usable width and opacity, for the intended garment.",
           "Record dated approval, then confirm the current quotation for the requested program.",
         ],
         boundary:
-          "The 104-product historical/draft catalogue does not verify a current exact cotton jersey article. Availability, specification, MOQ and lead time remain inquiry-specific.",
+          "The 104-product historical/draft catalogue does not verify a current exact cotton jersey article or its specification. Current availability, MOQ and lead time are inquiry-specific and must be confirmed with the offered sample and quotation.",
       },
       cta: {
         heading: "Review a cotton jersey brief with the sourcing team",
         body:
-          "Send a target sample, garment use or specification so the closest finished-sample and quotation path can be reviewed.",
+          "Start from a catalogue article, reference sample or specification-led brief, then confirm the current sample and quotation for the intended garment.",
         label: "Request a cotton jersey sample or quotation",
         inquiryOptionId: "cotton-jersey",
       },
@@ -155,6 +165,24 @@ export const publicFabricCategories: FabricCategory[] = [
           "Compare body jersey with rib constructions used for trims and stretch-focused garments.",
       },
       {
+        href: "/fabrics/cotton-spandex-jersey",
+        label: "Compare cotton jersey with cotton spandex jersey",
+        description:
+          "Review when a closer-fitting garment brief needs elastane-supported stretch and recovery rather than a conventional cotton jersey direction.",
+      },
+      {
+        href: "/fabrics/interlock-fabric",
+        label: "Compare cotton jersey with interlock fabric",
+        description:
+          "Use the interlock route when the garment brief calls for a double-knit construction, balanced faces or greater edge stability.",
+      },
+      {
+        href: "/custom-knit-fabric-development",
+        label: "Send a cotton jersey development brief",
+        description:
+          "Share a catalogue article, reference sample or specification-led brief for a current sample and quotation review.",
+      },
+      {
         href: "/ready-stock-knit-fabrics",
         label: "Review current finished-fabric records",
         description:
@@ -165,12 +193,34 @@ export const publicFabricCategories: FabricCategory[] = [
       {
         question: "What is cotton jersey fabric used for?",
         answer:
-          "Cotton jersey fabric is commonly used for T-shirts, base layers, loungewear and soft everyday apparel.",
+          "Cotton jersey fabric is commonly considered for T-shirts, base layers, loungewear and private-label basics because the single-knit construction can provide a soft, flexible fabric direction. Buyers should still match the exact article, opacity, drape, seam behaviour and care route to the garment before approval.",
       },
       {
         question: "Can overseas buyers request cotton jersey samples?",
         answer:
-          "Yes. O'range Textile supports fabric sample requests for overseas apparel buyers and sourcing teams.",
+          "Yes. An overseas buyer can start from a catalogue article, send a reference sample or submit a specification-led brief. O'range Textile can then review the garment use and requested checks, while current sample availability and the quotation are confirmed for the inquiry.",
+      },
+      {
+        question:
+          "How should buyers specify GSM and opacity for a cotton jersey T-shirt?",
+        answer:
+          "There is no universal GSM for every cotton jersey T-shirt. State the season, colour, silhouette, layering and opacity requirement, then confirm GSM and coverage on the current finished sample under an agreed viewing or test method before approval.",
+      },
+      {
+        question:
+          "What is the difference between 100% cotton and cotton-rich jersey?",
+        answer:
+          "100% cotton identifies an all-cotton fibre composition, while cotton-rich jersey includes another disclosed fibre that may change stretch, recovery, hand or care behaviour. Composition does not by itself establish performance, so buyers should confirm construction, finish and test requirements on the exact article.",
+      },
+      {
+        question: "How should shrinkage and spirality be checked?",
+        answer:
+          "Buyers should state the conditioning, wash, drying and measurement method, plus acceptable shrinkage and spirality limits for the garment. Test the offered finished sample using the agreed method and approve the actual article rather than relying on a category-level result.",
+      },
+      {
+        question: "Can buyers request custom colour, finish and usable width?",
+        answer:
+          "A buyer can include custom colour, surface finish and usable-width targets in the brief. O'range Textile can review them against a catalogue article or reference sample, but the achievable combination, sample route and commercial terms are confirmed for the specific inquiry and not assumed from the category page.",
       },
     ],
   },
