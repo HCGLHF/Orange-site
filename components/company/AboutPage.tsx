@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -35,17 +36,30 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
       <StructuredData data={createAboutPageJsonLd(seo)} />
 
       <article>
-        <header className="relative overflow-hidden border-b border-brand-soft bg-white">
-          <div
-            className="absolute inset-y-0 right-0 hidden w-[38%] border-l border-brand-soft bg-brand-cream lg:block"
-            aria-hidden
+        <header className="relative isolate h-[clamp(26rem,58svh,35rem)] overflow-hidden border-b border-brand-soft bg-brand-charcoal lg:h-[clamp(34rem,75svh,49rem)]">
+          <Image
+            src="/images/company/about-circular-knitting-floor.png"
+            alt="Rows of circular knitting machines inside a modern knitting factory"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
           />
-          <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.25fr_0.75fr] lg:px-8 lg:py-28">
-            <div>
+          <div className="absolute inset-0 bg-black/45" aria-hidden />
+          <div className="relative z-10 flex h-full items-center justify-center px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-6xl font-bold leading-none tracking-[-0.055em] text-white drop-shadow-lg sm:text-7xl lg:text-8xl">
+              About Us
+            </p>
+          </div>
+        </header>
+
+        <section className="border-b border-brand-soft bg-white">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-start lg:px-8">
+            <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-800">
                 Company profile · Shaoxing, China
               </p>
-              <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.05] tracking-[-0.035em] text-brand-charcoal sm:text-5xl lg:text-7xl">
+              <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.05] tracking-[-0.035em] text-brand-charcoal sm:text-5xl lg:text-6xl">
                 {seo.h1}
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-brand-charcoal/80 sm:text-xl sm:leading-9">
@@ -56,20 +70,20 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
               </p>
             </div>
 
-            <aside className="self-end border-t-4 border-brand-orange pt-6">
+            <aside className="border border-brand-charcoal/15 border-t-4 border-t-brand-orange bg-brand-cream p-6 sm:p-7">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-charcoal/80">
                 Operating model
               </p>
-              <p className="mt-3 text-2xl font-semibold leading-8 text-brand-charcoal">
+              <p className="mt-3 text-xl font-semibold leading-7 text-brand-charcoal sm:text-2xl sm:leading-8">
                 Export communication at the front. Documented knitting
                 capability behind it.
               </p>
-              <p className="mt-5 text-sm leading-7 text-brand-charcoal/80">
+              <p className="mt-4 text-sm leading-7 text-brand-charcoal/80">
                 {companyRelationship.location}
               </p>
             </aside>
           </div>
-        </header>
+        </section>
 
         <section className="bg-brand-cream">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
