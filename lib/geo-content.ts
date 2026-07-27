@@ -1,10 +1,10 @@
-import { publicFabricCategories } from "@/lib/public-catalog";
+import { publicFabricCategories } from "./public-catalog.ts";
 import {
   certificationEvidence,
   companyRelationship,
   manufacturingScale,
-} from "@/lib/company-evidence";
-import { SEO_SITE_ORIGIN } from "@/lib/seo/site-seo";
+} from "./company-evidence.ts";
+import { SEO_SITE_ORIGIN } from "./seo/site-seo.ts";
 
 export const siteUrl = SEO_SITE_ORIGIN;
 

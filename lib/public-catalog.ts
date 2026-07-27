@@ -184,7 +184,7 @@ export const publicFabricCategories: FabricCategory[] = [
       },
       {
         href: "/ready-stock-knit-fabrics",
-        label: "Review current finished-fabric records",
+        label: "Review documented finished-fabric records",
         description:
           "Start from documented article data, then ask sales to confirm the closest sourcing route.",
       },

@@ -201,7 +201,7 @@ export function ReadyStockLanding({
             </Link>
           </div>
           <div className="mt-8">
-            <Suspense fallback={<p className="py-12 text-center text-sm text-brand-charcoal/60">Loading current fabric records...</p>}>
+            <Suspense fallback={<p className="py-12 text-center text-sm text-brand-charcoal/60">Loading fabric records...</p>}>
               <FabricsCatalog
                 fabrics={fabrics}
                 totalFabricCount={totalFabricCount}

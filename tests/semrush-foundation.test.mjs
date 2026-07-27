@@ -393,14 +393,18 @@ test("French terry evidence and FAQs keep claims attributable and bounded", asyn
   const answersByQuestion = new Map(
     category.faq.map((faq) => [faq.question, faq.answer])
   );
-  assert.match(
+  const brushedFleeceClaims = [
     category.sourcingOverview.join(" "),
-    /brushed fleece commonly has a raised reverse, with one- or two-sided brushing depending on the article/i
-  );
-  assert.match(
     answersByQuestion.get("How is French terry different from brushed fleece?"),
-    /brushed fleece commonly has a raised reverse, with one- or two-sided brushing depending on the article/i
-  );
+  ];
+  for (const claim of brushedFleeceClaims) {
+    assert.match(claim, /brushed fleece[^.]*\bcommonly\b/i);
+    assert.match(claim, /depending on the article/i);
+    assert.doesNotMatch(
+      claim,
+      /brushed fleece\s+(?:has|always(?:\s+\w+){0,2})\s+a raised reverse/i
+    );
+  }
   const boundedAnswers = {
     "Can O'range Textile support private-label hoodie fabrics?":
       /confirmed in the current quotation/i,

@@ -41,10 +41,7 @@ test("homepage content contract uses double knit fabric in summary and hero alt"
 
 test("catalogue provenance is neutral in landing, hero, and category fallback copy", async () => {
   const { landingPages } = await import("../content/landing-pages.ts");
-  const geoContentSource = await readFile(
-    new URL("../lib/geo-content.ts", import.meta.url),
-    "utf8"
-  );
+  const { publicFabricCategories } = await import("../lib/public-catalog.ts");
   const categoryRenderer = await readFile(
     new URL("../app/fabrics/[slug]/page.tsx", import.meta.url),
     "utf8"
@@ -63,10 +60,6 @@ test("catalogue provenance is neutral in landing, hero, and category fallback co
     landingPages.readyStock.summary,
     /the supplied 104-record finished-fabric catalogue/i
   );
-  assert.match(
-    geoContentSource,
-    /the supplied 104-record finished-fabric catalogue/i
-  );
   assert.match(categoryRenderer, />Catalogue evidence boundary<\/h2>/);
   assert.match(
     categoryRenderer,
@@ -75,13 +68,23 @@ test("catalogue provenance is neutral in landing, hero, and category fallback co
 
   const buyerVisibleCopy = [
     landingPages.readyStock.summary,
-    geoContentSource,
+    JSON.stringify(publicFabricCategories),
     categoryRenderer,
     ...catalogueUiSources,
   ].join("\n");
   assert.doesNotMatch(
     buyerVisibleCopy,
-    /historical\/draft|(?:current\s+)?owner-confirmed|\bcurrent(?:\s+[\w-]+){0,4}\s+catalogue\b/i
+    /historical\/draft|(?:current\s+)?owner-confirmed|\bcurrent\s+(?:(?!(?:quotation|availability|confirmation)\b)[\w-]+\s+){0,4}(?:catalogue|records?|workbook)\b/i
+  );
+});
+
+test("homepage hero uses the runtime catalogue provenance contract", async () => {
+  const { heroContent } = await import("../lib/geo-content.ts");
+
+  assert.match(heroContent.description, /double knit fabric/i);
+  assert.match(
+    heroContent.description,
+    /the supplied 104-record finished-fabric catalogue/i
   );
 });
 
