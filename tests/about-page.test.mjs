@@ -259,6 +259,41 @@ test("About route uses unified metadata and one registry-owned H1", () => {
   );
 });
 
+test("About uses a full-bleed cinematic image hero before the company introduction", () => {
+  const component = readFileSync(
+    path.join(root, "components", "company", "AboutPage.tsx"),
+    "utf8"
+  );
+
+  assert.match(component, /import Image from ["']next\/image["']/);
+  assert.match(
+    component,
+    /<header\b[^>]*h-\[clamp\(26rem,58svh,35rem\)\][^>]*lg:h-\[clamp\(34rem,75svh,49rem\)\]/
+  );
+  assert.match(
+    component,
+    /src=["']\/images\/company\/about-circular-knitting-floor\.png["']/
+  );
+  assert.match(
+    component,
+    /alt=["']Rows of circular knitting machines inside a modern knitting factory["']/
+  );
+  assert.match(component, /sizes=["']100vw["']/);
+  assert.match(component, /className=["']object-cover object-center["']/);
+  assert.match(component, /absolute inset-0 bg-black\/45/);
+  assert.match(component, />\s*About Us\s*</);
+  assert.match(
+    component,
+    /<\/header>\s*<section\b[\s\S]*?<h1\b[^>]*>[\s\S]*?\{seo\.h1\}[\s\S]*?<\/h1>/
+  );
+  assert.doesNotMatch(component, /alt=["'][^"']*illustrative[^"']*["']/i);
+  assert.doesNotMatch(
+    component,
+    /Illustrative manufacturing view|Replace with verified factory photography/
+  );
+  assert.doesNotMatch(component, /<figure\b/);
+});
+
 test("About schema identifies the parent without assigning its certificate to the subsidiary", () => {
   const source = readFileSync(
     path.join(root, "lib", "company-schema.ts"),
