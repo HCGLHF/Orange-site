@@ -22,10 +22,10 @@ export function LandingRouteChooser({ routes }: { routes: LandingRoute[] }) {
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase text-brand-orange">Choose a sourcing route</p>
           <h2 className="mt-3 text-3xl font-semibold leading-tight text-brand-charcoal md:text-4xl">
-            Choose a double knit fabric sourcing route
+            Choose a finished fabric sourcing route
           </h2>
           <p className="mt-4 text-base leading-8 text-brand-charcoal/70">
-            Each route opens a different buyer page, so stock selection, finished-fabric comparison and custom development no longer lead to the same generic catalogue view.
+            Start with the closest supplied fabric direction or send a private development brief when the required construction is not shown online.
           </p>
         </div>
 

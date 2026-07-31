@@ -36,18 +36,19 @@ export default function ContactCard() {
       <div className="cc-inner">
         <motion.div variants={reduceMotion ? undefined : fadeUp} className="cc-header">
           <h2 className="cc-title">
-            Request Knit Fabric Samples
+            Request Finished Fabric Samples
           </h2>
           <p className="cc-lead">
             Shaoxing Shicheng Textile Products Co., Ltd. supports overseas
-            buyers with sample requests, fabric selection and RFQ follow-up.
+            buyers with finished knit and woven fabric samples, development
+            direction and RFQ follow-up.
           </p>
         </motion.div>
 
         <motion.div variants={reduceMotion ? undefined : staggerContainer} className="cc-grid">
           <motion.a
             variants={reduceMotion ? undefined : fadeUp}
-            href="mailto:folenchen0401@outlook.com?subject=Knit%20fabric%20sample%20request&body=Hello%20O'range%20Textile%2C%0A%0AI%20am%20interested%20in%20your%20knit%20fabrics."
+            href="mailto:folenchen0401@outlook.com?subject=Finished%20fabric%20sample%20request&body=Hello%20O'range%20Textile%2C%0A%0AI%20am%20interested%20in%20your%20finished%20knit%20or%20woven%20fabrics."
             className="cc-card cc-card-link"
           >
             <div className="cc-icon cc-icon-orange">

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-07-27T19:59:03.797Z",
-  "gitCommit": "784c716dc543c8d31d12e034ce9884428384380c",
-  "buildId": "JENQr4XYwrGmuxht1PKwq",
-  "registryHash": "d57aa5405a573deb69534808f12441f565c62d62c8eeaacc28f330e75d5cb5f0",
+  "generatedAt": "2026-07-31T23:06:30.499Z",
+  "gitCommit": "1e5d96b5af4edcb83bf35c5cbb2c8714a8f7b06d",
+  "buildId": "gsNzbqjrPYqmfFgnb8qFO",
+  "registryHash": "774e6eed84f6265271cfb531a5d838ba09e502ca4dd2a0b9b8222aa7c5cde83a",
   "baseUrl": "http://127.0.0.1:3210",
   "productionOrigin": "https://orangetextiles.com",
   "summary": {
@@ -34,20 +34,19 @@
     {
       "url": "https://orangetextiles.com",
       "path": "/",
-      "primaryKeyword": "double knit fabric",
+      "primaryKeyword": "finished fabric supplier",
       "secondaryKeywords": [
-        "double knit fabric supplier",
-        "knit fabric supplier",
-        "finished knit fabric",
-        "custom knit fabric",
-        "wholesale knit fabric"
+        "finished knit fabric supplier",
+        "finished woven fabric supplier",
+        "premium finished fabrics",
+        "custom fabric development"
       ],
       "searchIntent": "commercial",
       "topicCluster": "core-category",
       "targetPageType": "homepage",
-      "title": "Double Knit Fabric for Global Apparel Brands | O'range Textile",
-      "metaDescription": "Double knit fabric sourcing for global apparel brands covering interlock, Ponte Roma, scuba, air-layer and jacquard directions. Compare documented specifications, samples and supplier capabilities, then send composition, GSM, usable width, finish, quantity and destination for an RFQ.",
-      "h1": "Double Knit Fabric for Global Apparel Sourcing",
+      "title": "Finished Fabric Supplier for Apparel Brands | O'range Textile",
+      "metaDescription": "Finished fabric supplier for apparel brands sourcing premium finished knit and woven fabrics from Shaoxing Keqiao. Review supplied catalogue evidence, start from a sample, image or garment brief, and confirm composition, GSM, width, finish, quantity and testing before requesting an RFQ.",
+      "h1": "Finished Fabric Supplier for Premium Global Apparel Sourcing",
       "h1Count": 1,
       "imageCount": 1,
       "imageAltResult": "PASS",
@@ -98,7 +97,7 @@
       "secondaryKeywords": [
         "bulk finished knit fabric",
         "wholesale knit fabric",
-        "finished fabric supplier",
+        "bulk knit fabric sourcing",
         "knitted fabric manufacturer"
       ],
       "searchIntent": "commercial",

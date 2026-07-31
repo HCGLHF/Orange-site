@@ -27,24 +27,24 @@ type GeoHomePageProps = {
 
 const buyerRoutes: LandingRoute[] = [
   {
-    title: "Supplied finished-fabric catalogue",
-    description: "Review 104 documented articles, then confirm the exact colour, quantity, finish and commercial terms directly with sales.",
-    href: "/ready-stock-knit-fabrics",
-    action: "Review catalogue",
+    title: "Finished knit fabrics",
+    description: "Review article-level knit evidence across structured, air-layer, wool-blend, brushed, cashmere-blend and jacquard directions before confirming the exact specification.",
+    href: "/fabrics",
+    action: "Review finished knits",
     icon: "stock",
   },
   {
-    title: "Double knit fabric manufacturing and finished-fabric directions",
-    description: "Compare 11 documented air-layer, structured, brushed, wool-blend, cashmere-blend and jacquard series.",
-    href: "/finished-double-knit-fabrics",
-    action: "Compare finished fabrics",
+    title: "Finished woven fabrics",
+    description: "Source structure, stretch and medium-to-heavy woven directions from the approved partner-supply catalogue, with exact article evidence confirmed during inquiry.",
+    href: "/fabrics#inquiry-form",
+    action: "Send a woven fabric brief",
     icon: "range",
   },
   {
-    title: "Private fabric or garment inquiry",
-    description: "Send greige fabric, finished fabric or garment requirements for direct review by the sourcing team.",
+    title: "Custom fabric development",
+    description: "Start from an image, hand feel, reference sample, garment brief or functional target and let the sourcing team translate it into an executable fabric direction.",
     href: "/custom-knit-fabric-development",
-    action: "Build a development brief",
+    action: "Start a development brief",
     icon: "custom",
   },
 ];
@@ -71,9 +71,9 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
           <div className="mx-auto max-w-7xl">
             <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr]">
               <div>
-                <p className="text-sm font-semibold uppercase text-brand-orange">Why buyers start here</p>
+                <p className="text-sm font-semibold uppercase text-brand-orange">What we believe</p>
                 <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
-                  One sourcing route from greige fabric to finished garments
+                  Premium fabric development begins with a clear shared direction
                 </h2>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -94,14 +94,14 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase text-brand-orange">Article starting points</p>
-              <h2 className="mt-3 text-3xl font-semibold">Featured knit fabrics</h2>
+              <p className="text-sm font-semibold uppercase text-brand-orange">Finished-fabric starting points</p>
+              <h2 className="mt-3 text-3xl font-semibold">Selected finished knit articles</h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-brand-charcoal/70">
-                Use a listed article as the starting point for a sample request, or send a garment brief when the required construction is not shown.
+                These knit articles are selected from the current online library. Use one as a sample reference, explore the dedicated double-knit catalogue, or send a woven or custom fabric brief when the required direction is not shown.
               </p>
             </div>
-            <Link href="/fabrics" className="text-sm font-semibold text-brand-orange hover:underline">
-              View the full fabric library
+            <Link href="/finished-double-knit-fabrics" className="text-sm font-semibold text-brand-orange hover:underline">
+              Explore finished double-knit fabrics
             </Link>
           </div>
           {notionEmpty || featuredFabrics.length === 0 ? (

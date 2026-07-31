@@ -67,45 +67,46 @@ export type PublicLandingPage = Omit<LandingPageRecord, "editorNotes">;
 
 export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
   home: {
-    purpose: "Present the integrated production route and direct overseas buyers to the right inquiry path.",
-    eyebrow: "Integrated knit fabric and garment supply in Shaoxing Keqiao",
-    headline: "From Greige Fabric to Finished Fabric and Garment Supply",
+    purpose: "Present O'range as a premium finished knit and woven fabric supplier and direct global apparel buyers to the right development path.",
+    eyebrow: "Premium finished fabric development in Shaoxing Keqiao",
+    headline: "Premium Finished Fabrics for Global Apparel Sourcing",
     summary:
-      "Source double knit fabric through a documented finished-fabric route spanning interlock, Ponte Roma, scuba, air-layer, jacquard and other structured knit directions. Start from a catalogue article, reference sample or specification-led brief, then confirm composition, GSM, usable width, finish, colour, quantity and testing in the current quotation.",
+      "Source premium finished knit and finished woven fabrics through a specification-led route in Shaoxing Keqiao. Start from a catalogue article, reference sample or garment brief, then confirm exact requirements in the current quotation.",
     heroImage: {
       src: "/images/finished-fabrics/finished-double-knit-factory.webp",
-      alt: "Finished double knit fabric rolls and swatches in front of circular knitting machines",
+      alt: "Premium finished fabric rolls and swatches displayed in a Shaoxing textile production setting",
     },
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },
-      { label: "Production route", value: "Greige fabric, finished fabric and garments", enabled: true },
+      { label: "Finished-fabric scope", value: "Knit and woven development directions", enabled: true },
       { label: "Parent-company machine record", value: `${manufacturingScale[0].value} documented circular knitting machines`, enabled: true },
-      { label: "Export experience", value: "Asia, Europe, the Americas and Russia", enabled: true },
+      { label: "Export experience", value: "Bangladesh, Russia, Nepal, Europe, the United States and South America", enabled: true },
     ],
     advantages: [
       {
-        title: "An integrated production route",
-        body: "The current export offer focuses on finished fabrics, but the production chain can connect greige fabric, finished fabric and finished garment requirements within one sourcing conversation.",
+        title: "Belief starts the collaboration",
+        body: "We believe every successful collaboration begins with the belief that an idea is worth bringing to life.",
         enabled: true,
       },
       {
-        title: "Experience across buyer markets",
-        body: "Completed export business has included buyers in Bangladesh, Russia, Nepal, Europe, the United States and South America, supporting both fabric and apparel enquiries.",
+        title: "Development turns inspiration into fabric",
+        body: "From an image, hand feel or garment brief, O'range Textile turns inspiration into premium finished fabric solutions through informed development, transparent communication and disciplined follow-through.",
         enabled: true,
       },
       {
-        title: "Documentation available when relevant",
-        body: "GRS documentation can be reviewed for applicable recycled-fibre programmes. Scope, transaction coverage and supporting files are confirmed for the specific order during the inquiry process.",
+        title: "Commercial details stay order-specific",
+        body: "The wider production route can extend from greige fabric to finished fabric and finished garments. Composition, GSM, usable width, finish, colour, quantity, testing, documentation and lead time are confirmed against the selected article or approved development brief before an order proceeds. GRS documentation can be reviewed when applicable to the product and shipment.",
         enabled: true,
       },
     ],
     checklist: [],
     process: [],
     faq: [],
-    primaryCta: { label: "Send a fabric or garment inquiry", href: "/fabrics#inquiry-form" },
-    secondaryCta: { label: "Review 104 finished-fabric articles", href: "/finished-double-knit-fabrics" },
+    primaryCta: { label: "Send a finished-fabric inquiry", href: "/fabrics#inquiry-form" },
+    secondaryCta: { label: "Review finished knit fabrics", href: "/fabrics" },
     editorNotes: [
-      "The integrated greige-to-garment route and export markets were supplied by the business owner for this review.",
+      "The supplied A-J knit archive and Jincang woven catalogue are approved as O'range sales and development evidence.",
+      "Do not present archive records, draft concept images or missing specifications as live-stock guarantees.",
       "Do not publish customer names or transaction values without separate approval.",
       "Keep GRS language conditional on the applicable order and available transaction documentation.",
     ],

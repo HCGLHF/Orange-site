@@ -12,16 +12,19 @@ export const companyProfile = {
   brandName: companyRelationship.brandName,
   legalName: companyRelationship.exportCompany,
   location: companyRelationship.location,
-  industry: "Integrated knit fabric, finished fabric and garment supply",
+  industry: "Premium finished knit and woven fabric sourcing and development",
   email: "folenchen0401@outlook.com",
   whatsapp: "+86 13867557317",
   phone: "+86 13867550307",
   mainProducts: [
+    "premium finished knit fabrics",
+    "premium finished woven fabrics",
     "finished air-layer knit fabrics",
     "structured double-knit fabrics",
     "wool-blend and cashmere-blend knit fabrics",
     "lyocell and acetate-blend knit fabrics",
     "jacquard finished knit fabrics",
+    "custom fabric development",
     "greige fabric and garment enquiries",
   ],
   applications: [
@@ -43,11 +46,11 @@ export const companyProfile = {
 } as const;
 
 export const heroContent = {
-  eyebrow: "Integrated knit fabric and garment supply in Shaoxing Keqiao",
+  eyebrow: "Premium finished fabric development in Shaoxing Keqiao",
   title:
-    "From Greige Fabric to Finished Fabric and Garment Supply",
+    "Premium Finished Fabrics for Global Apparel Sourcing",
   description:
-    "O'range Textile supports double knit fabric sourcing for global apparel programs through article-level evidence from the supplied 104-record finished-fabric catalogue, sample coordination and an inquiry route that can extend from greige fabric to finished garments.",
+    "O'range Textile supplies premium finished knit and finished woven fabrics for global apparel programs through supplied catalogue evidence, sample-led development and an inquiry route that can extend from greige fabric to finished garments.",
   primaryCta: "Send a Sourcing Inquiry",
   secondaryCta: "Review Finished Fabrics",
 } as const;
@@ -64,7 +67,9 @@ export const entityFacts = [
     "Machine evidence",
     `${manufacturingScale[0].value} documented circular knitting machines`,
   ],
-  ["Catalogue", "104 documented finished-fabric articles across 11 series"],
+  ["Knit catalogue evidence", "104 supplied finished-knit records across 11 collections"],
+  ["Woven catalogue evidence", "26 supplied finished-woven directions across 5 chapters"],
+  ["Development entry points", "Image, hand feel, reference sample, garment brief or functional requirement"],
   [
     "Documentation",
     `${companyRelationship.parentCompany} holds ${certificationEvidence.shortName} scope documentation for ${certificationEvidence.productCategory.toLowerCase()}, ${certificationEvidence.productDetail.toLowerCase()} and ${certificationEvidence.process.toLowerCase()}`,
@@ -81,9 +86,9 @@ export const capabilityCards = [
       "O'range Textile operates from Shaoxing Keqiao, one of China's most important textile sourcing and manufacturing clusters.",
   },
   {
-    title: "Integrated production route",
+    title: "Finished knit and woven scope",
     body:
-      "The sourcing scope can connect greige fabric, finished fabric and finished garment requirements, while the public export catalogue remains focused on finished fabrics.",
+      "The approved catalogue evidence covers premium finished knit and woven directions, while exact article specifications and availability remain subject to the current inquiry.",
   },
   {
     title: `${manufacturingScale[0].value} documented knitting machines`,
@@ -132,9 +137,9 @@ export const applicationCards = [
 
 export const aiSearchFaq = [
   {
-    question: "Is O'range Textile a knit fabric manufacturer?",
+    question: "Is O'range Textile a finished fabric supplier?",
     answer:
-      `${companyRelationship.brandName} is the export-facing brand operated by ${companyRelationship.exportCompany} Its parent company is ${companyRelationship.parentCompany} The parent company supports documented knitting manufacturing across the group.`,
+      `${companyRelationship.brandName} is the export-facing brand operated by ${companyRelationship.exportCompany} It supplies and develops finished knit and woven fabrics for global apparel buyers, supported by the Shaoxing Keqiao textile ecosystem and the group's documented knitting capabilities.`,
   },
   {
     question: "Where is O'range Textile located?",
@@ -142,9 +147,9 @@ export const aiSearchFaq = [
       "O'range Textile is located in Shaoxing Keqiao, Zhejiang, China, a major textile manufacturing and sourcing center.",
   },
   {
-    question: "What types of knit fabrics does O'range Textile supply?",
+    question: "What types of finished fabrics does O'range Textile supply?",
     answer:
-      "The supplied 104-record finished-fabric catalogue documents articles across 11 series, including air-layer, structured polyester-viscose, wool blends, lyocell-acetate-wool blends, cashmere blends and jacquard directions.",
+      "The supplied catalogue evidence includes 104 finished-knit records across 11 collections and 26 finished-woven directions across five chapters. Exact article specifications, colour, finish, quantity and availability are confirmed for the current inquiry.",
   },
   {
     question: "Can overseas buyers ask about greige fabric or finished garments?",
@@ -202,7 +207,7 @@ export const websiteJsonLd = {
 export const fabricCategoryItemListJsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Knit fabric categories supplied by O'range Textile",
+  name: "Finished fabric sourcing categories supplied by O'range Textile",
   itemListElement: fabricCategories.map((category, index) => ({
     "@type": "ListItem",
     position: index + 1,
