@@ -23,8 +23,8 @@ export function SiteFooter() {
             {companyRelationship.brandName}
           </p>
           <p className="sf-copy">
-            {companyRelationship.exportCompany} · Export-focused knit fabric
-            sourcing from Shaoxing Keqiao.
+            {companyRelationship.exportCompany} · Premium finished knit and
+            woven fabric sourcing from Shaoxing Keqiao.
           </p>
         </div>
 

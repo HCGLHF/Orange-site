@@ -103,17 +103,17 @@ test("landing machine proof labels identify the parent-company record", async ()
 
 test("AI-search FAQ legal names do not produce duplicate punctuation", async () => {
   const evidence = await import(pathToFileURL(evidencePath).href);
-  const geoSource = readFileSync(path.join(root, "lib", "geo-content.ts"), "utf8");
-  const manufacturerAnswer =
-    `${evidence.companyRelationship.brandName} is the export-facing brand operated by ` +
-    `${evidence.companyRelationship.exportCompany} Its parent company is ` +
-    `${evidence.companyRelationship.parentCompany} The parent company supports documented knitting manufacturing across the group.`;
-
-  assert.match(
-    geoSource,
-    /\$\{companyRelationship\.exportCompany\} Its parent company is \$\{companyRelationship\.parentCompany\} The parent company supports/
+  const geo = await import(
+    pathToFileURL(path.join(root, "lib", "geo-content.ts")).href
   );
-  assert.doesNotMatch(manufacturerAnswer, /Ltd\.\.|Ltd\., supports/);
+  const supplierAnswer = geo.aiSearchFaq.find((item) =>
+    item.question.includes("finished fabric supplier")
+  )?.answer;
+
+  assert.ok(supplierAnswer);
+  assert.match(supplierAnswer, /finished knit and woven fabrics/i);
+  assert.ok(supplierAnswer.includes(evidence.companyRelationship.exportCompany));
+  assert.doesNotMatch(supplierAnswer, /Ltd\.\.|Ltd\.,/);
 });
 
 test("certificate design specification is UTF-8 clean and preserves exact facts", () => {

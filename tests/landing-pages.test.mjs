@@ -32,11 +32,21 @@ test("landing registry exposes four unique buyer purposes without editor notes",
   assert.ok(pages.every((page) => page.secondaryCta.href));
 });
 
-test("homepage content contract uses double knit fabric in summary and hero alt", async () => {
+test("homepage content contract covers premium finished knit and woven fabrics", async () => {
   const { landingPages } = await import("../content/landing-pages.ts");
 
-  assert.match(landingPages.home.summary, /double knit fabric/i);
-  assert.match(landingPages.home.heroImage.alt, /double knit fabric/i);
+  const homeText = JSON.stringify(landingPages.home);
+  assert.match(landingPages.home.summary, /finished knit/i);
+  assert.match(landingPages.home.summary, /finished woven/i);
+  assert.match(landingPages.home.heroImage.alt, /finished fabric/i);
+  assert.match(
+    homeText,
+    /We believe every successful collaboration begins with the belief that an idea is worth bringing to life\./
+  );
+  assert.match(
+    homeText,
+    /From an image, hand feel or garment brief, O'range Textile turns inspiration into premium finished fabric solutions through informed development, transparent communication and disciplined follow-through\./
+  );
 });
 
 test("catalogue provenance is neutral in landing, hero, and category fallback copy", async () => {
@@ -81,10 +91,11 @@ test("catalogue provenance is neutral in landing, hero, and category fallback co
 test("homepage hero uses the runtime catalogue provenance contract", async () => {
   const { heroContent } = await import("../lib/geo-content.ts");
 
-  assert.match(heroContent.description, /double knit fabric/i);
+  assert.match(heroContent.description, /finished knit/i);
+  assert.match(heroContent.description, /finished woven/i);
   assert.match(
     heroContent.description,
-    /the supplied 104-record finished-fabric catalogue/i
+    /supplied catalogue evidence/i
   );
 });
 
@@ -114,7 +125,7 @@ test("landing copy reflects the supplied export, production and inquiry evidence
   assert.match(landingPages.customDevelopment.primaryCta.href, /#contact|#inquiry-form/);
 });
 
-test("homepage renders its SEO H1, hero alt, sourcing route, and finished double-knit link", async () => {
+test("homepage renders its SEO H1, broad sourcing routes, and a contextual double-knit link", async () => {
   const geoHomeSource = await readFile(
     new URL("../components/geo/GeoHomePage.tsx", import.meta.url),
     "utf8"
@@ -152,12 +163,36 @@ test("homepage renders its SEO H1, hero alt, sourcing route, and finished double
   );
   assert.match(
     landingRouteChooserSource,
-    /<h2\b[^>]*>\s*choose a double knit fabric sourcing route\s*<\/h2>/i
+    /<h2\b[^>]*>\s*choose a finished fabric sourcing route\s*<\/h2>/i
   );
+  for (const routeTitle of [
+    "Finished knit fabrics",
+    "Finished woven fabrics",
+    "Custom fabric development",
+  ]) {
+    assert.match(geoHomeSource, new RegExp(`title:\\s*"${routeTitle}"`, "i"));
+  }
   assert.match(
     geoHomeSource,
-    /\{\s*title:\s*"[^"]*double[- ]knit fabric[^"]*"[\s\S]*?href:\s*"\/finished-double-knit-fabrics"/i
+    /(?:href:\s*|href=)"\/finished-double-knit-fabrics"/i
   );
+});
+
+test("shared homepage contact and footer copy support all finished fabrics", async () => {
+  const [contactCardSource, siteFooterSource] = await Promise.all(
+    [
+      "../components/ContactCard.tsx",
+      "../components/ui/SiteFooter.tsx",
+    ].map((relativePath) =>
+      readFile(new URL(relativePath, import.meta.url), "utf8")
+    )
+  );
+
+  assert.match(contactCardSource, /Request Finished Fabric Samples/i);
+  assert.match(contactCardSource, /Finished%20fabric%20sample%20request/i);
+  assert.doesNotMatch(contactCardSource, /Request Knit Fabric Samples/i);
+  assert.match(siteFooterSource, /premium finished knit and\s+woven fabric/i);
+  assert.doesNotMatch(siteFooterSource, /Export-focused knit fabric sourcing/i);
 });
 
 test("ready-stock and custom development routes have distinct buyer flows", async () => {

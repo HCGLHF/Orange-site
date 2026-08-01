@@ -38,17 +38,18 @@ test("SEO registry owns exactly 33 normalized public pages", async () => {
   }
 });
 
-test("homepage owns the commercial double knit fabric query", async () => {
+test("homepage owns the commercial finished fabric supplier query", async () => {
   const { getPublicPageSeo } = await loadSeo();
   const page = getPublicPageSeo("/");
 
-  assert.equal(page.primaryKeyword, "double knit fabric");
-  assert.ok(page.secondaryKeywords.includes("knit fabric supplier"));
+  assert.equal(page.primaryKeyword, "finished fabric supplier");
+  assert.ok(page.secondaryKeywords.includes("finished knit fabric supplier"));
+  assert.ok(page.secondaryKeywords.includes("finished woven fabric supplier"));
   assert.equal(
     page.metaTitle,
-    "Double Knit Fabric for Global Apparel Brands | O'range Textile"
+    "Finished Fabric Supplier for Apparel Brands | O'range Textile"
   );
-  assert.equal(page.h1, "Double Knit Fabric for Global Apparel Sourcing");
+  assert.equal(page.h1, "Finished Fabric Supplier for Premium Global Apparel Sourcing");
   assert.equal(page.searchIntent, "commercial");
   assert.equal(page.targetPageType, "homepage");
 });
@@ -208,10 +209,10 @@ test("crawl fields use the production origin and stable valid values", async () 
   }
 });
 
-test("updated catalogue entry points expose the 2026-07-28 sitemap date", async () => {
+test("updated catalogue entry points expose their reviewed sitemap dates", async () => {
   const { getPublicPageSeo } = await loadSeo();
   const expectedUpdatedAt = new Map([
-    ["/", "2026-07-28"],
+    ["/", "2026-08-01"],
     ["/fabrics/fleece-french-terry", "2026-07-28"],
     ["/fabrics/cotton-jersey", "2026-07-28"],
     ["/fabrics/interlock-fabric", "2026-07-28"],
