@@ -9,18 +9,27 @@ import {
   updateGoogleConsent,
   writeConsent,
 } from "@/lib/analytics/consent";
+import type {
+  AnalyticsBootstrapStatus,
+  AnalyticsDataLayer,
+  GoogleTag,
+} from "@/types/analytics";
 
 type StorageDouble = Pick<Storage, "getItem" | "setItem">;
 
 function asCall(item: unknown): unknown[] {
-  return Array.from(item as ArrayLike<unknown>);
+  return Array.from(item as unknown as ArrayLike<unknown>);
+}
+
+function runtimeQueueItems(dataLayer: AnalyticsDataLayer | undefined): unknown[] {
+  return (dataLayer ?? []) as unknown as unknown[];
 }
 
 function executeHeadScript(storage: StorageDouble) {
   const scriptWindow: {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
-    __orangeAnalyticsBootstrap?: unknown;
+    dataLayer?: AnalyticsDataLayer;
+    gtag?: GoogleTag;
+    __orangeAnalyticsBootstrap?: AnalyticsBootstrapStatus;
     localStorage: StorageDouble;
   } = { localStorage: storage };
 
@@ -154,13 +163,13 @@ describe("buildAnalyticsHeadScript", () => {
   it("queues fail-closed consent and privacy settings before reading storage", () => {
     let callsAtRead: unknown[][] = [];
     const getItem = vi.fn(() => {
-      callsAtRead = scriptWindow.dataLayer?.map(asCall) ?? [];
+      callsAtRead = runtimeQueueItems(scriptWindow.dataLayer).map(asCall);
       return '{"version":1,"analytics":"granted"}';
     });
     const scriptWindow: {
-      dataLayer?: unknown[];
-      gtag?: (...args: unknown[]) => void;
-      __orangeAnalyticsBootstrap?: unknown;
+      dataLayer?: AnalyticsDataLayer;
+      gtag?: GoogleTag;
+      __orangeAnalyticsBootstrap?: AnalyticsBootstrapStatus;
       localStorage: StorageDouble;
     } = { localStorage: { getItem, setItem: vi.fn() } };
 
@@ -176,7 +185,7 @@ describe("buildAnalyticsHeadScript", () => {
       ["set", "allow_ad_personalization_signals", false],
       ["set", "ads_data_redaction", true],
     ]);
-    expect(scriptWindow.dataLayer?.map(asCall)).toEqual([
+    expect(runtimeQueueItems(scriptWindow.dataLayer).map(asCall)).toEqual([
       ...callsAtRead,
       ["consent", "update", {
         analytics_storage: "granted",
@@ -195,7 +204,7 @@ describe("buildAnalyticsHeadScript", () => {
   ])("reports %s saved consent without queuing an update", (_label, value, status) => {
     const scriptWindow = executeHeadScript({ getItem: () => value, setItem: vi.fn() });
 
-    expect(scriptWindow.dataLayer?.map(asCall)).toHaveLength(3);
+    expect(runtimeQueueItems(scriptWindow.dataLayer).map(asCall)).toHaveLength(3);
     expect(scriptWindow.__orangeAnalyticsBootstrap).toEqual(status);
   });
 
@@ -207,7 +216,7 @@ describe("buildAnalyticsHeadScript", () => {
       setItem: vi.fn(),
     });
 
-    expect(scriptWindow.dataLayer?.map(asCall)).toHaveLength(3);
+    expect(runtimeQueueItems(scriptWindow.dataLayer).map(asCall)).toHaveLength(3);
     expect(scriptWindow.__orangeAnalyticsBootstrap).toEqual({
       choice: null,
       error: "storage_unavailable",
@@ -216,9 +225,9 @@ describe("buildAnalyticsHeadScript", () => {
 
   it("queues default-denied and reports unavailable when localStorage property access throws", () => {
     const scriptWindow: {
-      dataLayer?: unknown[];
-      gtag?: (...args: unknown[]) => void;
-      __orangeAnalyticsBootstrap?: unknown;
+      dataLayer?: AnalyticsDataLayer;
+      gtag?: GoogleTag;
+      __orangeAnalyticsBootstrap?: AnalyticsBootstrapStatus;
     } = {};
     Object.defineProperty(scriptWindow, "localStorage", {
       get() {
@@ -244,7 +253,7 @@ describe("buildAnalyticsHeadScript", () => {
       }
     }
 
-    expect(scriptWindow.dataLayer?.map(asCall)[0]).toEqual([
+    expect(runtimeQueueItems(scriptWindow.dataLayer).map(asCall)[0]).toEqual([
       "consent",
       "default",
       {
@@ -278,7 +287,7 @@ describe("buildGtmBootstrap", () => {
     const isolatedDocument = document.implementation.createHTMLDocument("analytics");
     const seedScript = isolatedDocument.createElement("script");
     isolatedDocument.head.append(seedScript);
-    const scriptWindow: { dataLayer?: unknown[] } = {};
+    const scriptWindow: { dataLayer?: AnalyticsDataLayer } = {};
 
     Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
       scriptWindow,
@@ -305,10 +314,10 @@ describe("buildGtmBootstrap", () => {
     const isolatedDocument = document.implementation.createHTMLDocument("analytics");
     isolatedDocument.head.append(isolatedDocument.createElement("script"));
     const scriptWindow: {
-      dataLayer?: unknown[];
-      gtag?: (...args: unknown[]) => void;
+      dataLayer?: AnalyticsDataLayer;
+      gtag?: GoogleTag;
       localStorage: StorageDouble;
-      __orangeAnalyticsBootstrap?: unknown;
+      __orangeAnalyticsBootstrap?: AnalyticsBootstrapStatus;
     } = {
       localStorage: { getItem: () => null, setItem: vi.fn() },
     };
@@ -319,7 +328,7 @@ describe("buildGtmBootstrap", () => {
       isolatedDocument,
     );
 
-    const dataLayer = scriptWindow.dataLayer ?? [];
+    const dataLayer = runtimeQueueItems(scriptWindow.dataLayer);
     const consentDefaultIndex = dataLayer.findIndex((item) => {
       const call = asCall(item);
       return call[0] === "consent" && call[1] === "default";

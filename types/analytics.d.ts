@@ -1,30 +1,28 @@
 export type AnalyticsConsentChoice = "granted" | "denied";
 export type InquiryFormName = "single_inquiry" | "batch_inquiry";
 
+declare const controlledAnalyticsDataLayerItem: unique symbol;
+
+type ControlledAnalyticsDataLayerItem = {
+  readonly [controlledAnalyticsDataLayerItem]: true;
+};
+
 export type OrangePageViewDataLayerItem = {
   event: "orange_page_view";
   page_path: string;
   page_location: string;
   page_referrer?: string;
-};
+} & ControlledAnalyticsDataLayerItem;
 
 export type OrangeGenerateLeadDataLayerItem = {
   event: "orange_generate_lead";
   form_name: InquiryFormName;
-};
+} & ControlledAnalyticsDataLayerItem;
 
 export type GtmStartDataLayerItem = {
   "gtm.start": number;
   event: "gtm.js";
-};
-
-export type AnalyticsDataLayerItem =
-  | OrangePageViewDataLayerItem
-  | OrangeGenerateLeadDataLayerItem
-  | GtmStartDataLayerItem
-  | IArguments;
-
-export type AnalyticsDataLayer = AnalyticsDataLayerItem[];
+} & ControlledAnalyticsDataLayerItem;
 
 export type GoogleConsentDefault = {
   analytics_storage: "denied";
@@ -39,6 +37,47 @@ export type GoogleConsentUpdate = {
   ad_user_data: "denied";
   ad_personalization: "denied";
 };
+
+export type GoogleConsentDefaultCommand = readonly [
+  "consent",
+  "default",
+  GoogleConsentDefault,
+];
+
+export type GoogleConsentUpdateCommand = readonly [
+  "consent",
+  "update",
+  GoogleConsentUpdate,
+];
+
+export type GoogleAllowAdPersonalizationSignalsCommand = readonly [
+  "set",
+  "allow_ad_personalization_signals",
+  false,
+];
+
+export type GoogleAdsDataRedactionCommand = readonly ["set", "ads_data_redaction", true];
+
+export type GoogleQueuedCommand =
+  | GoogleConsentDefaultCommand
+  | GoogleConsentUpdateCommand
+  | GoogleAllowAdPersonalizationSignalsCommand
+  | GoogleAdsDataRedactionCommand;
+
+export type AnalyticsDataLayerItem =
+  | OrangePageViewDataLayerItem
+  | OrangeGenerateLeadDataLayerItem
+  | GtmStartDataLayerItem
+  | GoogleQueuedCommand;
+
+/**
+ * Application code must use the controlled event API added in Task 5.
+ * Generated inline Google code owns runtime queue mutation.
+ */
+export interface AnalyticsDataLayer {
+  readonly length: number;
+  readonly [index: number]: AnalyticsDataLayerItem;
+}
 
 export interface GoogleTag {
   (command: "consent", action: "default", consent: GoogleConsentDefault): void;
