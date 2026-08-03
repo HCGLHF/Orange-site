@@ -8,7 +8,7 @@ export function buildAnalyticsHeadScript(): string {
   const storageKey = JSON.stringify(ANALYTICS_CONSENT_STORAGE_KEY);
   const version = JSON.stringify(ANALYTICS_CONSENT_VERSION);
 
-  return `(function(w,s){
+  return `(function(w){
 w.dataLayer=w.dataLayer||[];
 w.gtag=function(){w.dataLayer.push(arguments);};
 w.gtag("consent","default",{analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied"});
@@ -16,7 +16,7 @@ w.gtag("set","allow_ad_personalization_signals",false);
 w.gtag("set","ads_data_redaction",true);
 var status={choice:null,error:null};
 try{
-var raw=s.getItem(${storageKey});
+var raw=w.localStorage.getItem(${storageKey});
 if(raw!==null){
 try{
 var saved=JSON.parse(raw);
@@ -29,7 +29,7 @@ w.gtag("consent","update",{analytics_storage:saved.analytics,ad_storage:"denied"
 }
 }catch(e){status.error="storage_unavailable";}
 w.__orangeAnalyticsBootstrap=status;
-})(window,localStorage);`;
+})(window);`;
 }
 
 export function buildGtmBootstrap(id: string): string {

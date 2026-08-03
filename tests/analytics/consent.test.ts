@@ -21,9 +21,10 @@ function executeHeadScript(storage: StorageDouble) {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
     __orangeAnalyticsBootstrap?: unknown;
-  } = {};
+    localStorage: StorageDouble;
+  } = { localStorage: storage };
 
-  Function("window", "localStorage", buildAnalyticsHeadScript())(scriptWindow, storage);
+  Function("window", buildAnalyticsHeadScript())(scriptWindow);
   return scriptWindow;
 }
 
@@ -160,12 +161,10 @@ describe("buildAnalyticsHeadScript", () => {
       dataLayer?: unknown[];
       gtag?: (...args: unknown[]) => void;
       __orangeAnalyticsBootstrap?: unknown;
-    } = {};
+      localStorage: StorageDouble;
+    } = { localStorage: { getItem, setItem: vi.fn() } };
 
-    Function("window", "localStorage", buildAnalyticsHeadScript())(scriptWindow, {
-      getItem,
-      setItem: vi.fn(),
-    });
+    Function("window", buildAnalyticsHeadScript())(scriptWindow);
 
     expect(callsAtRead).toEqual([
       ["consent", "default", {
@@ -209,6 +208,52 @@ describe("buildAnalyticsHeadScript", () => {
     });
 
     expect(scriptWindow.dataLayer?.map(asCall)).toHaveLength(3);
+    expect(scriptWindow.__orangeAnalyticsBootstrap).toEqual({
+      choice: null,
+      error: "storage_unavailable",
+    });
+  });
+
+  it("queues default-denied and reports unavailable when localStorage property access throws", () => {
+    const scriptWindow: {
+      dataLayer?: unknown[];
+      gtag?: (...args: unknown[]) => void;
+      __orangeAnalyticsBootstrap?: unknown;
+    } = {};
+    Object.defineProperty(scriptWindow, "localStorage", {
+      get() {
+        throw new Error("blocked");
+      },
+    });
+
+    const globalStorageDescriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      get() {
+        throw new Error("blocked before IIFE");
+      },
+    });
+
+    try {
+      expect(() => Function("window", buildAnalyticsHeadScript())(scriptWindow)).not.toThrow();
+    } finally {
+      if (globalStorageDescriptor) {
+        Object.defineProperty(globalThis, "localStorage", globalStorageDescriptor);
+      } else {
+        Reflect.deleteProperty(globalThis, "localStorage");
+      }
+    }
+
+    expect(scriptWindow.dataLayer?.map(asCall)[0]).toEqual([
+      "consent",
+      "default",
+      {
+        analytics_storage: "denied",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+      },
+    ]);
     expect(scriptWindow.__orangeAnalyticsBootstrap).toEqual({
       choice: null,
       error: "storage_unavailable",
