@@ -3,17 +3,16 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-import { pushPageView, sanitizePathname } from "@/lib/analytics/events";
+import { pushPageView } from "@/lib/analytics/events";
 
 export function AnalyticsRouteTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const pagePath = sanitizePathname(pathname);
-    if (window.__orangeLastTrackedPath === pagePath) return;
+    if (window.__orangeLastTrackedPath === pathname) return;
 
-    window.__orangeLastTrackedPath = pagePath;
-    pushPageView(pagePath, window.location.href, document.referrer);
+    window.__orangeLastTrackedPath = pathname;
+    pushPageView(pathname, window.location.href, document.referrer);
   }, [pathname]);
 
   return null;

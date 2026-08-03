@@ -70,6 +70,20 @@ describe("AnalyticsRouteTracker", () => {
     await waitFor(() => expect(queuedPaths()).toEqual(["/blog"]));
   });
 
+  it.each(["/%", "//unknown", "/line\nbreak", "/null\u0000segment"])(
+    "skips malformed observed path %j and later tracks one genuine homepage view",
+    async (malformedPathname) => {
+      pathname = malformedPathname;
+      const view = render(<AnalyticsRouteTracker />);
+      await waitFor(() => expect(queuedPaths()).toEqual([]));
+
+      pathname = "/";
+      view.rerender(<AnalyticsRouteTracker />);
+
+      await waitFor(() => expect(queuedPaths()).toEqual(["/"]));
+    },
+  );
+
   it("renders nothing", () => {
     const { container } = render(<AnalyticsRouteTracker />);
     expect(container).toBeEmptyDOMElement();
