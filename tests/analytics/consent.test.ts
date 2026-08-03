@@ -274,6 +274,75 @@ describe("buildAnalyticsHeadScript", () => {
 });
 
 describe("buildGtmBootstrap", () => {
+  it("inserts one asynchronous GTM request and queues one startup item", () => {
+    const isolatedDocument = document.implementation.createHTMLDocument("analytics");
+    const seedScript = isolatedDocument.createElement("script");
+    isolatedDocument.head.append(seedScript);
+    const scriptWindow: { dataLayer?: unknown[] } = {};
+
+    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
+      scriptWindow,
+      isolatedDocument,
+    );
+
+    const insertedScripts = Array.from(isolatedDocument.scripts).filter(
+      (script) => script !== seedScript,
+    );
+    expect(insertedScripts).toHaveLength(1);
+    expect(insertedScripts[0].async).toBe(true);
+    expect(insertedScripts[0].src).toBe(
+      "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
+    );
+    expect(scriptWindow.dataLayer).toHaveLength(1);
+    const startup = scriptWindow.dataLayer?.[0] as
+      | { "gtm.start": number; event: "gtm.js" }
+      | undefined;
+    expect(startup?.event).toBe("gtm.js");
+    expect(startup?.["gtm.start"]).toEqual(expect.any(Number));
+  });
+
+  it("starts GTM once after the consent default in the shared data layer", () => {
+    const isolatedDocument = document.implementation.createHTMLDocument("analytics");
+    isolatedDocument.head.append(isolatedDocument.createElement("script"));
+    const scriptWindow: {
+      dataLayer?: unknown[];
+      gtag?: (...args: unknown[]) => void;
+      localStorage: StorageDouble;
+      __orangeAnalyticsBootstrap?: unknown;
+    } = {
+      localStorage: { getItem: () => null, setItem: vi.fn() },
+    };
+
+    Function("window", buildAnalyticsHeadScript())(scriptWindow);
+    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
+      scriptWindow,
+      isolatedDocument,
+    );
+
+    const dataLayer = scriptWindow.dataLayer ?? [];
+    const consentDefaultIndex = dataLayer.findIndex((item) => {
+      const call = asCall(item);
+      return call[0] === "consent" && call[1] === "default";
+    });
+    const gtmStartItems = dataLayer.filter(
+      (item) =>
+        typeof item === "object" &&
+        item !== null &&
+        "event" in item &&
+        item.event === "gtm.js",
+    );
+    const gtmStartIndex = dataLayer.indexOf(gtmStartItems[0]);
+    const gtmScripts = Array.from(isolatedDocument.scripts).filter(
+      (script) =>
+        script.src === "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
+    );
+
+    expect(consentDefaultIndex).toBeGreaterThanOrEqual(0);
+    expect(gtmStartItems).toHaveLength(1);
+    expect(gtmStartIndex).toBeGreaterThan(consentDefaultIndex);
+    expect(gtmScripts).toHaveLength(1);
+  });
+
   it("emits one startup event and one GTM request for a validated ID without consent logic", () => {
     const script = buildGtmBootstrap("GTM-5FHDLXGV");
 
