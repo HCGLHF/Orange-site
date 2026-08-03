@@ -82,6 +82,14 @@ function runtimeDataLayer(): RuntimeAnalyticsDataLayer | null {
     : null;
 }
 
+function safeEnqueue(item: AnalyticsDataLayerItem): void {
+  try {
+    runtimeDataLayer()?.push(item);
+  } catch {
+    // Analytics must never interrupt the user action being measured.
+  }
+}
+
 function createPageView(
   pagePath: string,
   pageLocation: string,
@@ -117,7 +125,7 @@ export function pushPageView(pathname: string, locationHref: string, referrer: s
   if (pagePath === null || !isTrackablePublicPath(pagePath)) return;
 
   const location = sanitizedLocation(locationHref, pagePath);
-  runtimeDataLayer()?.push(
+  safeEnqueue(
     createPageView(
       pagePath,
       location.pageLocation,
@@ -128,5 +136,5 @@ export function pushPageView(pathname: string, locationHref: string, referrer: s
 
 export function pushGenerateLead(formName: InquiryFormName): void {
   if (typeof window === "undefined") return;
-  runtimeDataLayer()?.push(createGenerateLead(formName));
+  safeEnqueue(createGenerateLead(formName));
 }

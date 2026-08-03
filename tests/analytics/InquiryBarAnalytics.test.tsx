@@ -111,6 +111,90 @@ describe("InquiryBar conversion analytics", () => {
     }
   });
 
+  it("keeps the accepted-submission success flow when analytics push throws", async () => {
+    const throwingDataLayer: Array<Record<string, string>> = [];
+    throwingDataLayer.push = () => {
+      throw new Error("analytics queue unavailable");
+    };
+    window.dataLayer = throwingDataLayer as unknown as Window["dataLayer"];
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, skipped: false }),
+      } as Response)
+      .mockResolvedValueOnce({ ok: true } as Response);
+    const resetSpy = vi
+      .spyOn(HTMLFormElement.prototype, "reset")
+      .mockImplementation(() => undefined);
+    const user = await renderOpenBatchInquiry();
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    await screen.findByRole("heading", { name: "Submitted" });
+    expect(resetSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("emits exactly once after a successful skipped-response Formspree fallback", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, skipped: true }),
+      } as Response)
+      .mockResolvedValueOnce({ ok: true } as Response);
+    const user = await renderOpenBatchInquiry();
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    await screen.findByRole("heading", { name: "Submitted" });
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+  });
+
+  it("does not emit when a skipped-response Formspree fallback is non-ok", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, skipped: true }),
+      } as Response)
+      .mockResolvedValueOnce({ ok: false } as Response);
+    const user = await renderOpenBatchInquiry();
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("Submission failed. Please try again or email us directly."),
+      ).toBeInTheDocument(),
+    );
+    expect(window.dataLayer).toEqual([]);
+  });
+
+  it("does not emit when a skipped-response Formspree fallback rejects", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, skipped: true }),
+      } as Response)
+      .mockRejectedValueOnce(new Error("fallback offline"));
+    const user = await renderOpenBatchInquiry();
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("Submission failed. Please try again or email us directly."),
+      ).toBeInTheDocument(),
+    );
+    expect(window.dataLayer).toEqual([]);
+  });
+
   it("does not push a lead when validation fails", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     await renderOpenBatchInquiry();

@@ -47,6 +47,22 @@ describe("InquiryModal conversion analytics", () => {
     expect(analyticsPayload).not.toContain("500 kg confidential");
   });
 
+  it("keeps the accepted-submission success flow when the analytics queue is frozen", async () => {
+    window.dataLayer = Object.freeze([]) as unknown as Window["dataLayer"];
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: true } as Response);
+    vi.spyOn(window, "alert").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const onClose = renderModal();
+    const user = await completeModalInquiry();
+
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(window.alert).toHaveBeenCalledWith(
+      "Submitted successfully. We will contact you shortly.",
+    );
+  });
+
   it("does not push a lead when validation fails", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     renderModal();

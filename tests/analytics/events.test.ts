@@ -149,6 +149,28 @@ describe("analytics events", () => {
     expect(Object.keys((window.dataLayer ?? [])[0] ?? {})).toEqual(["event", "form_name"]);
   });
 
+  it("does not throw when the analytics queue is frozen", () => {
+    window.dataLayer = Object.freeze([]) as unknown as Window["dataLayer"];
+
+    expect(() => pushGenerateLead("single_inquiry")).not.toThrow();
+    expect(() =>
+      pushPageView("/about", "https://orange-textile.com/about", ""),
+    ).not.toThrow();
+  });
+
+  it("does not throw when the analytics queue push method throws", () => {
+    const throwingDataLayer: Array<Record<string, string>> = [];
+    throwingDataLayer.push = () => {
+      throw new Error("analytics queue unavailable");
+    };
+    window.dataLayer = throwingDataLayer as unknown as Window["dataLayer"];
+
+    expect(() => pushGenerateLead("batch_inquiry")).not.toThrow();
+    expect(() =>
+      pushPageView("/fabrics", "https://orange-textile.com/fabrics", ""),
+    ).not.toThrow();
+  });
+
   it("only accepts the two application form names at compile time", () => {
     if (false) {
       // @ts-expect-error Arbitrary form names must not cross the analytics boundary.
