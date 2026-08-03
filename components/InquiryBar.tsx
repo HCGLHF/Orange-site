@@ -9,6 +9,7 @@ import {
   FORMSPREE_INQUIRY_ENDPOINT,
 } from "@/lib/inquiry-storage";
 import { OPEN_BATCH_INQUIRY_EVENT } from "@/lib/inquiry-events";
+import { pushGenerateLead } from "@/lib/analytics/events";
 
 export function InquiryBar() {
   const { t } = useLocale();
@@ -169,6 +170,7 @@ export function InquiryBar() {
         }).catch(() => {});
       }
 
+      pushGenerateLead("batch_inquiry");
       form.reset();
       setSubmitted(true);
       setTimeout(() => {

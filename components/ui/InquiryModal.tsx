@@ -11,6 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/LocaleProvider";
+import { pushGenerateLead } from "@/lib/analytics/events";
 
 export type { InquiryRecord };
 
@@ -109,6 +110,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       });
 
       if (response.ok) {
+        pushGenerateLead("single_inquiry");
         alert("Submitted successfully. We will contact you shortly.");
         handleClose();
       } else {
