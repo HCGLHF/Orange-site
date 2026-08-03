@@ -1,6 +1,8 @@
 export const TRACKABLE_PUBLIC_PATHS = [
   "/",
   "/about",
+  "/privacy",
+  "/terms",
   "/fabrics",
   "/ready-stock-knit-fabrics",
   "/finished-double-knit-fabrics",

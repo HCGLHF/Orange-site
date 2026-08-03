@@ -20,6 +20,7 @@ const allowedPageTypes = new Set([
   "guide",
   "blog",
   "about",
+  "legal",
 ]);
 const allowedChangeFrequencies = new Set(["daily", "weekly", "monthly"]);
 
@@ -28,14 +29,56 @@ const includesFolded = (text, keyword) =>
     .toLocaleLowerCase("en-US")
     .includes(keyword.toLocaleLowerCase("en-US"));
 
-test("SEO registry owns exactly 33 normalized public pages", async () => {
+test("SEO registry owns exactly 35 normalized public pages", async () => {
   const { getAllPublicPageSeo } = await loadSeo();
   const pages = getAllPublicPageSeo();
-  assert.equal(pages.length, 33);
+  assert.equal(pages.length, 35);
   assert.equal(new Set(pages.map((page) => page.path)).size, pages.length);
   for (const page of pages) {
     assert.match(page.path, /^\/(?:[a-z0-9-]+(?:\/[a-z0-9-]+)*)?$/);
   }
+});
+
+test("privacy and terms pages own exact navigational legal records", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+
+  assert.deepEqual(getPublicPageSeo("/privacy"), {
+    path: "/privacy",
+    primaryKeyword: "O'range Textile privacy policy",
+    secondaryKeywords: [
+      "analytics privacy choices",
+      "textile inquiry data privacy",
+    ],
+    searchIntent: "navigational",
+    topicCluster: "legal",
+    targetPageType: "legal",
+    metaTitle: "O'range Textile Privacy Policy | Analytics and Inquiries",
+    metaDescription:
+      "O'range Textile privacy policy explains how Shaoxing Shicheng Textile Products Co., Ltd. handles buyer inquiries, browser storage, GA4 cookieless measurement, optional analytics cookies, service providers, retention, choices and privacy contact requests.",
+    h1: "O'range Textile Privacy Policy",
+    updatedAt: "2026-08-03",
+    changeFrequency: "monthly",
+    priority: 0.2,
+  });
+
+  assert.deepEqual(getPublicPageSeo("/terms"), {
+    path: "/terms",
+    primaryKeyword: "O'range Textile terms of service",
+    secondaryKeywords: [
+      "textile website terms",
+      "fabric inquiry terms",
+    ],
+    searchIntent: "navigational",
+    topicCluster: "legal",
+    targetPageType: "legal",
+    metaTitle: "O'range Textile Terms of Service | Website Use",
+    metaDescription:
+      "O'range Textile terms of service explain permitted website use, informational fabric content, inquiry status, specification and availability confirmation, intellectual property, external services, disclaimers, liability limits and contact.",
+    h1: "O'range Textile Terms of Service",
+    updatedAt: "2026-08-03",
+    changeFrequency: "monthly",
+    priority: 0.2,
+  });
 });
 
 test("homepage owns the commercial finished fabric supplier query", async () => {

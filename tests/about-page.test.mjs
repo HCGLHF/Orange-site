@@ -335,6 +335,8 @@ test("global shell exposes About without duplicating the homepage footer", () =>
     "/fabrics",
     "/finished-double-knit-fabrics",
     "/custom-knit-fabric-development",
+    "/privacy",
+    "/terms",
   ];
 
   assert.match(shell, /<SiteFooter\s*\/>/);

@@ -15,5 +15,7 @@ test("analytics public paths exactly match the current SEO registry", async () =
   assert.deepEqual(analyticsPaths, seoPaths);
   assert.equal(new Set(analyticsPaths).size, analyticsPaths.length);
   for (const path of seoPaths) assert.equal(isTrackablePublicPath(path), true, path);
+  assert.equal(isTrackablePublicPath("/privacy"), true);
+  assert.equal(isTrackablePublicPath("/terms"), true);
   assert.equal(isTrackablePublicPath("/blog/buyer%40example.com"), false);
 });

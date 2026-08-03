@@ -12,7 +12,8 @@ export type SeoPageType =
   | "service"
   | "guide"
   | "blog"
-  | "about";
+  | "about"
+  | "legal";
 
 export type PublicPageSeo = {
   path: string;
@@ -68,6 +69,42 @@ const publicPageSeo = [
     updatedAt: "2026-07-23",
     changeFrequency: "monthly",
     priority: 0.7,
+  },
+  {
+    path: "/privacy",
+    primaryKeyword: "O'range Textile privacy policy",
+    secondaryKeywords: [
+      "analytics privacy choices",
+      "textile inquiry data privacy",
+    ],
+    searchIntent: "navigational",
+    topicCluster: "legal",
+    targetPageType: "legal",
+    metaTitle: "O'range Textile Privacy Policy | Analytics and Inquiries",
+    metaDescription:
+      "O'range Textile privacy policy explains how Shaoxing Shicheng Textile Products Co., Ltd. handles buyer inquiries, browser storage, GA4 cookieless measurement, optional analytics cookies, service providers, retention, choices and privacy contact requests.",
+    h1: "O'range Textile Privacy Policy",
+    updatedAt: "2026-08-03",
+    changeFrequency: "monthly",
+    priority: 0.2,
+  },
+  {
+    path: "/terms",
+    primaryKeyword: "O'range Textile terms of service",
+    secondaryKeywords: [
+      "textile website terms",
+      "fabric inquiry terms",
+    ],
+    searchIntent: "navigational",
+    topicCluster: "legal",
+    targetPageType: "legal",
+    metaTitle: "O'range Textile Terms of Service | Website Use",
+    metaDescription:
+      "O'range Textile terms of service explain permitted website use, informational fabric content, inquiry status, specification and availability confirmation, intellectual property, external services, disclaimers, liability limits and contact.",
+    h1: "O'range Textile Terms of Service",
+    updatedAt: "2026-08-03",
+    changeFrequency: "monthly",
+    priority: 0.2,
   },
   {
     path: "/fabrics",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PrivacySettingsButton } from "@/components/ui/PrivacySettingsButton";
 import { companyRelationship } from "@/lib/company-evidence";
 
 const footerLinks = [
@@ -12,6 +13,8 @@ const footerLinks = [
     href: "/custom-knit-fabric-development",
     label: "Custom development",
   },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Service" },
 ] as const;
 
 export function SiteFooter() {
@@ -40,6 +43,9 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <PrivacySettingsButton />
+            </li>
           </ul>
         </nav>
       </div>

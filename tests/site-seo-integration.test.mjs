@@ -17,6 +17,8 @@ const staticRoutes = [
   "app/finished-double-knit-fabrics/page.tsx",
   "app/custom-knit-fabric-development/page.tsx",
   "app/blog/page.tsx",
+  "app/privacy/page.tsx",
+  "app/terms/page.tsx",
 ];
 
 test("all static pages use createPageMetadata", async () => {
