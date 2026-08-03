@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
-import Script from "next/script";
 import { AppShell } from "@/components/AppShell";
 import { InquiryProvider } from "@/components/InquiryProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
+import { AnalyticsConsentProvider } from "@/components/analytics/AnalyticsConsentProvider";
+import { AnalyticsRouteTracker } from "@/components/analytics/AnalyticsRouteTracker";
+import { buildAnalyticsHeadScript, buildGtmBootstrap } from "@/lib/analytics/bootstrap";
+import { getGtmContainerId } from "@/lib/analytics/config";
 import { SEO_SITE_ORIGIN } from "@/lib/seo/site-seo";
 import "./globals.css";
 
@@ -11,7 +14,6 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
 });
-const GA_ID = "G-LXGZLVJXNP";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SEO_SITE_ORIGIN),
@@ -22,29 +24,42 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gtmContainerId = getGtmContainerId();
+
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} antialiased bg-gray-50`}>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-          strategy="afterInteractive"
+      <head>
+        <script
+          id="analytics-consent-default"
+          dangerouslySetInnerHTML={{ __html: buildAnalyticsHeadScript() }}
         />
-        <Script id="ga4-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_ID}', {
-              page_title: document.title,
-              page_location: window.location.href,
-            });
-          `}
-        </Script>
-        <LocaleProvider>
-          <InquiryProvider>
-            <AppShell>{children}</AppShell>
-          </InquiryProvider>
-        </LocaleProvider>
+        {gtmContainerId ? (
+          <script
+            id="google-tag-manager"
+            dangerouslySetInnerHTML={{ __html: buildGtmBootstrap(gtmContainerId) }}
+          />
+        ) : null}
+      </head>
+      <body className={`${spaceGrotesk.variable} antialiased bg-gray-50`}>
+        {gtmContainerId ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmContainerId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        ) : null}
+        <AnalyticsConsentProvider>
+          <AnalyticsRouteTracker />
+          <LocaleProvider>
+            <InquiryProvider>
+              <AppShell>{children}</AppShell>
+            </InquiryProvider>
+          </LocaleProvider>
+        </AnalyticsConsentProvider>
       </body>
     </html>
   );
