@@ -2,7 +2,7 @@ import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-let pathname = "/products";
+let pathname = "/fabrics";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => pathname,
@@ -23,7 +23,7 @@ function queuedPaths(): string[] {
 
 describe("AnalyticsRouteTracker", () => {
   beforeEach(() => {
-    pathname = "/products";
+    pathname = "/fabrics";
   });
 
   it("tracks the initial pathname once in React Strict Mode", async () => {
@@ -33,30 +33,41 @@ describe("AnalyticsRouteTracker", () => {
       </React.StrictMode>,
     );
 
-    await waitFor(() => expect(queuedPaths()).toEqual(["/products"]));
+    await waitFor(() => expect(queuedPaths()).toEqual(["/fabrics"]));
   });
 
   it("does not duplicate the same pathname after a remount", async () => {
     const first = render(<AnalyticsRouteTracker />);
-    await waitFor(() => expect(queuedPaths()).toEqual(["/products"]));
+    await waitFor(() => expect(queuedPaths()).toEqual(["/fabrics"]));
     first.unmount();
 
     render(<AnalyticsRouteTracker />);
 
-    await waitFor(() => expect(queuedPaths()).toEqual(["/products"]));
+    await waitFor(() => expect(queuedPaths()).toEqual(["/fabrics"]));
   });
 
   it("tracks pathname changes and tracks a revisited pathname again", async () => {
     const view = render(<AnalyticsRouteTracker />);
-    await waitFor(() => expect(queuedPaths()).toEqual(["/products"]));
+    await waitFor(() => expect(queuedPaths()).toEqual(["/fabrics"]));
 
-    pathname = "/contact?private=value";
+    pathname = "/about?private=value";
     view.rerender(<AnalyticsRouteTracker />);
-    await waitFor(() => expect(queuedPaths()).toEqual(["/products", "/contact"]));
+    await waitFor(() => expect(queuedPaths()).toEqual(["/fabrics", "/about"]));
 
-    pathname = "/products";
+    pathname = "/fabrics";
     view.rerender(<AnalyticsRouteTracker />);
-    await waitFor(() => expect(queuedPaths()).toEqual(["/products", "/contact", "/products"]));
+    await waitFor(() => expect(queuedPaths()).toEqual(["/fabrics", "/about", "/fabrics"]));
+  });
+
+  it("skips an unknown path and tracks a later allowlisted navigation", async () => {
+    pathname = "/blog/buyer%40example.com";
+    const view = render(<AnalyticsRouteTracker />);
+    await waitFor(() => expect(queuedPaths()).toEqual([]));
+
+    pathname = "/blog";
+    view.rerender(<AnalyticsRouteTracker />);
+
+    await waitFor(() => expect(queuedPaths()).toEqual(["/blog"]));
   });
 
   it("renders nothing", () => {

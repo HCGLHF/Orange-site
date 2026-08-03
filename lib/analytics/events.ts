@@ -4,6 +4,7 @@ import type {
   OrangeGenerateLeadDataLayerItem,
   OrangePageViewDataLayerItem,
 } from "@/types/analytics";
+import { isTrackablePublicPath } from "@/lib/analytics/public-paths";
 
 export type InquiryFormName = AnalyticsInquiryFormName;
 
@@ -31,24 +32,39 @@ export function sanitizePathname(value: string): string {
   return parsePathname(value) ?? "/";
 }
 
-function absolutePageUrl(value: string, pathname: string): string | null {
+type SanitizedLocation = {
+  pageLocation: string;
+  origin: string | null;
+};
+
+function sanitizedLocation(value: string, pathname: string): SanitizedLocation {
   try {
     const url = new URL(value);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-    return `${url.origin}${pathname}`;
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return { pageLocation: pathname, origin: null };
+    }
+    return { pageLocation: `${url.origin}${pathname}`, origin: url.origin };
   } catch {
-    return null;
+    return { pageLocation: pathname, origin: null };
   }
 }
 
-function sanitizedReferrer(value: string): string | null {
+function sanitizedReferrer(value: string, currentOrigin: string | null): string | null {
   if (value === "") return null;
 
   try {
     const url = new URL(value);
     if (url.protocol !== "http:" && url.protocol !== "https:") return null;
     const pathname = parsePathname(url.pathname);
-    return pathname === null ? null : `${url.origin}${pathname}`;
+    if (
+      currentOrigin !== null &&
+      url.origin === currentOrigin &&
+      pathname !== null &&
+      isTrackablePublicPath(pathname)
+    ) {
+      return `${url.origin}${pathname}`;
+    }
+    return url.origin;
   } catch {
     return null;
   }
@@ -97,9 +113,17 @@ function createGenerateLead(formName: InquiryFormName): OrangeGenerateLeadDataLa
 export function pushPageView(pathname: string, locationHref: string, referrer: string): void {
   if (typeof window === "undefined") return;
 
-  const pagePath = sanitizePathname(pathname);
-  const pageLocation = absolutePageUrl(locationHref, pagePath) ?? pagePath;
-  runtimeDataLayer()?.push(createPageView(pagePath, pageLocation, sanitizedReferrer(referrer)));
+  const pagePath = parsePathname(pathname);
+  if (pagePath === null || !isTrackablePublicPath(pagePath)) return;
+
+  const location = sanitizedLocation(locationHref, pagePath);
+  runtimeDataLayer()?.push(
+    createPageView(
+      pagePath,
+      location.pageLocation,
+      sanitizedReferrer(referrer, location.origin),
+    ),
+  );
 }
 
 export function pushGenerateLead(formName: InquiryFormName): void {
