@@ -4,6 +4,16 @@ const CONSENT_KEY = "orange-textile.analytics-consent";
 const GTM_ID = "GTM-5FHDLXGV";
 const BANNER_COPY =
   "We use basic cookieless measurement by default. Accepting enables analytics cookies for more complete traffic and conversion reporting. You can change your choice at any time through Privacy settings in the footer. Read our terms.";
+const ALL_DENIED_UPDATE = [
+  "consent",
+  "update",
+  {
+    analytics_storage: "denied",
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+  },
+] as const;
 
 type ConsoleFailure = { kind: "console" | "pageerror"; message: string };
 type DataLayerSnapshotItem = unknown[] | Record<string, unknown>;
@@ -94,6 +104,70 @@ async function expectNoRuntimeFailures(failures: ConsoleFailure[]) {
   expect(failures, "console errors, page errors, or hydration errors").toEqual([]);
 }
 
+async function installNoReloadWitness(page: Page) {
+  const marker = await page.evaluate(() => {
+    const value = crypto.randomUUID();
+    Reflect.set(window, "__orangeE2EDocumentMarker", value);
+    return value;
+  });
+  let mainFrameNavigations = 0;
+  const countMainFrameNavigation = (frame: ReturnType<Page["mainFrame"]>) => {
+    if (frame === page.mainFrame()) mainFrameNavigations += 1;
+  };
+  page.on("framenavigated", countMainFrameNavigation);
+
+  return async () => {
+    const currentMarker = await page.evaluate(() =>
+      Reflect.get(window, "__orangeE2EDocumentMarker"),
+    );
+    page.off("framenavigated", countMainFrameNavigation);
+    expect(
+      currentMarker,
+      "the consent action must keep the current document",
+    ).toBe(marker);
+    expect(mainFrameNavigations, "the consent action must not navigate the main frame").toBe(0);
+  };
+}
+
+async function expectNewAllDeniedUpdateAfter(page: Page, startIndex: number) {
+  await expect
+    .poll(async () => {
+      const newItems = (await dataLayerSnapshot(page)).slice(startIndex);
+      return newItems.some(
+        (item) =>
+          Array.isArray(item) &&
+          item[0] === "consent" &&
+          item[1] === "update" &&
+          JSON.stringify(item) === JSON.stringify(ALL_DENIED_UPDATE),
+      );
+    })
+    .toBe(true);
+
+  const newItems = (await dataLayerSnapshot(page)).slice(startIndex);
+  expect(newItems).toContainEqual([...ALL_DENIED_UPDATE]);
+}
+
+async function expectSafeAreaSupport(page: Page) {
+  const banner = page.getByRole("region", { name: "Analytics privacy choices" });
+  await expect(banner.locator(":scope > div")).toHaveClass(
+    /pb-\[calc\(1\.25rem\+env\(safe-area-inset-bottom\)\)\]/,
+  );
+  expect(
+    await page.evaluate(() =>
+      Array.from(document.styleSheets).some((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules).some((rule) =>
+            rule.cssText.includes("env(safe-area-inset-bottom)"),
+          );
+        } catch {
+          return false;
+        }
+      }),
+    ),
+    "the rendered stylesheet must preserve the safe-area environment variable",
+  ).toBe(true);
+}
+
 test("queues denied consent before GTM and loads one exact container without standalone GA", async ({
   context,
   page,
@@ -161,9 +235,7 @@ test("shows the exact first-visit choices and Accept grants only analytics witho
   await expect(banner.getByRole("button")).toHaveCount(2);
   await expect(banner.getByRole("button", { name: /close/i })).toHaveCount(0);
 
-  const navigationEntriesBefore = await page.evaluate(
-    () => performance.getEntriesByType("navigation").length,
-  );
+  const assertSameDocument = await installNoReloadWitness(page);
   await banner.getByRole("button", { name: "Accept analytics cookies" }).click();
   await expect(banner).toBeHidden();
 
@@ -180,9 +252,7 @@ test("shows the exact first-visit choices and Accept grants only analytics witho
       ad_personalization: "denied",
     },
   ]);
-  expect(await page.evaluate(() => performance.getEntriesByType("navigation").length)).toBe(
-    navigationEntriesBefore,
-  );
+  await assertSameDocument();
 
   await page.reload();
   await expect(banner).toBeHidden();
@@ -206,8 +276,10 @@ test("Decline keeps all consent denied and remains hidden after refresh", async 
   await page.goto("/");
 
   const banner = page.getByRole("region", { name: "Analytics privacy choices" });
+  const assertSameDocument = await installNoReloadWitness(page);
   await banner.getByRole("button", { name: "Decline analytics cookies" }).click();
   await expect(banner).toBeHidden();
+  await assertSameDocument();
   expect(await page.evaluate((key) => localStorage.getItem(key), CONSENT_KEY)).toBe(
     '{"version":1,"analytics":"denied"}',
   );
@@ -273,16 +345,20 @@ test("same-origin tabs synchronize choices, removal, and invalid values fail clo
     .poll(async () => (await consentCommands(pageTwo, "update")).at(-1)?.[2])
     .toMatchObject({ analytics_storage: "denied" });
 
+  const beforeRemovalIndex = (await dataLayerSnapshot(pageTwo)).length;
   await pageOne.evaluate((key) => localStorage.removeItem(key), CONSENT_KEY);
   await expect(pageTwo.getByRole("region", { name: "Analytics privacy choices" })).toBeVisible();
-  await expect
-    .poll(async () => (await consentCommands(pageTwo, "update")).at(-1)?.[2])
-    .toMatchObject({ analytics_storage: "denied" });
+  await expectNewAllDeniedUpdateAfter(pageTwo, beforeRemovalIndex);
+  await expect(
+    pageTwo.getByText("We could not save your analytics choice in this browser."),
+  ).toHaveCount(0);
 
+  const beforeCorruptionIndex = (await dataLayerSnapshot(pageTwo)).length;
   await pageOne.evaluate(
     ([key, value]) => localStorage.setItem(key, value),
     [CONSENT_KEY, '{"version":999,"analytics":"granted"}'],
   );
+  await expectNewAllDeniedUpdateAfter(pageTwo, beforeCorruptionIndex);
   await expect(pageTwo.getByText("We could not save your analytics choice in this browser.")).toBeVisible();
   await expect(pageTwo.getByRole("region", { name: "Analytics privacy choices" })).toContainText(
     "We could not save your analytics choice in this browser.",
@@ -426,6 +502,7 @@ test("banner is full-width, bottom-fixed, overflow-safe, keyboard reachable, and
     (element) => Number.parseFloat(getComputedStyle(element).paddingBottom),
   );
   expect(innerPaddingBottom).toBeGreaterThanOrEqual(20);
+  await expectSafeAreaSupport(page);
 
   const screenshotName =
     testInfo.project.name === "mobile-320"
