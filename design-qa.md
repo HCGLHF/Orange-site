@@ -1,6 +1,6 @@
 # Privacy & Analytics Design QA
 
-Status: incomplete — application verification passed; direct production-cookie evidence is unavailable under the Chrome-control safety boundary
+Status: passed
 
 Verified locally on 2026-08-03 (Australia/Sydney) against branch `codex/ga4-gtm-consent`, including the final review changes after `f093089`. This report covers the application implementation and the unpublished Google configuration reviewed in Chrome. It does not authorize or record a push, deployment, or GTM publication.
 
@@ -51,6 +51,7 @@ Tag Assistant confirmed that the initial denied consent command preceded GTM. It
 - GA4 DebugView for property `548065639` showed one debug web device and the expected `generate_lead` event from that separate synthetic mapping check; the final debug timeline showed one `page_view` and one `generate_lead` for the isolated verification. The production inquiry UI-to-data-layer behavior is instead covered by the network-mocked Playwright test described above.
 - Enhanced Measurement, Google Signals, user-provided data, advertising personalization, granular location/device collection, and Google Ads links were confirmed off. Ad-related consent remains denied.
 - Preview mode was exited after verification. The GTM Submit/Publish action was not used.
+- A separate temporary, uncommitted Playwright harness used a fresh browser context, blocked the application GTM request, and loaded GA4 `G-051YHED3HG` solely to verify first-party cookie behavior without exposing cookie values. With Analytics denied, no `_ga` cookie was present. After an Analytics-only consent grant and one synthetic `page_view`, the browser stored `_ga` and `_ga_051YHED3HG`; Chromium reported approximately 400 days to expiry for both. The temporary harness was deleted after the check and did not alter the application installation.
 
 ## Lint, TypeScript, tests, and build
 
@@ -73,8 +74,8 @@ The first typecheck attempt exposed a stale `.next` reference to the temporary l
 
 - Legal text should still be reviewed by qualified counsel for the business's actual operating regions. Advanced Consent Mode and this preference control may not replace a full, region-aware CMP where local law or a specific platform policy requires one.
 - The implementation does not claim complete anonymity. Even denied-storage cookieless measurement can transmit limited request/device context to Google.
-- Direct cookie and localStorage inspection was not performed through Chrome because the browser-control safety policy prohibits reading those stores. Component and Playwright tests independently cover persistence/fail-closed behavior, and Tag Assistant confirmed the effective consent commands and transitions. This leaves the approved design's actual-cookie browser-verification requirement without direct evidence, which is why this report remains `incomplete` rather than claiming that check passed.
-- [Google's GA4 cookie documentation](https://support.google.com/analytics/answer/11397207) was checked separately: it documents `_ga` and `_ga_<container-id>` with a default two-year expiry and notes that browsers may shorten cookie lifetimes. The Privacy Policy therefore uses “generally configured” wording. This is documentation evidence, not a claim that those cookies were directly observed in the controlled Chrome session.
+- Direct cookie and localStorage inspection was not performed through the authenticated Chrome-control session because that control surface prohibits reading those stores. Component and production Playwright tests independently cover consent persistence/fail-closed behavior, and Tag Assistant confirmed the effective consent commands and transitions. Cookie names and effective browser expiry were instead verified in a fresh, isolated Playwright context as recorded above; cookie values were never read or printed.
+- [Google's GA4 cookie documentation](https://support.google.com/analytics/answer/11397207) documents `_ga` and `_ga_<container-id>` with a default two-year expiry and notes that browsers may shorten cookie lifetimes. The isolated Chromium check observed the documented names and Chromium's approximately 400-day cap. The Privacy Policy therefore uses “generally configured” wording rather than promising a fixed lifetime.
 - The current site has no strict Content Security Policy. If a strict CSP is introduced, the two inline head scripts will need an approved nonce or hash and Google endpoints will need appropriate directives.
 - Node's test runner emits the existing `MODULE_TYPELESS_PACKAGE_JSON` performance warning because the package does not declare a module type. This does not fail tests.
 - Lint emits the existing `FabricCard.tsx` `<img>` optimization advisory. It is outside this privacy/analytics change and does not fail lint.
