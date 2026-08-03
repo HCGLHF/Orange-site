@@ -1,4 +1,6 @@
-import React, { useRef } from "react";
+import React, { act, useRef } from "react";
+import { hydrateRoot, type Root } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -88,14 +90,95 @@ describe("AnalyticsConsentProvider", () => {
     expect(within(region).queryByText(/^close$/i)).not.toBeInTheDocument();
   });
 
-  it("uses the approved distinct primary and secondary action hierarchy", async () => {
+  it("uses the exact approved visual contract", async () => {
     renderProvider();
     const accept = await screen.findByRole("button", { name: "Accept analytics cookies" });
     const decline = screen.getByRole("button", { name: "Decline analytics cookies" });
+    const region = screen.getByRole("region", { name: "Analytics privacy choices" });
+    const inner = region.firstElementChild;
+    const heading = screen.getByRole("heading", { level: 2, name: "Privacy & analytics" });
+    const actions = accept.parentElement;
 
-    expect(accept).toHaveClass("min-h-12", "bg-white", "text-[#24252a]");
-    expect(decline).toHaveClass("min-h-12", "border", "bg-transparent", "text-white");
-    expect(accept.className).not.toBe(decline.className);
+    expect(region).toHaveAttribute(
+      "class",
+      "fixed inset-x-0 bottom-0 z-[120] max-h-[100dvh] overflow-y-auto border-t border-white/15 bg-[#24252a] text-white",
+    );
+    expect(inner).toHaveAttribute(
+      "class",
+      "mx-auto flex w-full max-w-7xl flex-col gap-5 px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 lg:min-h-40 lg:flex-row lg:items-center lg:justify-between lg:gap-9 lg:px-8 lg:py-6",
+    );
+    expect(inner?.firstElementChild).toHaveAttribute("class", "max-w-4xl");
+    expect(heading).toHaveAttribute(
+      "class",
+      "text-xs font-bold uppercase tracking-[0.16em] text-[#f0987e] outline-none",
+    );
+    expect(heading.nextElementSibling).toHaveAttribute(
+      "class",
+      "mt-2 text-sm leading-6 text-white/90 sm:text-[15px]",
+    );
+    expect(screen.getByRole("link", { name: "terms" })).toHaveAttribute(
+      "class",
+      "underline underline-offset-4",
+    );
+    expect(actions).toHaveAttribute(
+      "class",
+      "grid shrink-0 grid-cols-1 gap-2.5 sm:grid-cols-2",
+    );
+    expect(decline).toHaveAttribute(
+      "class",
+      "min-h-12 min-w-32 rounded-lg border border-white bg-transparent px-6 font-semibold text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0987e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#24252a]",
+    );
+    expect(accept).toHaveAttribute(
+      "class",
+      "min-h-12 min-w-32 rounded-lg border border-white bg-white px-6 font-semibold text-[#24252a] hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0987e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#24252a]",
+    );
+  });
+
+  it("omits the banner on the server and hydrates without a mismatch before showing it", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    const ui = (
+      <AnalyticsConsentProvider>
+        <span>Hydration child</span>
+      </AnalyticsConsentProvider>
+    );
+    const markup = renderToString(ui);
+    expect(markup).toContain("Hydration child");
+    expect(markup).not.toContain("Analytics privacy choices");
+    container.innerHTML = markup;
+    const actEnvironment = globalThis as typeof globalThis & {
+      IS_REACT_ACT_ENVIRONMENT?: boolean;
+    };
+    const previousActEnvironment = actEnvironment.IS_REACT_ACT_ENVIRONMENT;
+    actEnvironment.IS_REACT_ACT_ENVIRONMENT = true;
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    let root: Root | undefined;
+
+    try {
+      await act(async () => {
+        root = hydrateRoot(container, ui);
+      });
+
+      const mismatchErrors = consoleError.mock.calls.filter((call) =>
+        call.some(
+          (value) =>
+            typeof value === "string" &&
+            /hydration failed|did not match|server html|while hydrating/i.test(value),
+        ),
+      );
+      expect(mismatchErrors).toHaveLength(0);
+      expect(
+        within(container).getByRole("region", { name: "Analytics privacy choices" }),
+      ).toBeInTheDocument();
+    } finally {
+      await act(async () => root?.unmount());
+      if (previousActEnvironment === undefined) {
+        delete actEnvironment.IS_REACT_ACT_ENVIRONMENT;
+      } else {
+        actEnvironment.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
+      }
+      container.remove();
+    }
   });
 
   it("persists granted consent before updating Google and then hides", async () => {
@@ -154,7 +237,9 @@ describe("AnalyticsConsentProvider", () => {
     window.gtag = gtag;
     renderProvider();
 
-    await user.click(await screen.findByRole("button", { name: "Accept analytics cookies" }));
+    const accept = await screen.findByRole("button", { name: "Accept analytics cookies" });
+    gtag.mockClear();
+    await user.click(accept);
 
     expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
@@ -203,6 +288,54 @@ describe("AnalyticsConsentProvider", () => {
       });
     },
   );
+
+  it("uses a valid bootstrap without reading localStorage again", async () => {
+    window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
+    const getItem = vi.spyOn(Storage.prototype, "getItem");
+
+    renderProvider();
+
+    await waitFor(() =>
+      expect(screen.queryByRole("region", { name: "Analytics privacy choices" })).not.toBeInTheDocument(),
+    );
+    expect(getItem).not.toHaveBeenCalled();
+  });
+
+  it("warns and fails closed for an invalid fallback stored value", async () => {
+    localStorage.setItem(ANALYTICS_CONSENT_STORAGE_KEY, "not-json");
+    const gtag = vi.fn();
+    window.gtag = gtag;
+
+    renderProvider();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(PERSISTENCE_ERROR);
+    expect(alert).toHaveAttribute("class", "mt-3 text-sm font-medium text-[#ffd5ca]");
+    expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
+    expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+  });
+
+  it("warns and fails closed when fallback localStorage property access throws", async () => {
+    const descriptor = Object.getOwnPropertyDescriptor(window, "localStorage");
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get() {
+        throw new Error("blocked");
+      },
+    });
+    const gtag = vi.fn();
+    window.gtag = gtag;
+
+    try {
+      renderProvider();
+    } finally {
+      if (descriptor) Object.defineProperty(window, "localStorage", descriptor);
+    }
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
+    expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
+    expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+  });
 
   it("does not duplicate the consent update already queued by a valid bootstrap", async () => {
     window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
@@ -273,26 +406,32 @@ describe("AnalyticsConsentProvider", () => {
     window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
     const gtag = vi.fn();
     window.gtag = gtag;
-    renderProvider();
+    renderProvider(<button type="button">Page control</button>);
+    const pageControl = screen.getByRole("button", { name: "Page control" });
+    pageControl.focus();
 
     dispatchConsentStorage(null);
 
     expect(await screen.findByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+    expect(pageControl).toHaveFocus();
   });
 
   it("reopens fail-closed with a warning when another tab writes invalid consent", async () => {
     window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
     const gtag = vi.fn();
     window.gtag = gtag;
-    renderProvider();
+    renderProvider(<button type="button">Page control</button>);
+    const pageControl = screen.getByRole("button", { name: "Page control" });
+    pageControl.focus();
 
     dispatchConsentStorage("not-json");
 
     expect(await screen.findByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
     expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
     expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+    expect(pageControl).toHaveFocus();
   });
 
   it("ignores unrelated storage events", async () => {
