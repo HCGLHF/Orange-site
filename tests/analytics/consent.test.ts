@@ -169,7 +169,7 @@ describe("getGtmContainerId", () => {
 });
 
 describe("buildAnalyticsHeadScript", () => {
-  it("queues fail-closed consent and privacy settings before reading storage", () => {
+  it("restores saved consent before queueing privacy settings", () => {
     let callsAtRead: unknown[][] = [];
     const getItem = vi.fn(() => {
       callsAtRead = runtimeQueueItems(scriptWindow.dataLayer).map(asCall);
@@ -191,8 +191,6 @@ describe("buildAnalyticsHeadScript", () => {
         ad_user_data: "denied",
         ad_personalization: "denied",
       }],
-      ["set", "allow_ad_personalization_signals", false],
-      ["set", "ads_data_redaction", true],
     ]);
     expect(runtimeQueueItems(scriptWindow.dataLayer).map(asCall)).toEqual([
       ...callsAtRead,
@@ -202,6 +200,8 @@ describe("buildAnalyticsHeadScript", () => {
         ad_user_data: "denied",
         ad_personalization: "denied",
       }],
+      ["set", "allow_ad_personalization_signals", false],
+      ["set", "ads_data_redaction", true],
     ]);
     expect(getItem).toHaveBeenCalledWith(ANALYTICS_CONSENT_STORAGE_KEY);
     expect(scriptWindow.__orangeAnalyticsBootstrap).toEqual({ choice: "granted", error: null });

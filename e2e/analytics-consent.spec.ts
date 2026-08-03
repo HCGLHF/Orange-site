@@ -100,6 +100,14 @@ async function pageViews(page: Page) {
   );
 }
 
+async function leadEvents(page: Page) {
+  const snapshot = await dataLayerSnapshot(page);
+  return snapshot.filter(
+    (item): item is Record<string, unknown> =>
+      !Array.isArray(item) && item.event === "orange_generate_lead",
+  );
+}
+
 async function expectNoRuntimeFailures(failures: ConsoleFailure[]) {
   expect(failures, "console errors, page errors, or hydration errors").toEqual([]);
 }
@@ -267,6 +275,28 @@ test("shows the exact first-visit choices and Accept grants only analytics witho
       ad_personalization: "denied",
     },
   ]);
+  const restoredSnapshot = await dataLayerSnapshot(page);
+  const restoredDefaultIndex = restoredSnapshot.findIndex(
+    (item) => Array.isArray(item) && item[0] === "consent" && item[1] === "default",
+  );
+  const restoredUpdateIndex = restoredSnapshot.findIndex(
+    (item) => Array.isArray(item) && item[0] === "consent" && item[1] === "update",
+  );
+  const personalizationSetIndex = restoredSnapshot.findIndex(
+    (item) =>
+      Array.isArray(item) && item[0] === "set" && item[1] === "allow_ad_personalization_signals",
+  );
+  const redactionSetIndex = restoredSnapshot.findIndex(
+    (item) => Array.isArray(item) && item[0] === "set" && item[1] === "ads_data_redaction",
+  );
+  const restoredGtmStartIndex = restoredSnapshot.findIndex(
+    (item) => !Array.isArray(item) && item.event === "gtm.js" && "gtm.start" in item,
+  );
+  expect(restoredDefaultIndex).toBeGreaterThanOrEqual(0);
+  expect(restoredUpdateIndex).toBeGreaterThan(restoredDefaultIndex);
+  expect(personalizationSetIndex).toBeGreaterThan(restoredUpdateIndex);
+  expect(redactionSetIndex).toBeGreaterThan(personalizationSetIndex);
+  expect(restoredGtmStartIndex).toBeGreaterThan(redactionSetIndex);
   await expectNoRuntimeFailures(failures);
 });
 
@@ -457,10 +487,59 @@ test("tracks each real allowed App Router navigation once and suppresses unknown
   }
 
   const beforeUnknown = await pageViews(page);
-  await page.evaluate(() => window.history.pushState(null, "", "/blog/buyer%40example.com"));
+  const unknownPath = "/blog/buyer%40example.com";
+  await page.evaluate((pathname) => window.history.pushState(null, "", pathname), unknownPath);
   await expect(page).toHaveURL(/\/blog\/buyer%40example\.com$/);
-  await page.waitForTimeout(100);
+  await expect
+    .poll(() => page.evaluate(() => window.__orangeLastTrackedPath))
+    .toBe(unknownPath);
   expect(await pageViews(page)).toEqual(beforeUnknown);
+  await expectNoRuntimeFailures(failures);
+});
+
+test("a successful production single-inquiry UI path emits only the controlled lead field", async ({
+  context,
+  page,
+}) => {
+  await protectAnalyticsRequests(context);
+  const failures = captureRuntimeFailures(page);
+  const formspreeRequests: string[] = [];
+  await page.route("https://formspree.io/f/mojpdwdg", async (route) => {
+    formspreeRequests.push(route.request().postData() ?? "");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: '{"ok":true}',
+    });
+  });
+  await page.addInitScript((key) => {
+    localStorage.setItem(key, '{"version":1,"analytics":"denied"}');
+  }, CONSENT_KEY);
+  await page.goto("/");
+
+  await page
+    .locator("header")
+    .getByRole("button", { name: "Send a finished-fabric inquiry" })
+    .click();
+  const dialog = page.getByRole("dialog", { name: "Request free samples" });
+  await expect(dialog).toBeVisible();
+  await dialog.locator("#inquiry-name").fill("Analytics Test Buyer");
+  await dialog.locator("#inquiry-email").fill("analytics-test@example.invalid");
+  await dialog.locator("#inquiry-company").fill("Analytics Test Company");
+  await dialog.locator("#inquiry-qty").fill("123 metres test quantity");
+  page.once("dialog", (browserDialog) => browserDialog.accept());
+  await dialog.getByRole("button", { name: "Submit", exact: true }).click();
+
+  await expect.poll(async () => (await leadEvents(page)).length).toBe(1);
+  expect(formspreeRequests).toHaveLength(1);
+  const leads = await leadEvents(page);
+  expect(leads).toEqual([
+    { event: "orange_generate_lead", form_name: "single_inquiry" },
+  ]);
+  expect(Object.keys(leads[0]).sort()).toEqual(["event", "form_name"]);
+  expect(JSON.stringify(leads)).not.toMatch(
+    /Analytics Test Buyer|analytics-test@example\.invalid|Analytics Test Company|123 metres/i,
+  );
   await expectNoRuntimeFailures(failures);
 });
 
@@ -485,10 +564,20 @@ test("banner is full-width, bottom-fixed, overflow-safe, keyboard reachable, and
     await page.evaluate(() => document.documentElement.clientWidth),
   );
 
-  for (const name of ["Decline analytics cookies", "Accept analytics cookies"]) {
-    const button = banner.getByRole("button", { name });
-    await button.focus();
-    await button.scrollIntoViewIfNeeded();
+  const reachedButtons = new Set<string>();
+  for (let press = 0; press < 100 && reachedButtons.size < 2; press += 1) {
+    await page.keyboard.press("Tab");
+    const accessibleName = await page.evaluate(() =>
+      document.activeElement?.getAttribute("aria-label") ?? "",
+    );
+    if (
+      accessibleName !== "Decline analytics cookies" &&
+      accessibleName !== "Accept analytics cookies"
+    ) {
+      continue;
+    }
+    reachedButtons.add(accessibleName);
+    const button = banner.getByRole("button", { name: accessibleName });
     await expect(button).toBeFocused();
     const buttonBox = await button.boundingBox();
     expect(buttonBox?.height).toBeGreaterThanOrEqual(48);
@@ -497,6 +586,9 @@ test("banner is full-width, bottom-fixed, overflow-safe, keyboard reachable, and
       testInfo.project.use.viewport!.height + 1,
     );
   }
+  expect(Array.from(reachedButtons).sort()).toEqual(
+    ["Accept analytics cookies", "Decline analytics cookies"].sort(),
+  );
 
   const innerPaddingBottom = await banner.locator(":scope > div").evaluate(
     (element) => Number.parseFloat(getComputedStyle(element).paddingBottom),

@@ -1,8 +1,8 @@
 # Privacy & Analytics Design QA
 
-Status: passed
+Status: incomplete — application verification passed; direct production-cookie evidence is unavailable under the Chrome-control safety boundary
 
-Verified locally on 2026-08-03 (Australia/Sydney) against branch `codex/ga4-gtm-consent`, based on `000f004`. This report covers the application implementation and the unpublished Google configuration reviewed in Chrome. It does not authorize or record a push, deployment, or GTM publication.
+Verified locally on 2026-08-03 (Australia/Sydney) against branch `codex/ga4-gtm-consent`, including the final review changes after `f093089`. This report covers the application implementation and the unpublished Google configuration reviewed in Chrome. It does not authorize or record a push, deployment, or GTM publication.
 
 ## Identifiers and duplicate-risk audit
 
@@ -17,24 +17,26 @@ Verified locally on 2026-08-03 (Australia/Sydney) against branch `codex/ga4-gtm-
 ## Consent execution order
 
 1. The first application-owned script in `<head>` creates `dataLayer`/`gtag` and queues `consent/default` with `analytics_storage`, `ad_storage`, `ad_user_data`, and `ad_personalization` all set to `denied`.
-2. The same synchronous script disables ad-personalization signals, enables ads-data redaction, and reads only `orange-textile.analytics-consent`. A strictly valid version-1 saved choice queues `consent/update`; invalid or unavailable storage remains denied.
-3. Only after the default command and any saved-choice update does the GTM bootstrap queue `gtm.js` and request `GTM-5FHDLXGV`.
-4. GTM initializes GA4 `G-051YHED3HG` once with automatic page views disabled. Controlled `orange_page_view` and successful `orange_generate_lead` events then drive measurement.
-5. Accept saves `{"version":1,"analytics":"granted"}` and queues a consent update granting analytics storage only. Decline saves the same schema with `denied`; all advertising consent fields remain denied in both cases. Neither choice reloads the page.
+2. The same synchronous script reads only `orange-textile.analytics-consent`. A strictly valid version-1 saved choice queues `consent/update`; invalid or unavailable storage remains denied.
+3. After the saved choice is restored, the script disables ad-personalization signals and enables ads-data redaction.
+4. Only after the default command, storage read, optional saved-choice update, and privacy `set` commands does the GTM bootstrap queue `gtm.js` and request `GTM-5FHDLXGV`.
+5. GTM initializes GA4 `G-051YHED3HG` once with automatic page views disabled. Controlled `orange_page_view` and successful `orange_generate_lead` events then drive measurement.
+6. Accept saves `{"version":1,"analytics":"granted"}` and queues a consent update granting analytics storage only. Decline saves the same schema with `denied`; all advertising consent fields remain denied in both cases. Neither choice reloads the page.
 
 Tag Assistant confirmed that the initial denied consent command preceded GTM. It also confirmed that Decline kept all four fields denied and Accept changed only `analytics_storage` to `granted`.
 
 ## Component test results
 
-- `npm test`: passed, 136/136 Node tests.
+- `npm test`: passed, 137/137 Node tests, including the browser-runner request-timeout contract.
 - `npm run test:components`: passed, 126/126 Vitest tests across seven files.
 - Coverage includes the exact first-visit text and buttons, distinct Accept/Decline styling, absence of a Close control, granted/denied persistence, inaccessible or invalid localStorage fail-closed behavior, footer reopen, heading focus and focus restoration, storage-event synchronization, consent bootstrap order, controlled data-layer fields, and successful inquiry conversion events.
 - Analytics queue failures are isolated from successful inquiry submission behavior. No name, email, telephone number, message, or form content is included in custom analytics events.
 
 ## Browser and responsive results
 
-- `npm run test:browser`: passed, 16/16 Playwright tests across desktop Chromium and Chromium at `320x256`.
-- Browser coverage verifies consent-before-GTM ordering, exact IDs with one installation, no standalone GA script, Accept/Decline updates, refresh persistence, cross-tab synchronization, localStorage fail-closed behavior, one route event per allowed navigation, unknown/PII-path suppression, successful inquiry mapping, no horizontal overflow, a full-width bottom-fixed banner, and no console or hydration errors.
+- `npm run test:browser`: passed, 18/18 Playwright tests across desktop Chromium and Chromium at `320x256`.
+- Browser coverage verifies consent-before-restore-before-privacy-settings-before-GTM ordering, exact IDs with one installation, no standalone GA script, Accept/Decline updates, refresh persistence, cross-tab synchronization, localStorage fail-closed behavior, one route event per allowed navigation, unknown/PII-path suppression after the route tracker has observed the pathname, successful inquiry mapping, no horizontal overflow, a full-width bottom-fixed banner, real Tab-key reachability, and no console or hydration errors.
+- The lead test uses the production homepage single-inquiry UI. It submits clearly synthetic values while Playwright intercepts and fulfils the Formspree request locally; it creates no Formspree or Notion record. The resulting `orange_generate_lead` object contains exactly `event` and the controlled `form_name: single_inquiry`, with none of the entered values.
 - Desktop visual review passed: the banner spans the viewport, remains attached to the bottom edge, separates explanation and actions clearly, and preserves the requested button hierarchy.
 - `320x256` visual review passed: the banner uses internal vertical scrolling without horizontal overflow; both 48px-minimum action buttons remain reachable. The captured mobile frame is intentionally scrolled within the banner to show both actions.
 - Visual evidence:
@@ -45,8 +47,8 @@ Tag Assistant confirmed that the initial denied consent command preceded GTM. It
 
 - Chrome Tag Assistant preview connected to `orangetextiles.com` and detected `GTM-5FHDLXGV` and GA4 `G-051YHED3HG`.
 - The unpublished workspace contained nine additions and no modifications or deletions: four controlled data-layer variables, two custom-event triggers, and three Google tags (Configuration, Page View, and Generate Lead).
-- The Configuration tag fired once with `send_page_view: false`. The Page View tag received the controlled `page_path`, `page_location`, and optional `page_referrer` values. The Generate Lead tag fired once for the controlled `orange_generate_lead` test and exposed only `form_name`.
-- GA4 DebugView for property `548065639` showed one debug web device and the expected `generate_lead` event; the final debug timeline showed one `page_view` and one `generate_lead` for the isolated verification.
+- The Configuration tag fired once with `send_page_view: false`. The Page View tag received the controlled `page_path`, `page_location`, and optional `page_referrer` values. The Generate Lead tag fired once for a separate synthetic allowlisted data-layer push and exposed only `form_name`; this verifies the unpublished GTM mapping, not the production inquiry UI path.
+- GA4 DebugView for property `548065639` showed one debug web device and the expected `generate_lead` event from that separate synthetic mapping check; the final debug timeline showed one `page_view` and one `generate_lead` for the isolated verification. The production inquiry UI-to-data-layer behavior is instead covered by the network-mocked Playwright test described above.
 - Enhanced Measurement, Google Signals, user-provided data, advertising personalization, granular location/device collection, and Google Ads links were confirmed off. Ad-related consent remains denied.
 - Preview mode was exited after verification. The GTM Submit/Publish action was not used.
 
@@ -58,11 +60,12 @@ Fresh verification completed on 2026-08-03:
 | --- | --- |
 | `npm run lint` | Passed; one pre-existing `components/ui/FabricCard.tsx` `<img>` advisory warning |
 | `npm run typecheck` | Passed |
-| `npm test` | Passed, 136/136 |
+| `npm test` | Passed, 137/137, including the browser-runner request-timeout contract |
 | `npm run test:components` | Passed, 126/126 |
-| `npm run test:browser` | Passed, 16/16; production server and both viewports |
+| `npm run test:browser` | Passed, 18/18; production server and both viewports |
 | `npm run build` | Passed; 43 static/generated pages completed |
 | `git diff --check` | Passed; no whitespace errors |
+| `npm audit --omit=dev` | Reports 4 high-severity vulnerabilities; recorded below as known dependency risk |
 
 The first typecheck attempt exposed a stale `.next` reference to the temporary local analytics-preview route used during external verification. That regenerable build cache was removed after its path was verified inside this worktree; the clean typecheck and both subsequent production builds passed.
 
@@ -70,11 +73,12 @@ The first typecheck attempt exposed a stale `.next` reference to the temporary l
 
 - Legal text should still be reviewed by qualified counsel for the business's actual operating regions. Advanced Consent Mode and this preference control may not replace a full, region-aware CMP where local law or a specific platform policy requires one.
 - The implementation does not claim complete anonymity. Even denied-storage cookieless measurement can transmit limited request/device context to Google.
-- Direct cookie and localStorage inspection was not performed through Chrome because the browser-control safety policy prohibits reading those stores. Component and Playwright tests independently cover persistence/fail-closed behavior, and Tag Assistant confirmed the effective consent commands and transitions.
+- Direct cookie and localStorage inspection was not performed through Chrome because the browser-control safety policy prohibits reading those stores. Component and Playwright tests independently cover persistence/fail-closed behavior, and Tag Assistant confirmed the effective consent commands and transitions. This leaves the approved design's actual-cookie browser-verification requirement without direct evidence, which is why this report remains `incomplete` rather than claiming that check passed.
+- [Google's GA4 cookie documentation](https://support.google.com/analytics/answer/11397207) was checked separately: it documents `_ga` and `_ga_<container-id>` with a default two-year expiry and notes that browsers may shorten cookie lifetimes. The Privacy Policy therefore uses “generally configured” wording. This is documentation evidence, not a claim that those cookies were directly observed in the controlled Chrome session.
 - The current site has no strict Content Security Policy. If a strict CSP is introduced, the two inline head scripts will need an approved nonce or hash and Google endpoints will need appropriate directives.
 - Node's test runner emits the existing `MODULE_TYPELESS_PACKAGE_JSON` performance warning because the package does not declare a module type. This does not fail tests.
 - Lint emits the existing `FabricCard.tsx` `<img>` optimization advisory. It is outside this privacy/analytics change and does not fail lint.
-- Three non-blocking Playwright hardening opportunities remain: the unknown-route assertion uses a fixed 100 ms wait, keyboard reachability is checked with programmatic `.focus()` rather than a complete Tab traversal, and the loopback server readiness probe has no per-request timeout.
+- The project remains on Next.js `14.2.33`. A current `npm audit --omit=dev` reports 4 high-severity vulnerabilities across the resolved `next`, `playwright`, and nested `postcss` packages. The Next.js findings include published denial-of-service, request-smuggling/cache, XSS, SSRF, and Server Action advisories; npm reports no fix available for the current resolution. Dependency/framework upgrading and any required regression work remain a separate security task rather than being silently folded into this analytics change.
 - Vitest 3.2.4 depends on a Vite release whose declared Node requirement starts at Node 20.19. The project currently does not declare an `engines` range, so older Node installations could fail before tests run. Verification passed on Node 24.11.1.
 - localStorage can be unavailable in restrictive browser modes. The implementation catches read/write failures, keeps analytics storage denied, leaves the choice UI usable, and presents a readable save error.
 

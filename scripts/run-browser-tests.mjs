@@ -9,7 +9,10 @@ const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
 
 async function isServerReachable() {
   try {
-    const response = await fetch(baseUrl, { redirect: "manual" });
+    const response = await fetch(baseUrl, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(2_000),
+    });
     return response.status > 0;
   } catch {
     return false;

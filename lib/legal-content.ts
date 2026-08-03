@@ -76,7 +76,7 @@ export const PRIVACY_CONTENT = {
       title: "Your choices and requests",
       paragraphs: [
         "You can reopen the choice bar at any time through Privacy settings in the footer. Declining withdraws permission for Analytics cookies but retains the limited cookieless measurement described above.",
-        "For a privacy request about information you have provided, contact folenchen0401@outlook.com. We may need enough information to identify the relevant inquiry and respond to your request.",
+        "You may contact Shaoxing Shicheng Textile Products Co., Ltd. to request access to, or correction of, inquiry information you have provided, or to raise a privacy complaint. Email folenchen0401@outlook.com with enough information for us to identify the relevant inquiry and understand your request. We will consider and respond to it in line with applicable requirements.",
       ],
     },
     {

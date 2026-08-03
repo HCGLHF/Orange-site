@@ -12,8 +12,6 @@ export function buildAnalyticsHeadScript(): string {
 w.dataLayer=w.dataLayer||[];
 w.gtag=function(){w.dataLayer.push(arguments);};
 w.gtag("consent","default",{analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied"});
-w.gtag("set","allow_ad_personalization_signals",false);
-w.gtag("set","ads_data_redaction",true);
 var status={choice:null,error:null};
 try{
 var raw=w.localStorage.getItem(${storageKey});
@@ -28,6 +26,8 @@ w.gtag("consent","update",{analytics_storage:saved.analytics,ad_storage:"denied"
 }catch(e){status.error="invalid_value";}
 }
 }catch(e){status.error="storage_unavailable";}
+w.gtag("set","allow_ad_personalization_signals",false);
+w.gtag("set","ads_data_redaction",true);
 w.__orangeAnalyticsBootstrap=status;
 })(window);`;
 }

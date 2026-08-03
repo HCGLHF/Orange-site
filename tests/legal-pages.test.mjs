@@ -71,9 +71,17 @@ test("typed legal content contains every reviewed section and required disclosur
     "Privacy settings",
     "folenchen0401@outlook.com",
     "We do not describe this processing as anonymous.",
+    "request access",
+    "correction",
+    "privacy complaint",
   ]) {
     assert.ok(privacy.includes(required), `privacy must disclose ${required}`);
   }
+  assert.match(
+    privacy,
+    /privacy complaint[\s\S]*folenchen0401@outlook\.com/i,
+    "privacy must provide one confirmed contact route for complaints",
+  );
   assert.doesNotMatch(privacy, /inquiry information is retained for exactly/i);
 
   assert.ok(
