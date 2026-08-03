@@ -133,6 +133,15 @@ describe("updateGoogleConsent", () => {
       ad_personalization: "denied",
     });
   });
+
+  it("does not throw when the installed Google tag function throws", () => {
+    window.gtag = vi.fn(() => {
+      throw new Error("broken gtag");
+    });
+
+    expect(() => updateGoogleConsent("granted")).not.toThrow();
+    expect(window.gtag).toHaveBeenCalledOnce();
+  });
 });
 
 describe("getGtmContainerId", () => {

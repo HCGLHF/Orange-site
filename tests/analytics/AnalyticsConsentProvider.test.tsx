@@ -28,10 +28,27 @@ function renderProvider(children: React.ReactNode = <PrivacySettingsButton />) {
 }
 
 function dispatchConsentStorage(newValue: string | null) {
+  if (newValue === null) {
+    window.localStorage.removeItem(ANALYTICS_CONSENT_STORAGE_KEY);
+  } else {
+    window.localStorage.setItem(ANALYTICS_CONSENT_STORAGE_KEY, newValue);
+  }
+
   window.dispatchEvent(
     new StorageEvent("storage", {
       key: ANALYTICS_CONSENT_STORAGE_KEY,
       newValue,
+      storageArea: window.localStorage,
+    }),
+  );
+}
+
+function dispatchConsentClear() {
+  window.localStorage.clear();
+  window.dispatchEvent(
+    new StorageEvent("storage", {
+      key: null,
+      newValue: null,
       storageArea: window.localStorage,
     }),
   );
@@ -46,6 +63,11 @@ function ManualTrigger() {
       Custom privacy trigger
     </button>
   );
+}
+
+function ChoiceProbe() {
+  const { choice } = useAnalyticsConsent();
+  return <output aria-label="Current analytics choice">{choice ?? "none"}</output>;
 }
 
 afterEach(() => {
@@ -251,6 +273,85 @@ describe("AnalyticsConsentProvider", () => {
     );
   });
 
+  it.each([
+    ["Accept", "Accept analytics cookies"],
+    ["Decline", "Decline analytics cookies"],
+  ] as const)(
+    "removes a stale persisted grant when %s cannot be saved and remounts denied",
+    async (_label, actionName) => {
+      localStorage.setItem(
+        ANALYTICS_CONSENT_STORAGE_KEY,
+        '{"version":1,"analytics":"granted"}',
+      );
+      window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
+      const gtag = vi.fn();
+      window.gtag = gtag;
+      const user = userEvent.setup();
+      const firstRender = renderProvider();
+
+      await user.click(screen.getByRole("button", { name: "Privacy settings" }));
+      const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+        throw new Error("blocked");
+      });
+      const removeItem = vi.spyOn(Storage.prototype, "removeItem");
+      const clear = vi.spyOn(Storage.prototype, "clear");
+      gtag.mockClear();
+
+      await user.click(screen.getByRole("button", { name: actionName }));
+
+      expect(removeItem).toHaveBeenCalledWith(ANALYTICS_CONSENT_STORAGE_KEY);
+      expect(clear).not.toHaveBeenCalled();
+      expect(localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY)).toBeNull();
+      expect(screen.getByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
+      expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+      expect(gtag).not.toHaveBeenCalledWith(
+        "consent",
+        "update",
+        expect.objectContaining({ analytics_storage: "granted" }),
+      );
+
+      firstRender.unmount();
+      Reflect.deleteProperty(window, "__orangeAnalyticsBootstrap");
+      setItem.mockRestore();
+      removeItem.mockRestore();
+      clear.mockRestore();
+      gtag.mockClear();
+      renderProvider();
+
+      expect(
+        await screen.findByRole("region", { name: "Analytics privacy choices" }),
+      ).toBeInTheDocument();
+      expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+    },
+  );
+
+  it("remains denied and open when both persistence and stale-key removal throw", async () => {
+    localStorage.setItem(
+      ANALYTICS_CONSENT_STORAGE_KEY,
+      '{"version":1,"analytics":"granted"}',
+    );
+    window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
+    const gtag = vi.fn();
+    window.gtag = gtag;
+    const user = userEvent.setup();
+    renderProvider();
+    await user.click(screen.getByRole("button", { name: "Privacy settings" }));
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("blocked write");
+    });
+    const removeItem = vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+      throw new Error("blocked removal");
+    });
+    gtag.mockClear();
+
+    await user.click(screen.getByRole("button", { name: "Accept analytics cookies" }));
+
+    expect(removeItem).toHaveBeenCalledWith(ANALYTICS_CONSENT_STORAGE_KEY);
+    expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
+    expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+  });
+
   it.each(["invalid_value", "storage_unavailable"] as const)(
     "shows a persistence warning and fails closed for initial bootstrap error %s",
     async (error) => {
@@ -288,6 +389,38 @@ describe("AnalyticsConsentProvider", () => {
       });
     },
   );
+
+  it("ignores same-key storage events from sessionStorage", async () => {
+    localStorage.setItem(
+      ANALYTICS_CONSENT_STORAGE_KEY,
+      '{"version":1,"analytics":"granted"}',
+    );
+    window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
+    const gtag = vi.fn();
+    window.gtag = gtag;
+    renderProvider(<button type="button">Page control</button>);
+    const pageControl = screen.getByRole("button", { name: "Page control" });
+    pageControl.focus();
+    sessionStorage.setItem(
+      ANALYTICS_CONSENT_STORAGE_KEY,
+      '{"version":1,"analytics":"denied"}',
+    );
+
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: ANALYTICS_CONSENT_STORAGE_KEY,
+        newValue: '{"version":1,"analytics":"denied"}',
+        storageArea: window.sessionStorage,
+      }),
+    );
+
+    await waitFor(() => expect(gtag).not.toHaveBeenCalled());
+    expect(screen.queryByRole("region", { name: "Analytics privacy choices" })).not.toBeInTheDocument();
+    expect(localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY)).toBe(
+      '{"version":1,"analytics":"granted"}',
+    );
+    expect(pageControl).toHaveFocus();
+  });
 
   it("uses a valid bootstrap without reading localStorage again", async () => {
     window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
@@ -334,6 +467,74 @@ describe("AnalyticsConsentProvider", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
     expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
+    expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+  });
+
+  it("stays open when fail-closed consent encounters a throwing Google tag", async () => {
+    window.gtag = vi.fn(() => {
+      throw new Error("broken gtag");
+    });
+
+    expect(() => renderProvider()).not.toThrow();
+
+    expect(
+      await screen.findByRole("region", { name: "Analytics privacy choices" }),
+    ).toBeInTheDocument();
+  });
+
+  it("closes, persists, and restores focus when Google tag throws after a successful save", async () => {
+    window.__orangeAnalyticsBootstrap = { choice: "denied", error: null };
+    window.gtag = vi.fn(() => {
+      throw new Error("broken gtag");
+    });
+    const user = userEvent.setup();
+    renderProvider(<ManualTrigger />);
+    const trigger = screen.getByRole("button", { name: "Custom privacy trigger" });
+
+    await user.click(trigger);
+    await user.click(await screen.findByRole("button", { name: "Accept analytics cookies" }));
+
+    expect(localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY)).toBe(
+      '{"version":1,"analytics":"granted"}',
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole("region", { name: "Analytics privacy choices" })).not.toBeInTheDocument(),
+    );
+    expect(trigger).toHaveFocus();
+  });
+
+  it("initializes fallback consent once in Strict Mode and keeps one working storage listener", async () => {
+    localStorage.setItem(
+      ANALYTICS_CONSENT_STORAGE_KEY,
+      '{"version":1,"analytics":"granted"}',
+    );
+    const gtag = vi.fn();
+    window.gtag = gtag;
+
+    render(
+      <React.StrictMode>
+        <AnalyticsConsentProvider>
+          <ChoiceProbe />
+        </AnalyticsConsentProvider>
+      </React.StrictMode>,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByRole("status", { name: "Current analytics choice" })).toHaveTextContent(
+        "granted",
+      ),
+    );
+    expect(gtag).toHaveBeenCalledTimes(1);
+    gtag.mockClear();
+
+    dispatchConsentStorage('{"version":1,"analytics":"denied"}');
+
+    await waitFor(() =>
+      expect(screen.getByRole("status", { name: "Current analytics choice" })).toHaveTextContent(
+        "denied",
+      ),
+    );
+    expect(gtag).toHaveBeenCalledTimes(1);
     expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
   });
 
@@ -418,6 +619,62 @@ describe("AnalyticsConsentProvider", () => {
     expect(pageControl).toHaveFocus();
   });
 
+  it("treats a localStorage clear event as consent removal without stealing focus", async () => {
+    localStorage.setItem(
+      ANALYTICS_CONSENT_STORAGE_KEY,
+      '{"version":1,"analytics":"granted"}',
+    );
+    window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
+    const gtag = vi.fn();
+    window.gtag = gtag;
+    renderProvider(<button type="button">Page control</button>);
+    const pageControl = screen.getByRole("button", { name: "Page control" });
+    pageControl.focus();
+
+    dispatchConsentClear();
+
+    expect(
+      await screen.findByRole("region", { name: "Analytics privacy choices" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY)).toBeNull();
+    expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+    expect(pageControl).toHaveFocus();
+  });
+
+  it("fails closed when localStorage access throws while handling a storage event", async () => {
+    window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
+    const gtag = vi.fn();
+    window.gtag = gtag;
+    renderProvider(<button type="button">Page control</button>);
+    const pageControl = screen.getByRole("button", { name: "Page control" });
+    pageControl.focus();
+    const descriptor = Object.getOwnPropertyDescriptor(window, "localStorage");
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get() {
+        throw new Error("blocked");
+      },
+    });
+
+    try {
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: null,
+          newValue: null,
+          storageArea: null,
+        }),
+      );
+    } finally {
+      if (descriptor) Object.defineProperty(window, "localStorage", descriptor);
+    }
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(PERSISTENCE_ERROR);
+    expect(screen.getByRole("region", { name: "Analytics privacy choices" })).toBeInTheDocument();
+    expect(gtag).toHaveBeenCalledWith("consent", "update", DENIED_UPDATE);
+    expect(pageControl).toHaveFocus();
+  });
+
   it("reopens fail-closed with a warning when another tab writes invalid consent", async () => {
     window.__orangeAnalyticsBootstrap = { choice: "granted", error: null };
     const gtag = vi.fn();
@@ -439,6 +696,8 @@ describe("AnalyticsConsentProvider", () => {
     const gtag = vi.fn();
     window.gtag = gtag;
     renderProvider();
+
+    localStorage.setItem("orange-textile-inquiries", "not-json");
 
     window.dispatchEvent(
       new StorageEvent("storage", {

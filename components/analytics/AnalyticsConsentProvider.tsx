@@ -42,6 +42,7 @@ export function AnalyticsConsentProvider({ children }: AnalyticsConsentProviderP
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const shouldFocusHeadingRef = useRef(false);
   const shouldReturnFocusRef = useRef(false);
+  const initializedRef = useRef(false);
 
   const failClosed = useCallback((showError: boolean) => {
     updateGoogleConsent("denied");
@@ -52,6 +53,8 @@ export function AnalyticsConsentProvider({ children }: AnalyticsConsentProviderP
 
   useEffect(() => {
     setMounted(true);
+    if (initializedRef.current) return;
+    initializedRef.current = true;
 
     const bootstrap = window.__orangeAnalyticsBootstrap;
     if (bootstrap !== undefined) {
@@ -79,15 +82,30 @@ export function AnalyticsConsentProvider({ children }: AnalyticsConsentProviderP
         failClosed(saved.error !== null);
       }
     }
+  }, [failClosed]);
 
+  useEffect(() => {
     const syncConsent = (event: StorageEvent) => {
-      if (event.key !== ANALYTICS_CONSENT_STORAGE_KEY) return;
+      if (event.key !== ANALYTICS_CONSENT_STORAGE_KEY && event.key !== null) return;
+
+      let storage: Storage;
+      try {
+        storage = window.localStorage;
+      } catch {
+        shouldFocusHeadingRef.current = false;
+        shouldReturnFocusRef.current = false;
+        returnFocusRef.current = null;
+        failClosed(true);
+        return;
+      }
+
+      if (event.storageArea !== null && event.storageArea !== storage) return;
 
       shouldFocusHeadingRef.current = false;
       shouldReturnFocusRef.current = false;
       returnFocusRef.current = null;
 
-      if (event.newValue === null) {
+      if (event.key === null || event.newValue === null) {
         failClosed(false);
         return;
       }
@@ -132,13 +150,20 @@ export function AnalyticsConsentProvider({ children }: AnalyticsConsentProviderP
   const saveChoice = useCallback(
     (nextChoice: AnalyticsConsentChoice) => {
       let result: ReturnType<typeof writeConsent>;
+      let storage: Storage | null = null;
       try {
-        result = writeConsent(window.localStorage, nextChoice);
+        storage = window.localStorage;
+        result = writeConsent(storage, nextChoice);
       } catch {
         result = { ok: false, error: "storage_unavailable" };
       }
 
       if (!result.ok) {
+        try {
+          (storage ?? window.localStorage).removeItem(ANALYTICS_CONSENT_STORAGE_KEY);
+        } catch {
+          // The runtime denial below remains authoritative when cleanup is blocked.
+        }
         shouldReturnFocusRef.current = false;
         failClosed(true);
         return;

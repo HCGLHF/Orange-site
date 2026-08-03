@@ -66,10 +66,14 @@ export function writeConsent(
 }
 
 export function updateGoogleConsent(choice: AnalyticsConsentChoice): void {
-  window.gtag?.("consent", "update", {
-    analytics_storage: choice,
-    ad_storage: "denied",
-    ad_user_data: "denied",
-    ad_personalization: "denied",
-  });
+  try {
+    window.gtag?.("consent", "update", {
+      analytics_storage: choice,
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+    });
+  } catch {
+    // Consent state must remain operable even if a third-party runtime is malformed.
+  }
 }
