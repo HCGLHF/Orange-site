@@ -37,6 +37,7 @@ test("critical Hero images use responsive Next image delivery", async () => {
       component,
       /<Image\b[\s\S]*?\bpriority\b[\s\S]*?\bsizes="100vw"[\s\S]*?\/>/
     );
+    assert.match(component, /\bquality=\{50\}/);
   }
 });
 
