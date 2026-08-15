@@ -40,6 +40,7 @@ export function LandingHero({
             />
             <Link
               href={page.secondaryCta.href}
+              prefetch={false}
               className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/60 px-7 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-brand-charcoal"
             >
               {page.secondaryCta.label}

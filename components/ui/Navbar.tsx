@@ -67,6 +67,7 @@ function NavbarContent() {
             <Link
               ref={brandLinkRef}
               href="/"
+              prefetch={false}
               title={t("heroTitle")}
               aria-label={`${t("heroTitle")} · ${t("navHome")}`}
               aria-current={pathname === "/" ? "page" : undefined}
@@ -83,6 +84,7 @@ function NavbarContent() {
             <div className="gn-actions">
               <Link
                 href={INQUIRY_HREF}
+                prefetch={false}
                 aria-label={`Inquiry cart: ${totalCount} ${
                   totalCount === 1 ? "item" : "items"
                 }`}
@@ -101,6 +103,7 @@ function NavbarContent() {
 
               <Link
                 href={INQUIRY_HREF}
+                prefetch={false}
                 className="gn-cta"
               >
                 {t("navCtaInquiry")}
@@ -109,6 +112,7 @@ function NavbarContent() {
 
             <Link
               href={INQUIRY_HREF}
+              prefetch={false}
               className="gn-quote"
             >
               Quote

@@ -196,6 +196,7 @@ export function DesktopNavigation({
             <Link
               key={section.id}
               href={section.href}
+              prefetch={false}
               aria-current={isActive ? "page" : undefined}
               className="dn-link"
             >
@@ -280,6 +281,7 @@ export function DesktopNavigation({
                       menuItemRefs.current[section.id] = itemRefs;
                     }}
                     href={item.href}
+                    prefetch={false}
                     aria-current={
                       isCurrentItem ? "page" : undefined
                     }

@@ -40,6 +40,29 @@ test("critical Hero images use responsive Next image delivery", async () => {
   }
 });
 
+test("initial-shell and above-the-fold secondary links do not auto-prefetch", async () => {
+  const files = [
+    "components/landing/LandingHero.tsx",
+    "components/ui/Navbar.tsx",
+    "components/ui/DesktopNavigation.tsx",
+    "components/ui/MobileNavigationDrawer.tsx",
+    "components/ui/BottomNav.tsx",
+    "components/ui/SiteFooter.tsx",
+  ];
+
+  for (const file of files) {
+    const text = await source(file);
+    const linkCount = (text.match(/<Link\b/g) ?? []).length;
+    const noPrefetchCount = (text.match(/\bprefetch=\{false\}/g) ?? []).length;
+    assert.ok(linkCount > 0, `${file} must contain at least one Next Link`);
+    assert.equal(
+      noPrefetchCount,
+      linkCount,
+      `${file} contains an auto-prefetching Link`
+    );
+  }
+});
+
 test("the current application ships no video code or video URL", async () => {
   const files = (
     await Promise.all(

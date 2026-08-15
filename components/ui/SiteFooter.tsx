@@ -37,6 +37,7 @@ export function SiteFooter() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  prefetch={false}
                   className="sf-link"
                 >
                   {item.label}

@@ -213,6 +213,7 @@ export function MobileNavigationDrawer({
                   <Link
                     key={section.id}
                     href={section.href}
+                    prefetch={false}
                     aria-current={isActive ? "page" : undefined}
                     onClick={onRouteSelect}
                     className={`flex min-h-11 items-center rounded-r-lg border-l-4 px-3 py-2 text-base font-semibold outline-none transition-colors hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none ${
@@ -276,6 +277,7 @@ export function MobileNavigationDrawer({
                         <Link
                           key={item.id}
                           href={item.href}
+                          prefetch={false}
                           aria-current={
                             isCurrentItem ? "page" : undefined
                           }
@@ -299,6 +301,7 @@ export function MobileNavigationDrawer({
           <div className="mt-6 space-y-3 border-t border-brand-charcoal/10 pt-5">
             <Link
               href={INQUIRY_HREF}
+              prefetch={false}
               onClick={onRouteSelect}
               className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-base font-semibold text-brand-charcoal outline-none transition-colors hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none"
             >
@@ -312,6 +315,7 @@ export function MobileNavigationDrawer({
             </Link>
             <Link
               href={INQUIRY_HREF}
+              prefetch={false}
               onClick={onRouteSelect}
               className="flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-orange px-4 py-3 text-center text-base font-bold text-white outline-none transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
             >

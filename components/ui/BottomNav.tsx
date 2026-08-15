@@ -104,6 +104,7 @@ export function BottomNav() {
             <li key={tab.id}>
               <Link
                 href={tab.href!}
+                prefetch={false}
                 onClick={() => setActiveTab(tab.id)}
                 className="flex flex-col items-center justify-center gap-1 py-3 text-xs text-brand-charcoal/70"
               >
