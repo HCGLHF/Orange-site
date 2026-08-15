@@ -49,6 +49,7 @@ test("initial-shell and above-the-fold secondary links do not auto-prefetch", as
     "components/ui/MobileNavigationDrawer.tsx",
     "components/ui/BottomNav.tsx",
     "components/ui/SiteFooter.tsx",
+    "components/analytics/AnalyticsConsentBanner.tsx",
   ];
 
   for (const file of files) {

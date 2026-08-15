@@ -34,7 +34,7 @@ export function AnalyticsConsentBanner({
             We use basic cookieless measurement by default. Accepting enables analytics cookies
             for more complete traffic and conversion reporting. You can change your choice at any
             time through Privacy settings in the footer. Read our{" "}
-            <Link href="/terms" className="underline underline-offset-4">
+            <Link href="/terms" prefetch={false} className="underline underline-offset-4">
               terms
             </Link>
             .
