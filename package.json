@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "test:performance-contract": "node --test tests/performance-critical-path.test.mjs",
     "test:components": "vitest run",
     "test:browser": "node scripts/run-browser-tests.mjs",
     "dev": "next dev",
