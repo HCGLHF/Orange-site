@@ -139,7 +139,7 @@ test("below-the-fold contact and inquiry overlays stay out of initial client JS"
     source("components/DeferredStickyInquiryBar.tsx"),
   ]);
 
-  assert.doesNotMatch(contactCard, /^\s*["']use client["'];/m);
+  assert.doesNotMatch(contactCard, /^\s*["']use client["'];?\s*$/m);
   assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
   assert.doesNotMatch(
     inquiryProvider,
