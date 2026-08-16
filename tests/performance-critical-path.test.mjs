@@ -30,42 +30,76 @@ function selfClosingTags(source, tagName) {
   );
 }
 
-function functionCallArguments(source, functionName) {
-  const calls = [];
-  const matcher = new RegExp(`\\b${functionName}\\s*\\(`, "g");
+function hasEnabledPriorityProp(tag) {
+  return /(?:^|\s)priority\b(?:\s*=\s*\{\s*true\s*\}(?=\s|\/>)|(?!\s*=)(?=\s|\/>))/.test(
+    tag
+  );
+}
 
-  for (const match of source.matchAll(matcher)) {
-    const openingParen = match.index + match[0].lastIndexOf("(");
-    let depth = 0;
-    let quote;
+function parenthesizedArguments(source, openingParen) {
+  let depth = 0;
+  let quote;
 
-    for (let index = openingParen; index < source.length; index += 1) {
-      const character = source[index];
+  for (let index = openingParen; index < source.length; index += 1) {
+    const character = source[index];
 
-      if (quote) {
-        if (character === "\\\\") {
-          index += 1;
-        } else if (character === quote) {
-          quote = undefined;
-        }
-        continue;
+    if (quote) {
+      if (character === "\\\\") {
+        index += 1;
+      } else if (character === quote) {
+        quote = undefined;
       }
+      continue;
+    }
 
-      if (character === '"' || character === "'" || character === "`") {
-        quote = character;
-      } else if (character === "(") {
-        depth += 1;
-      } else if (character === ")") {
-        depth -= 1;
-        if (depth === 0) {
-          calls.push(source.slice(openingParen + 1, index));
-          break;
-        }
-      }
+    if (character === "/" && source[index + 1] === "/") {
+      const lineEnd = source.indexOf("\n", index + 2);
+      if (lineEnd === -1) return undefined;
+      index = lineEnd;
+      continue;
+    }
+    if (character === "/" && source[index + 1] === "*") {
+      const commentEnd = source.indexOf("*/", index + 2);
+      if (commentEnd === -1) return undefined;
+      index = commentEnd + 1;
+      continue;
+    }
+
+    if (character === '"' || character === "'" || character === "`") {
+      quote = character;
+    } else if (character === "(") {
+      depth += 1;
+    } else if (character === ")") {
+      depth -= 1;
+      if (depth === 0) return source.slice(openingParen + 1, index);
     }
   }
 
-  return calls;
+  return undefined;
+}
+
+function dynamicCallArgumentsForBinding(source, binding) {
+  const matcher = new RegExp(`\\bconst\\s+${binding}\\s*=\\s*dynamic\\s*\\(`, "g");
+
+  return [...source.matchAll(matcher)]
+    .map((match) => {
+      const openingParen = match.index + match[0].lastIndexOf("(");
+      return parenthesizedArguments(source, openingParen);
+    })
+    .filter(Boolean);
+}
+
+function assertDefaultDynamicImport(source) {
+  assert.match(source, /\bimport\s+dynamic\s+from\s*["']next\/dynamic["']/);
+}
+
+function assertNoStaticValueImport(source, modulePath) {
+  assert.doesNotMatch(
+    source,
+    new RegExp(
+      `\\bimport(?!\\s*\\()(?:\\s+(?!type\\b)[^;]*?\\bfrom\\s*|\\s*)["']${modulePath}["']`
+    )
+  );
 }
 
 test("critical Hero images use responsive delivery and the approved mobile quality", async () => {
@@ -78,10 +112,10 @@ test("critical Hero images use responsive delivery and the approved mobile quali
   assert.doesNotMatch(config, /unoptimized\s*:\s*true/);
   for (const component of [landingHero, aboutPage]) {
     const priorityImage = selfClosingTags(component, "Image").find((tag) =>
-      /\bpriority\b/.test(tag)
+      hasEnabledPriorityProp(tag)
     );
     assert.ok(priorityImage, "a priority Image tag is required");
-    assert.match(priorityImage, /\bpriority\b/);
+    assert.ok(hasEnabledPriorityProp(priorityImage));
     assert.match(priorityImage, /\bsizes\s*=\s*["']100vw["']/);
     assert.match(priorityImage, /\bquality\s*=\s*\{\s*35\s*\}/);
   }
@@ -132,30 +166,62 @@ test("the current application ships no video code or video URL", async () => {
   }
 });
 
-test("below-the-fold contact and inquiry overlays stay out of initial client JS", async () => {
-  const [contactCard, inquiryProvider, stickyGate] = await Promise.all([
-    source("components/ContactCard.tsx"),
-    source("components/InquiryProvider.tsx"),
-    source("components/DeferredStickyInquiryBar.tsx"),
-  ]);
+test("below-the-fold contact content stays out of initial client JS", async () => {
+  const contactCard = await source("components/ContactCard.tsx");
 
-  assert.doesNotMatch(contactCard, /^\s*["']use client["'];?\s*$/m);
-  assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
   assert.doesNotMatch(
-    inquiryProvider,
-    /import\s*\{[^}]*\bInquiryModal\b[^}]*\}\s*from\s*["']@\/components\/ui\/InquiryModal["']/
+    contactCard,
+    /^\s*(["'])use client\1;?\s*(?:\/\/.*)?$/m
   );
-  const inquiryModalDynamicCall = functionCallArguments(
+  assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
+});
+
+test("inquiry modal loads from a lazy client-only chunk", async () => {
+  const inquiryProvider = await source("components/InquiryProvider.tsx");
+
+  assertNoStaticValueImport(
     inquiryProvider,
-    "dynamic"
-  ).find((call) =>
-    /\bimport\s*\(\s*["']@\/components\/ui\/InquiryModal["']\s*\)/.test(call)
+    "@/components/ui/InquiryModal"
   );
-  assert.ok(inquiryModalDynamicCall, "InquiryModal must load through dynamic()");
+  assertDefaultDynamicImport(inquiryProvider);
+  const [inquiryModalDynamicCall] = dynamicCallArgumentsForBinding(
+    inquiryProvider,
+    "InquiryModal"
+  );
+  assert.ok(inquiryModalDynamicCall, "const InquiryModal = dynamic(...) is required");
+  assert.match(
+    inquiryModalDynamicCall,
+    /\bimport\s*\(\s*["']@\/components\/ui\/InquiryModal["']\s*\)\s*\.then\s*\(\s*\(?\s*module\s*\)?\s*=>\s*module\.InquiryModal\s*\)/
+  );
   assert.match(
     inquiryModalDynamicCall,
     /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
   );
   assert.match(inquiryProvider, /\bopen\s*\?\s*\(\s*<InquiryModal\b/);
+});
+
+test("deferred sticky inquiry bar loads from a lazy client-only chunk", async () => {
+  const stickyGate = await source(
+    "components/DeferredStickyInquiryBar.tsx"
+  );
+
+  assertDefaultDynamicImport(stickyGate);
+  assertNoStaticValueImport(stickyGate, "@/components/StickyInquiryBar");
+  const [stickyInquiryBarDynamicCall] = dynamicCallArgumentsForBinding(
+    stickyGate,
+    "StickyInquiryBar"
+  );
+  assert.ok(
+    stickyInquiryBarDynamicCall,
+    "const StickyInquiryBar = dynamic(...) is required"
+  );
+  assert.match(
+    stickyInquiryBarDynamicCall,
+    /\bimport\s*\(\s*["']@\/components\/StickyInquiryBar["']\s*\)/
+  );
+  assert.match(
+    stickyInquiryBarDynamicCall,
+    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
+  );
   assert.match(stickyGate, /totalCount > 0 \? <StickyInquiryBar \/> : null/);
 });
