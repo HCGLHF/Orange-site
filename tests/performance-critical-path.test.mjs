@@ -24,6 +24,50 @@ async function sourceFiles(directory) {
   return nested.flat();
 }
 
+function selfClosingTags(source, tagName) {
+  return [...source.matchAll(new RegExp(`<${tagName}\\b[^>]*?\\/>`, "g"))].map(
+    (match) => match[0]
+  );
+}
+
+function functionCallArguments(source, functionName) {
+  const calls = [];
+  const matcher = new RegExp(`\\b${functionName}\\s*\\(`, "g");
+
+  for (const match of source.matchAll(matcher)) {
+    const openingParen = match.index + match[0].lastIndexOf("(");
+    let depth = 0;
+    let quote;
+
+    for (let index = openingParen; index < source.length; index += 1) {
+      const character = source[index];
+
+      if (quote) {
+        if (character === "\\\\") {
+          index += 1;
+        } else if (character === quote) {
+          quote = undefined;
+        }
+        continue;
+      }
+
+      if (character === '"' || character === "'" || character === "`") {
+        quote = character;
+      } else if (character === "(") {
+        depth += 1;
+      } else if (character === ")") {
+        depth -= 1;
+        if (depth === 0) {
+          calls.push(source.slice(openingParen + 1, index));
+          break;
+        }
+      }
+    }
+  }
+
+  return calls;
+}
+
 test("critical Hero images use responsive delivery and the approved mobile quality", async () => {
   const [config, landingHero, aboutPage] = await Promise.all([
     source("next.config.mjs"),
@@ -33,11 +77,13 @@ test("critical Hero images use responsive delivery and the approved mobile quali
 
   assert.doesNotMatch(config, /unoptimized\s*:\s*true/);
   for (const component of [landingHero, aboutPage]) {
-    assert.match(
-      component,
-      /<Image\b[\s\S]*?\bpriority\b[\s\S]*?\bsizes="100vw"[\s\S]*?\/>/
+    const priorityImage = selfClosingTags(component, "Image").find((tag) =>
+      /\bpriority\b/.test(tag)
     );
-    assert.match(component, /\bquality=\{35\}/);
+    assert.ok(priorityImage, "a priority Image tag is required");
+    assert.match(priorityImage, /\bpriority\b/);
+    assert.match(priorityImage, /\bsizes\s*=\s*["']100vw["']/);
+    assert.match(priorityImage, /\bquality\s*=\s*\{\s*35\s*\}/);
   }
 });
 
@@ -93,13 +139,23 @@ test("below-the-fold contact and inquiry overlays stay out of initial client JS"
     source("components/DeferredStickyInquiryBar.tsx"),
   ]);
 
-  assert.doesNotMatch(contactCard, /^"use client";/m);
+  assert.doesNotMatch(contactCard, /^\s*["']use client["'];/m);
   assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
   assert.doesNotMatch(
     inquiryProvider,
-    /import \{ InquiryModal \} from "@\/components\/ui\/InquiryModal"/
+    /import\s*\{[^}]*\bInquiryModal\b[^}]*\}\s*from\s*["']@\/components\/ui\/InquiryModal["']/
   );
-  assert.match(inquiryProvider, /dynamic\([\s\S]*InquiryModal[\s\S]*ssr:\s*false/);
-  assert.match(inquiryProvider, /open \? \([\s\S]*<InquiryModal/);
+  const inquiryModalDynamicCall = functionCallArguments(
+    inquiryProvider,
+    "dynamic"
+  ).find((call) =>
+    /\bimport\s*\(\s*["']@\/components\/ui\/InquiryModal["']\s*\)/.test(call)
+  );
+  assert.ok(inquiryModalDynamicCall, "InquiryModal must load through dynamic()");
+  assert.match(
+    inquiryModalDynamicCall,
+    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
+  );
+  assert.match(inquiryProvider, /\bopen\s*\?\s*\(\s*<InquiryModal\b/);
   assert.match(stickyGate, /totalCount > 0 \? <StickyInquiryBar \/> : null/);
 });
