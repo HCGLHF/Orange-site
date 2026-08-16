@@ -42,7 +42,7 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
             alt="Rows of circular knitting machines inside a modern knitting factory"
             fill
             priority
-            quality={50}
+            quality={35}
             sizes="100vw"
             className="object-cover object-center"
           />
