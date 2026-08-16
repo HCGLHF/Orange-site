@@ -300,7 +300,10 @@ describe("buildAnalyticsHeadScript", () => {
 
 describe("buildGtmBootstrap", () => {
   function createRuntime(
-    options: { performanceObserver?: "available" | "unavailable" | "observe-throws" } = {},
+    options: {
+      performanceObserver?: "available" | "unavailable" | "observe-throws";
+      now?: () => number;
+    } = {},
   ) {
     const isolatedDocument = document.implementation.createHTMLDocument("analytics");
     let lcpCallback:
@@ -322,7 +325,7 @@ describe("buildGtmBootstrap", () => {
       clearTimeout: typeof clearTimeout;
       PerformanceObserver?: typeof FakePerformanceObserver;
     } = {
-      performance: { now: () => Date.now() },
+      performance: { now: options.now ?? (() => Date.now()) },
       setTimeout,
       clearTimeout,
       ...(options.performanceObserver === "unavailable"
@@ -370,6 +373,37 @@ describe("buildGtmBootstrap", () => {
       src: "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
     });
     expect(script?.dataset.orangeLoadedAt).toBe(String(GTM_MIN_REQUEST_TIME_MS));
+  });
+
+  it("reschedules when the floor timer fires a fraction early", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    let now = 0;
+    const { isolatedDocument } = createRuntime({ now: () => now });
+
+    now = GTM_MIN_REQUEST_TIME_MS - 0.1;
+    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+
+    now = GTM_MIN_REQUEST_TIME_MS;
+    vi.advanceTimersByTime(1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+  });
+
+  it("reschedules when the latest LCP buffer timer fires a fraction early", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    let now = 0;
+    const { emitLcp, isolatedDocument } = createRuntime({ now: () => now });
+
+    emitLcp(3500);
+    now = 4499.9;
+    vi.advanceTimersByTime(4500);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+
+    now = 4500;
+    vi.advanceTimersByTime(1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
   });
 
   it("reschedules the request after a buffered LCP candidate", () => {

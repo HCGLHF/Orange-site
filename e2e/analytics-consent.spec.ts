@@ -184,31 +184,72 @@ test("queues denied consent before GTM and loads one delayed exact container wit
 }) => {
   const requests = await protectAnalyticsRequests(context);
   const failures = captureRuntimeFailures(page);
+  await page.addInitScript((floor) => {
+    const lcpState = { startTimes: [] as number[], latest: 0 };
+    const preFloorGtmState = { checkedAt: 0, requestCount: 0 };
+    Reflect.set(window, "__orangeE2ELcpState", lcpState);
+    Reflect.set(window, "__orangeE2EPreFloorGtmState", preFloorGtmState);
+    try {
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          lcpState.startTimes.push(entry.startTime);
+          lcpState.latest = Math.max(lcpState.latest, entry.startTime);
+        }
+      }).observe({ type: "largest-contentful-paint", buffered: true });
+    } catch {}
+    window.setTimeout(() => {
+      preFloorGtmState.checkedAt = performance.now();
+      preFloorGtmState.requestCount = performance
+        .getEntriesByType("resource")
+        .filter((entry) => /googletagmanager\.com\/gtm\.js(?:\?|$)/.test(entry.name)).length;
+    }, floor - 100);
+  }, GTM_MIN_REQUEST_TIME_MS);
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Privacy & analytics" })).toBeVisible();
   expect(await page.locator("#google-tag-manager-bootstrap").count()).toBe(1);
   expect(await page.locator("#google-tag-manager").count()).toBe(0);
 
-  await page.waitForFunction(
-    (checkpoint) => performance.now() >= checkpoint,
-    GTM_MIN_REQUEST_TIME_MS - 500,
-  );
-  expect(requests.gtmRequests, "GTM must not request before its floor").toHaveLength(0);
-
   await expect.poll(() => requests.gtmRequests.length, { timeout: 8000 }).toBe(1);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        performance
+          .getEntriesByType("resource")
+          .filter((entry) => /googletagmanager\.com\/gtm\.js(?:\?|$)/.test(entry.name))
+          .map((entry) => entry.startTime),
+      ),
+    )
+    .toHaveLength(1);
   const deferredTiming = await page.evaluate(() => {
     const script = document.getElementById("google-tag-manager") as HTMLScriptElement | null;
-    const lcpEntries = performance.getEntriesByType("largest-contentful-paint") as PerformanceEntry[];
+    const lcpState = Reflect.get(window, "__orangeE2ELcpState") as {
+      startTimes: number[];
+      latest: number;
+    };
+    const preFloorGtmState = Reflect.get(window, "__orangeE2EPreFloorGtmState") as {
+      checkedAt: number;
+      requestCount: number;
+    };
 
     return {
       loadedAt: Number(script?.dataset.orangeLoadedAt),
-      latestLcp: lcpEntries.reduce((latest, entry) => Math.max(latest, entry.startTime), 0),
+      lcpStartTimes: lcpState.startTimes,
+      latestObservedLcp: lcpState.latest,
+      preFloorGtmState,
+      requestStartTimes: performance
+        .getEntriesByType("resource")
+        .filter((entry) => /googletagmanager\.com\/gtm\.js(?:\?|$)/.test(entry.name))
+        .map((entry) => entry.startTime),
     };
   });
-  expect(deferredTiming.loadedAt).toBeGreaterThanOrEqual(GTM_MIN_REQUEST_TIME_MS - 50);
-  expect(deferredTiming.loadedAt - deferredTiming.latestLcp).toBeGreaterThanOrEqual(
-    GTM_LCP_BUFFER_MS - 50,
+  expect(deferredTiming.preFloorGtmState.checkedAt).toBeLessThan(GTM_MIN_REQUEST_TIME_MS);
+  expect(deferredTiming.preFloorGtmState.requestCount).toBe(0);
+  expect(deferredTiming.requestStartTimes).toHaveLength(1);
+  expect(deferredTiming.requestStartTimes[0]).toBeGreaterThanOrEqual(GTM_MIN_REQUEST_TIME_MS);
+  expect(deferredTiming.loadedAt).toBeGreaterThanOrEqual(GTM_MIN_REQUEST_TIME_MS);
+  expect(deferredTiming.loadedAt - deferredTiming.latestObservedLcp).toBeGreaterThanOrEqual(
+    GTM_LCP_BUFFER_MS,
   );
 
   const snapshot = await dataLayerSnapshot(page);
