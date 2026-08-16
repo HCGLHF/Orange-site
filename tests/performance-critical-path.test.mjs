@@ -24,7 +24,7 @@ async function sourceFiles(directory) {
   return nested.flat();
 }
 
-test("critical Hero images use responsive Next image delivery", async () => {
+test("critical Hero images use responsive delivery and the approved mobile quality", async () => {
   const [config, landingHero, aboutPage] = await Promise.all([
     source("next.config.mjs"),
     source("components/landing/LandingHero.tsx"),
@@ -37,13 +37,14 @@ test("critical Hero images use responsive Next image delivery", async () => {
       component,
       /<Image\b[\s\S]*?\bpriority\b[\s\S]*?\bsizes="100vw"[\s\S]*?\/>/
     );
-    assert.match(component, /\bquality=\{50\}/);
+    assert.match(component, /\bquality=\{35\}/);
   }
 });
 
 test("initial-shell and above-the-fold secondary links do not auto-prefetch", async () => {
   const files = [
     "components/landing/LandingHero.tsx",
+    "components/finished-fabric/FinishedFabricPage.tsx",
     "components/ui/Navbar.tsx",
     "components/ui/DesktopNavigation.tsx",
     "components/ui/MobileNavigationDrawer.tsx",
@@ -83,4 +84,22 @@ test("the current application ships no video code or video URL", async () => {
       path.relative(root, file)
     );
   }
+});
+
+test("below-the-fold contact and inquiry overlays stay out of initial client JS", async () => {
+  const [contactCard, inquiryProvider, stickyGate] = await Promise.all([
+    source("components/ContactCard.tsx"),
+    source("components/InquiryProvider.tsx"),
+    source("components/DeferredStickyInquiryBar.tsx"),
+  ]);
+
+  assert.doesNotMatch(contactCard, /^"use client";/m);
+  assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
+  assert.doesNotMatch(
+    inquiryProvider,
+    /import \{ InquiryModal \} from "@\/components\/ui\/InquiryModal"/
+  );
+  assert.match(inquiryProvider, /dynamic\([\s\S]*InquiryModal[\s\S]*ssr:\s*false/);
+  assert.match(inquiryProvider, /open \? \([\s\S]*<InquiryModal/);
+  assert.match(stickyGate, /totalCount > 0 \? <StickyInquiryBar \/> : null/);
 });

@@ -20,7 +20,11 @@ test("root layout uses one consent-aware GTM loader and explicit route tracking"
   }
 
   assert.match(source, /const gtmContainerId = getGtmContainerId\(\);/);
-  assert.match(source, /<head>[\s\S]*id="analytics-consent-default"[\s\S]*buildAnalyticsHeadScript\(\)[\s\S]*id="google-tag-manager"[\s\S]*buildGtmBootstrap\(gtmContainerId\)[\s\S]*<\/head>/);
+  assert.match(
+    source,
+    /<head>[\s\S]*id="analytics-consent-default"[\s\S]*buildAnalyticsHeadScript\(\)[\s\S]*id="google-tag-manager-bootstrap"[\s\S]*buildGtmBootstrap\(gtmContainerId\)[\s\S]*<\/head>/
+  );
+  assert.doesNotMatch(source, /id="google-tag-manager"[\s\S]*dangerouslySetInnerHTML/);
 
   const body = source.match(/<body[^>]*>([\s\S]*?)<\/body>/)?.[1];
   assert.ok(body, "body JSX must remain explicit");
