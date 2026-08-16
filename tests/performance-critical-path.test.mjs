@@ -188,7 +188,13 @@ function isExactModalImportChain(expression, modulePath, exportName) {
   );
 }
 
-function assertLazyDynamicComponent(sourceFile, binding, modulePath, exportName) {
+function assertLazyDynamicComponent(
+  sourceFile,
+  binding,
+  modulePath,
+  exportName,
+  loadingComponent
+) {
   const dynamicBinding = defaultImportBinding(sourceFile, "next/dynamic");
   assert.ok(dynamicBinding, "a default dynamic import from next/dynamic is required");
 
@@ -231,6 +237,101 @@ function assertLazyDynamicComponent(sourceFile, binding, modulePath, exportName)
     ssr && ssr.initializer.kind === ts.SyntaxKind.FalseKeyword,
     `${binding} dynamic options must set ssr: false`
   );
+
+  if (loadingComponent) {
+    const loading = config.properties.find(
+      (property) =>
+        ts.isPropertyAssignment(property) &&
+        ((ts.isIdentifier(property.name) && property.name.text === "loading") ||
+          (ts.isStringLiteralLike(property.name) && property.name.text === "loading"))
+    );
+    assert.ok(
+      loading &&
+        ts.isIdentifier(unwrappedExpression(loading.initializer)) &&
+        unwrappedExpression(loading.initializer).text === loadingComponent,
+      `${binding} dynamic options must set loading: ${loadingComponent}`
+    );
+  }
+}
+
+function assertRetryableModalFactory(sourceFile) {
+  const dynamicBinding = defaultImportBinding(sourceFile, "next/dynamic");
+  const factory = sourceFile.statements.find(
+    (statement) =>
+      ts.isFunctionDeclaration(statement) &&
+      statement.name?.text === "createRetryableInquiryModal"
+  );
+  assert.ok(factory?.body, "a module-level retryable InquiryModal factory is required");
+  assert.equal(factory.body.statements.length, 1, "retryable modal factory must have one return");
+  const [statement] = factory.body.statements;
+  assert.ok(
+    ts.isReturnStatement(statement) && statement.expression,
+    "retryable modal factory must return dynamic(...)"
+  );
+  const initializer = unwrappedExpression(statement.expression);
+  assert.ok(
+    ts.isCallExpression(initializer) &&
+      ts.isIdentifier(initializer.expression) &&
+      initializer.expression.text === dynamicBinding,
+    "retryable modal factory must call the imported dynamic binding"
+  );
+  const returnedExpression = loaderReturnExpression(initializer.arguments[0]);
+  assert.ok(
+    returnedExpression &&
+      isExactModalImportChain(
+        returnedExpression,
+        "@/components/ui/InquiryModal",
+        "InquiryModal"
+      ),
+    "retryable modal factory must use the exact InquiryModal dynamic loader"
+  );
+  const config = unwrappedExpression(initializer.arguments[1]);
+  assert.ok(config && ts.isObjectLiteralExpression(config));
+  const propertyByName = (name) =>
+    config.properties.find(
+      (property) =>
+        ts.isPropertyAssignment(property) &&
+        ((ts.isIdentifier(property.name) && property.name.text === name) ||
+          (ts.isStringLiteralLike(property.name) && property.name.text === name))
+    );
+  const ssr = propertyByName("ssr");
+  const loading = propertyByName("loading");
+  assert.ok(ssr?.initializer.kind === ts.SyntaxKind.FalseKeyword);
+  assert.ok(
+    loading &&
+      ts.isIdentifier(unwrappedExpression(loading.initializer)) &&
+      unwrappedExpression(loading.initializer).text === "InquiryModalLoading",
+    "retryable modal factory must set loading: InquiryModalLoading"
+  );
+}
+
+function assertActiveModalStartsWithLazyBinding(sourceFile) {
+  let found = false;
+  const visit = (node) => {
+    if (ts.isVariableDeclaration(node) && ts.isArrayBindingPattern(node.name)) {
+      const [activeBinding] = node.name.elements;
+      const initializer = node.initializer && unwrappedExpression(node.initializer);
+      if (
+        activeBinding &&
+        ts.isBindingElement(activeBinding) &&
+        ts.isIdentifier(activeBinding.name) &&
+        activeBinding.name.text === "ActiveInquiryModal" &&
+        initializer &&
+        ts.isCallExpression(initializer) &&
+        initializer.arguments.length === 1
+      ) {
+        const initialComponent = loaderReturnExpression(initializer.arguments[0]);
+        found = Boolean(
+          initialComponent &&
+            ts.isIdentifier(initialComponent) &&
+            initialComponent.text === "InquiryModal"
+        );
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  assert.ok(found, "ActiveInquiryModal must start from the lazy InquiryModal binding");
 }
 
 function hasDirectivePrologue(sourceFile, directive) {
@@ -327,9 +428,12 @@ function assertInquiryModalStaysLazy(inquiryProvider) {
     sourceFile,
     "InquiryModal",
     "@/components/ui/InquiryModal",
-    "InquiryModal"
+    "InquiryModal",
+    "InquiryModalLoading"
   );
-  assertUniqueConditionalRender(sourceFile, "InquiryModal", isOpenTrueNullGate);
+  assertRetryableModalFactory(sourceFile);
+  assertActiveModalStartsWithLazyBinding(sourceFile);
+  assertUniqueConditionalRender(sourceFile, "ActiveInquiryModal", isOpenTrueNullGate);
 }
 
 function assertStickyInquiryBarStaysLazy(stickyGate) {
