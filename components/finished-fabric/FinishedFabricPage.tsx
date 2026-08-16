@@ -136,7 +136,7 @@ export function FinishedFabricPage({
                       {item.label}
                     </span>
                   ) : (
-                    <Link href={item.href} className="ff-crumb-link">
+                    <Link href={item.href} prefetch={false} className="ff-crumb-link">
                       {item.label}
                     </Link>
                   )}
@@ -162,7 +162,7 @@ export function FinishedFabricPage({
                 ) : null}
                 <div className="ff-hero-actions">
                   <SampleRequestCta label="Request a finished-fabric sample" className="" />
-                  <Link href="/finished-double-knit-fabrics" className="ff-range-link">
+                  <Link href="/finished-double-knit-fabrics" prefetch={false} className="ff-range-link">
                     View the finished-fabric range
                     <ArrowRight className="ff-arrow" aria-hidden />
                   </Link>
@@ -208,6 +208,7 @@ export function FinishedFabricPage({
                     <Link
                       key={article.url}
                       href={article.url}
+                      prefetch={false}
                       className="ff-guide-card"
                     >
                       <div>
@@ -293,7 +294,7 @@ export function FinishedFabricPage({
             <h2 className="ff-related-title">Continue the sourcing route</h2>
             <div className="ff-related-grid">
               {page.relatedLinks.map((item) => (
-                <Link key={item.href} href={item.href} className="ff-related-link">
+                <Link key={item.href} href={item.href} prefetch={false} className="ff-related-link">
                   <span>{item.label}</span>
                   <ArrowRight className="ff-related-arrow" aria-hidden />
                 </Link>
