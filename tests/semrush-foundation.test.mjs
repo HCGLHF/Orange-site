@@ -971,7 +971,14 @@ test("category CTAs forward a valid fabric option through the inquiry flow", asy
   assert.match(sampleRequestCta, /openInquiry\(fabricId\)/);
   assert.match(inquiryProvider, /openInquiry: \(initialFabricId\?: string\) => void/);
   assert.match(inquiryProvider, /setInitialFabricId\(fabricId\)/);
-  assert.match(inquiryProvider, /<InquiryModal[\s\S]*?initialFabricId=\{initialFabricId\}/);
+  assert.match(
+    inquiryProvider,
+    /const\s+InquiryModal\s*=\s*dynamic\(\s*\(\)\s*=>\s*import\("@\/components\/ui\/InquiryModal"\)\.then\(\(module\)\s*=>\s*module\.InquiryModal\),\s*\{\s*ssr:\s*false\s*\}\s*\)/s
+  );
+  assert.match(
+    inquiryProvider,
+    /\{open\s*\?\s*\(\s*<InquiryModal[\s\S]*?initialFabricId=\{initialFabricId\}[\s\S]*?\)\s*:\s*null\}/
+  );
   assert.match(inquiryModal, /initialFabricId\?: string/);
   assert.match(inquiryModal, /inquiryOptions\.some\(\(option\) => option\.id === initialFabricId\)/);
   assert.match(inquiryModal, /setFabricId\(.*initialFabricId.*finished-range/s);

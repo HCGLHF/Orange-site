@@ -8,9 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import StickyInquiryBar from "@/components/StickyInquiryBar";
+import dynamic from "next/dynamic";
+import { DeferredStickyInquiryBar } from "@/components/DeferredStickyInquiryBar";
 import { InquiryCartProvider } from "@/components/InquiryCartProvider";
-import { InquiryModal } from "@/components/ui/InquiryModal";
 
 type InquiryContextValue = {
   openInquiry: (initialFabricId?: string) => void;
@@ -18,6 +18,12 @@ type InquiryContextValue = {
 };
 
 const InquiryContext = createContext<InquiryContextValue | null>(null);
+
+const InquiryModal = dynamic(
+  () =>
+    import("@/components/ui/InquiryModal").then((module) => module.InquiryModal),
+  { ssr: false }
+);
 
 export function InquiryProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -40,12 +46,14 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
     <InquiryContext.Provider value={value}>
       <InquiryCartProvider>
         {children}
-        <StickyInquiryBar />
-        <InquiryModal
-          open={open}
-          onClose={closeInquiry}
-          initialFabricId={initialFabricId}
-        />
+        <DeferredStickyInquiryBar />
+        {open ? (
+          <InquiryModal
+            open
+            onClose={closeInquiry}
+            initialFabricId={initialFabricId}
+          />
+        ) : null}
       </InquiryCartProvider>
     </InquiryContext.Provider>
   );
