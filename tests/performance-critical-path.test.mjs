@@ -3,6 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 
 const root = path.dirname(
   fileURLToPath(new URL("../package.json", import.meta.url))
@@ -36,122 +37,321 @@ function hasEnabledPriorityProp(tag) {
   );
 }
 
-function parenthesizedArguments(source, openingParen) {
-  let depth = 0;
-  let quote;
-
-  for (let index = openingParen; index < source.length; index += 1) {
-    const character = source[index];
-
-    if (quote) {
-      if (character === "\\\\") {
-        index += 1;
-      } else if (character === quote) {
-        quote = undefined;
-      }
-      continue;
-    }
-
-    if (character === "/" && source[index + 1] === "/") {
-      const lineEnd = source.indexOf("\n", index + 2);
-      if (lineEnd === -1) return undefined;
-      index = lineEnd;
-      continue;
-    }
-    if (character === "/" && source[index + 1] === "*") {
-      const commentEnd = source.indexOf("*/", index + 2);
-      if (commentEnd === -1) return undefined;
-      index = commentEnd + 1;
-      continue;
-    }
-
-    if (character === '"' || character === "'" || character === "`") {
-      quote = character;
-    } else if (character === "(") {
-      depth += 1;
-    } else if (character === ")") {
-      depth -= 1;
-      if (depth === 0) return source.slice(openingParen + 1, index);
-    }
-  }
-
-  return undefined;
-}
-
-function dynamicCallArgumentsForBinding(source, binding) {
-  const matcher = new RegExp(`\\bconst\\s+${binding}\\s*=\\s*dynamic\\s*\\(`, "g");
-
-  return [...source.matchAll(matcher)]
-    .map((match) => {
-      const openingParen = match.index + match[0].lastIndexOf("(");
-      return parenthesizedArguments(source, openingParen);
-    })
-    .filter(Boolean);
-}
-
-function assertDefaultDynamicImport(source) {
-  assert.match(source, /\bimport\s+dynamic\s+from\s*["']next\/dynamic["']/);
-}
-
-function assertNoStaticValueImport(source, modulePath) {
-  assert.doesNotMatch(
+function parseTsx(source) {
+  return ts.createSourceFile(
+    "contract.tsx",
     source,
-    new RegExp(
-      `\\bimport(?!\\s*\\()(?:\\s+(?!type\\b)[^;]*?\\bfrom\\s*|\\s*)["']${modulePath}["']`
-    )
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX
   );
 }
 
+function unwrappedExpression(expression) {
+  let current = expression;
+  while (
+    ts.isParenthesizedExpression(current) ||
+    ts.isAsExpression(current) ||
+    ts.isTypeAssertionExpression(current) ||
+    ts.isNonNullExpression(current)
+  ) {
+    current = current.expression;
+  }
+  return current;
+}
+
+function importModulePath(statement) {
+  return ts.isImportDeclaration(statement) &&
+    ts.isStringLiteralLike(statement.moduleSpecifier)
+    ? statement.moduleSpecifier.text
+    : undefined;
+}
+
+function isValueImport(statement) {
+  const clause = statement.importClause;
+  if (!clause) return true;
+  if (clause.isTypeOnly) return false;
+  if (clause.name) return true;
+  if (!clause.namedBindings) return false;
+  if (ts.isNamespaceImport(clause.namedBindings)) return true;
+  return clause.namedBindings.elements.some((specifier) => !specifier.isTypeOnly);
+}
+
+function assertNoStaticValueImport(sourceFile, modulePath) {
+  const staticValueImport = sourceFile.statements.find(
+    (statement) =>
+      ts.isImportDeclaration(statement) &&
+      importModulePath(statement) === modulePath &&
+      isValueImport(statement)
+  );
+  assert.ok(!staticValueImport, `static value import remains for ${modulePath}`);
+}
+
+function defaultImportBinding(sourceFile, modulePath) {
+  const declaration = sourceFile.statements.find(
+    (statement) =>
+      ts.isImportDeclaration(statement) &&
+      importModulePath(statement) === modulePath &&
+      statement.importClause?.name &&
+      !statement.importClause.isTypeOnly
+  );
+  return declaration?.importClause?.name.text;
+}
+
+function variableDeclaration(sourceFile, binding) {
+  let declaration;
+  const visit = (node) => {
+    if (
+      !declaration &&
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === binding
+    ) {
+      declaration = node;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return declaration;
+}
+
+function isExactDynamicImport(expression, modulePath) {
+  const candidate = unwrappedExpression(expression);
+  return (
+    ts.isCallExpression(candidate) &&
+    candidate.expression.kind === ts.SyntaxKind.ImportKeyword &&
+    candidate.arguments.length === 1 &&
+    ts.isStringLiteralLike(candidate.arguments[0]) &&
+    candidate.arguments[0].text === modulePath
+  );
+}
+
+function containsExactDynamicImport(node, modulePath) {
+  let found = false;
+  const visit = (candidate) => {
+    if (isExactDynamicImport(candidate, modulePath)) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(candidate, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function thenSelectsExport(node, modulePath, exportName) {
+  let found = false;
+  const visit = (candidate) => {
+    if (
+      ts.isCallExpression(candidate) &&
+      ts.isPropertyAccessExpression(candidate.expression) &&
+      candidate.expression.name.text === "then" &&
+      isExactDynamicImport(candidate.expression.expression, modulePath) &&
+      candidate.arguments.length > 0 &&
+      callbackSelectsExport(candidate.arguments[0], exportName)
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(candidate, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function callbackSelectsExport(callback, exportName) {
+  const candidate = unwrappedExpression(callback);
+  if (!ts.isArrowFunction(candidate) && !ts.isFunctionExpression(candidate)) {
+    return false;
+  }
+  const parameterNames = new Set(
+    candidate.parameters
+      .filter((parameter) => ts.isIdentifier(parameter.name))
+      .map((parameter) => parameter.name.text)
+  );
+  const isSelection = (expression) => {
+    const value = unwrappedExpression(expression);
+    return (
+      ts.isPropertyAccessExpression(value) &&
+      value.name.text === exportName &&
+      ts.isIdentifier(unwrappedExpression(value.expression)) &&
+      parameterNames.has(unwrappedExpression(value.expression).text)
+    );
+  };
+
+  if (!ts.isBlock(candidate.body)) return isSelection(candidate.body);
+
+  let found = false;
+  const visit = (node) => {
+    if (ts.isReturnStatement(node) && node.expression && isSelection(node.expression)) {
+      found = true;
+      return;
+    }
+    if (node !== candidate.body && (ts.isArrowFunction(node) || ts.isFunctionExpression(node))) {
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(candidate.body);
+  return found;
+}
+
+function assertLazyDynamicComponent(sourceFile, binding, modulePath, exportName) {
+  const dynamicBinding = defaultImportBinding(sourceFile, "next/dynamic");
+  assert.ok(dynamicBinding, "a default dynamic import from next/dynamic is required");
+
+  const declaration = variableDeclaration(sourceFile, binding);
+  assert.ok(declaration, `const ${binding} = dynamic(...) is required`);
+  assert.ok(
+    ts.isVariableDeclarationList(declaration.parent) &&
+      (declaration.parent.flags & ts.NodeFlags.Const) !== 0,
+    `${binding} must use a const declaration`
+  );
+
+  const initializer = declaration.initializer && unwrappedExpression(declaration.initializer);
+  assert.ok(
+    initializer &&
+      ts.isCallExpression(initializer) &&
+      ts.isIdentifier(initializer.expression) &&
+      initializer.expression.text === dynamicBinding,
+    `${binding} must call the imported dynamic binding`
+  );
+  assert.ok(initializer.arguments[0], `${binding} needs a dynamic loader`);
+  assert.ok(
+    containsExactDynamicImport(initializer.arguments[0], modulePath),
+    `${binding} loader must dynamically import ${modulePath}`
+  );
+  if (exportName) {
+    assert.ok(
+      thenSelectsExport(initializer.arguments[0], modulePath, exportName),
+      `${binding} loader must select ${exportName} through .then(...)`
+    );
+  }
+
+  const config = initializer.arguments[1] && unwrappedExpression(initializer.arguments[1]);
+  assert.ok(
+    config && ts.isObjectLiteralExpression(config),
+    `${binding} needs an options object as dynamic()'s second argument`
+  );
+  const ssr = config.properties.find(
+    (property) =>
+      ts.isPropertyAssignment(property) &&
+      ((ts.isIdentifier(property.name) && property.name.text === "ssr") ||
+        (ts.isStringLiteralLike(property.name) && property.name.text === "ssr"))
+  );
+  assert.ok(
+    ssr && ssr.initializer.kind === ts.SyntaxKind.FalseKeyword,
+    `${binding} dynamic options must set ssr: false`
+  );
+}
+
+function hasDirectivePrologue(sourceFile, directive) {
+  for (const statement of sourceFile.statements) {
+    if (!ts.isExpressionStatement(statement) || !ts.isStringLiteral(statement.expression)) {
+      return false;
+    }
+    if (statement.expression.text === directive) return true;
+  }
+  return false;
+}
+
+function hasOpenConditionalComponent(sourceFile, componentName) {
+  let found = false;
+  const visit = (node) => {
+    if (
+      ts.isConditionalExpression(node) &&
+      ts.isIdentifier(unwrappedExpression(node.condition)) &&
+      unwrappedExpression(node.condition).text === "open" &&
+      containsJsxComponent(node.whenTrue, componentName)
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return found;
+}
+
+function containsJsxComponent(node, componentName) {
+  let found = false;
+  const visit = (candidate) => {
+    const tagName = ts.isJsxSelfClosingElement(candidate)
+      ? candidate.tagName
+      : ts.isJsxOpeningElement(candidate)
+        ? candidate.tagName
+        : undefined;
+    if (tagName && ts.isIdentifier(tagName) && tagName.text === componentName) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(candidate, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function hasStickyInquiryConditional(sourceFile) {
+  let found = false;
+  const visit = (node) => {
+    if (
+      ts.isConditionalExpression(node) &&
+      ts.isBinaryExpression(node.condition) &&
+      node.condition.operatorToken.kind === ts.SyntaxKind.GreaterThanToken &&
+      ts.isIdentifier(node.condition.left) &&
+      node.condition.left.text === "totalCount" &&
+      ts.isNumericLiteral(node.condition.right) &&
+      node.condition.right.text === "0" &&
+      containsJsxComponent(node.whenTrue, "StickyInquiryBar") &&
+      unwrappedExpression(node.whenFalse).kind === ts.SyntaxKind.NullKeyword
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return found;
+}
+
 function assertContactCardStaysServerRendered(contactCard) {
-  assert.doesNotMatch(
-    contactCard,
-    /^\s*(["'])use client\1;?\s*(?:\/\/.*)?$/m
+  const sourceFile = parseTsx(contactCard);
+  assert.equal(
+    hasDirectivePrologue(sourceFile, "use client"),
+    false,
+    "ContactCard must not be a client component"
   );
   assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
 }
 
 function assertInquiryModalStaysLazy(inquiryProvider) {
-  assertNoStaticValueImport(
-    inquiryProvider,
-    "@/components/ui/InquiryModal"
-  );
-  assertDefaultDynamicImport(inquiryProvider);
-  const [inquiryModalDynamicCall] = dynamicCallArgumentsForBinding(
-    inquiryProvider,
+  const sourceFile = parseTsx(inquiryProvider);
+  assertNoStaticValueImport(sourceFile, "@/components/ui/InquiryModal");
+  assertLazyDynamicComponent(
+    sourceFile,
+    "InquiryModal",
+    "@/components/ui/InquiryModal",
     "InquiryModal"
   );
-  assert.ok(inquiryModalDynamicCall, "const InquiryModal = dynamic(...) is required");
-  assert.match(
-    inquiryModalDynamicCall,
-    /\bimport\s*\(\s*["']@\/components\/ui\/InquiryModal["']\s*\)\s*\.then\s*\(\s*\(?\s*module\s*\)?\s*=>\s*module\.InquiryModal\s*\)/
+  assert.ok(
+    hasOpenConditionalComponent(sourceFile, "InquiryModal"),
+    "InquiryModal must render in open's true branch"
   );
-  assert.match(
-    inquiryModalDynamicCall,
-    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
-  );
-  assert.match(inquiryProvider, /\bopen\s*\?\s*\(\s*<InquiryModal\b/);
 }
 
 function assertStickyInquiryBarStaysLazy(stickyGate) {
-  assertDefaultDynamicImport(stickyGate);
-  assertNoStaticValueImport(stickyGate, "@/components/StickyInquiryBar");
-  const [stickyInquiryBarDynamicCall] = dynamicCallArgumentsForBinding(
-    stickyGate,
-    "StickyInquiryBar"
+  const sourceFile = parseTsx(stickyGate);
+  assertNoStaticValueImport(sourceFile, "@/components/StickyInquiryBar");
+  assertLazyDynamicComponent(
+    sourceFile,
+    "StickyInquiryBar",
+    "@/components/StickyInquiryBar"
   );
   assert.ok(
-    stickyInquiryBarDynamicCall,
-    "const StickyInquiryBar = dynamic(...) is required"
+    hasStickyInquiryConditional(sourceFile),
+    "StickyInquiryBar must render only when totalCount > 0"
   );
-  assert.match(
-    stickyInquiryBarDynamicCall,
-    /\bimport\s*\(\s*["']@\/components\/StickyInquiryBar["']\s*\)/
-  );
-  assert.match(
-    stickyInquiryBarDynamicCall,
-    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
-  );
-  assert.match(stickyGate, /totalCount > 0 \? <StickyInquiryBar \/> : null/);
 }
 
 test("critical Hero images use responsive delivery and the approved mobile quality", async () => {
