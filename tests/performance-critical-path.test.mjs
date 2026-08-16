@@ -98,22 +98,21 @@ function defaultImportBinding(sourceFile, modulePath) {
   return declaration?.importClause?.name.text;
 }
 
-function variableDeclaration(sourceFile, binding) {
-  let declaration;
-  const visit = (node) => {
+function topLevelConstDeclaration(sourceFile, binding) {
+  for (const statement of sourceFile.statements) {
     if (
-      !declaration &&
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === binding
+      !ts.isVariableStatement(statement) ||
+      (statement.declarationList.flags & ts.NodeFlags.Const) === 0
     ) {
-      declaration = node;
-      return;
+      continue;
     }
-    ts.forEachChild(node, visit);
-  };
-  visit(sourceFile);
-  return declaration;
+    const declaration = statement.declarationList.declarations.find(
+      (candidate) =>
+        ts.isIdentifier(candidate.name) && candidate.name.text === binding
+    );
+    if (declaration) return declaration;
+  }
+  return undefined;
 }
 
 function isExactDynamicImport(expression, modulePath) {
@@ -125,39 +124,6 @@ function isExactDynamicImport(expression, modulePath) {
     ts.isStringLiteralLike(candidate.arguments[0]) &&
     candidate.arguments[0].text === modulePath
   );
-}
-
-function containsExactDynamicImport(node, modulePath) {
-  let found = false;
-  const visit = (candidate) => {
-    if (isExactDynamicImport(candidate, modulePath)) {
-      found = true;
-      return;
-    }
-    ts.forEachChild(candidate, visit);
-  };
-  visit(node);
-  return found;
-}
-
-function thenSelectsExport(node, modulePath, exportName) {
-  let found = false;
-  const visit = (candidate) => {
-    if (
-      ts.isCallExpression(candidate) &&
-      ts.isPropertyAccessExpression(candidate.expression) &&
-      candidate.expression.name.text === "then" &&
-      isExactDynamicImport(candidate.expression.expression, modulePath) &&
-      candidate.arguments.length > 0 &&
-      callbackSelectsExport(candidate.arguments[0], exportName)
-    ) {
-      found = true;
-      return;
-    }
-    ts.forEachChild(candidate, visit);
-  };
-  visit(node);
-  return found;
 }
 
 function callbackSelectsExport(callback, exportName) {
@@ -197,17 +163,37 @@ function callbackSelectsExport(callback, exportName) {
   return found;
 }
 
+function loaderReturnExpression(loader) {
+  const candidate = unwrappedExpression(loader);
+  if (!ts.isArrowFunction(candidate) && !ts.isFunctionExpression(candidate)) {
+    return undefined;
+  }
+  if (!ts.isBlock(candidate.body)) return unwrappedExpression(candidate.body);
+  if (candidate.body.statements.length !== 1) return undefined;
+  const [statement] = candidate.body.statements;
+  return ts.isReturnStatement(statement) && statement.expression
+    ? unwrappedExpression(statement.expression)
+    : undefined;
+}
+
+function isExactModalImportChain(expression, modulePath, exportName) {
+  const candidate = unwrappedExpression(expression);
+  return (
+    ts.isCallExpression(candidate) &&
+    ts.isPropertyAccessExpression(candidate.expression) &&
+    candidate.expression.name.text === "then" &&
+    isExactDynamicImport(candidate.expression.expression, modulePath) &&
+    candidate.arguments.length === 1 &&
+    callbackSelectsExport(candidate.arguments[0], exportName)
+  );
+}
+
 function assertLazyDynamicComponent(sourceFile, binding, modulePath, exportName) {
   const dynamicBinding = defaultImportBinding(sourceFile, "next/dynamic");
   assert.ok(dynamicBinding, "a default dynamic import from next/dynamic is required");
 
-  const declaration = variableDeclaration(sourceFile, binding);
-  assert.ok(declaration, `const ${binding} = dynamic(...) is required`);
-  assert.ok(
-    ts.isVariableDeclarationList(declaration.parent) &&
-      (declaration.parent.flags & ts.NodeFlags.Const) !== 0,
-    `${binding} must use a const declaration`
-  );
+  const declaration = topLevelConstDeclaration(sourceFile, binding);
+  assert.ok(declaration, `a top-level const ${binding} = dynamic(...) is required`);
 
   const initializer = declaration.initializer && unwrappedExpression(declaration.initializer);
   assert.ok(
@@ -217,17 +203,18 @@ function assertLazyDynamicComponent(sourceFile, binding, modulePath, exportName)
       initializer.expression.text === dynamicBinding,
     `${binding} must call the imported dynamic binding`
   );
-  assert.ok(initializer.arguments[0], `${binding} needs a dynamic loader`);
+  const loader = initializer.arguments[0];
+  assert.ok(loader, `${binding} needs a dynamic loader`);
+  const returnedExpression = loaderReturnExpression(loader);
+  assert.ok(returnedExpression, `${binding} loader must return one expression`);
   assert.ok(
-    containsExactDynamicImport(initializer.arguments[0], modulePath),
-    `${binding} loader must dynamically import ${modulePath}`
+    exportName
+      ? isExactModalImportChain(returnedExpression, modulePath, exportName)
+      : isExactDynamicImport(returnedExpression, modulePath),
+    exportName
+      ? `${binding} loader must return ${modulePath}.then(...${exportName}...)`
+      : `${binding} loader must return import(${modulePath})`
   );
-  if (exportName) {
-    assert.ok(
-      thenSelectsExport(initializer.arguments[0], modulePath, exportName),
-      `${binding} loader must select ${exportName} through .then(...)`
-    );
-  }
 
   const config = initializer.arguments[1] && unwrappedExpression(initializer.arguments[1]);
   assert.ok(
@@ -256,63 +243,71 @@ function hasDirectivePrologue(sourceFile, directive) {
   return false;
 }
 
-function hasOpenConditionalComponent(sourceFile, componentName) {
-  let found = false;
-  const visit = (node) => {
-    if (
-      ts.isConditionalExpression(node) &&
-      ts.isIdentifier(unwrappedExpression(node.condition)) &&
-      unwrappedExpression(node.condition).text === "open" &&
-      containsJsxComponent(node.whenTrue, componentName)
-    ) {
-      found = true;
+function jsxReferences(sourceFile, binding) {
+  const references = [];
+  const visit = (node, conditionalBranches) => {
+    if (ts.isConditionalExpression(node)) {
+      visit(node.condition, conditionalBranches);
+      visit(node.whenTrue, [
+        ...conditionalBranches,
+        { conditional: node, branch: "true" },
+      ]);
+      visit(node.whenFalse, [
+        ...conditionalBranches,
+        { conditional: node, branch: "false" },
+      ]);
       return;
     }
-    ts.forEachChild(node, visit);
-  };
-  visit(sourceFile);
-  return found;
-}
 
-function containsJsxComponent(node, componentName) {
-  let found = false;
-  const visit = (candidate) => {
-    const tagName = ts.isJsxSelfClosingElement(candidate)
-      ? candidate.tagName
-      : ts.isJsxOpeningElement(candidate)
-        ? candidate.tagName
+    const tagName = ts.isJsxSelfClosingElement(node)
+      ? node.tagName
+      : ts.isJsxOpeningElement(node)
+        ? node.tagName
         : undefined;
-    if (tagName && ts.isIdentifier(tagName) && tagName.text === componentName) {
-      found = true;
-      return;
+    if (tagName && ts.isIdentifier(tagName) && tagName.text === binding) {
+      references.push({ conditionalBranches });
     }
-    ts.forEachChild(candidate, visit);
+    ts.forEachChild(node, (child) => visit(child, conditionalBranches));
   };
-  visit(node);
-  return found;
+  visit(sourceFile, []);
+  return references;
 }
 
-function hasStickyInquiryConditional(sourceFile) {
-  let found = false;
-  const visit = (node) => {
-    if (
-      ts.isConditionalExpression(node) &&
-      ts.isBinaryExpression(node.condition) &&
-      node.condition.operatorToken.kind === ts.SyntaxKind.GreaterThanToken &&
-      ts.isIdentifier(node.condition.left) &&
-      node.condition.left.text === "totalCount" &&
-      ts.isNumericLiteral(node.condition.right) &&
-      node.condition.right.text === "0" &&
-      containsJsxComponent(node.whenTrue, "StickyInquiryBar") &&
-      unwrappedExpression(node.whenFalse).kind === ts.SyntaxKind.NullKeyword
-    ) {
-      found = true;
-      return;
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(sourceFile);
-  return found;
+function isNullExpression(expression) {
+  return unwrappedExpression(expression).kind === ts.SyntaxKind.NullKeyword;
+}
+
+function isOpenTrueNullGate(context) {
+  const condition = unwrappedExpression(context.conditional.condition);
+  return (
+    context.branch === "true" &&
+    ts.isIdentifier(condition) &&
+    condition.text === "open" &&
+    isNullExpression(context.conditional.whenFalse)
+  );
+}
+
+function isStickyTrueNullGate(context) {
+  const condition = unwrappedExpression(context.conditional.condition);
+  return (
+    context.branch === "true" &&
+    ts.isBinaryExpression(condition) &&
+    condition.operatorToken.kind === ts.SyntaxKind.GreaterThanToken &&
+    ts.isIdentifier(unwrappedExpression(condition.left)) &&
+    unwrappedExpression(condition.left).text === "totalCount" &&
+    ts.isNumericLiteral(unwrappedExpression(condition.right)) &&
+    unwrappedExpression(condition.right).text === "0" &&
+    isNullExpression(context.conditional.whenFalse)
+  );
+}
+
+function assertUniqueConditionalRender(sourceFile, binding, isRequiredGate) {
+  const references = jsxReferences(sourceFile, binding);
+  assert.equal(references.length, 1, `${binding} must have exactly one JSX render`);
+  assert.ok(
+    references[0].conditionalBranches.some(isRequiredGate),
+    `${binding} must render in the required true branch with a null fallback`
+  );
 }
 
 function assertContactCardStaysServerRendered(contactCard) {
@@ -334,10 +329,7 @@ function assertInquiryModalStaysLazy(inquiryProvider) {
     "@/components/ui/InquiryModal",
     "InquiryModal"
   );
-  assert.ok(
-    hasOpenConditionalComponent(sourceFile, "InquiryModal"),
-    "InquiryModal must render in open's true branch"
-  );
+  assertUniqueConditionalRender(sourceFile, "InquiryModal", isOpenTrueNullGate);
 }
 
 function assertStickyInquiryBarStaysLazy(stickyGate) {
@@ -348,9 +340,10 @@ function assertStickyInquiryBarStaysLazy(stickyGate) {
     "StickyInquiryBar",
     "@/components/StickyInquiryBar"
   );
-  assert.ok(
-    hasStickyInquiryConditional(sourceFile),
-    "StickyInquiryBar must render only when totalCount > 0"
+  assertUniqueConditionalRender(
+    sourceFile,
+    "StickyInquiryBar",
+    isStickyTrueNullGate
   );
 }
 
