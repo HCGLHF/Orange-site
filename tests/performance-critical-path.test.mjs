@@ -102,6 +102,58 @@ function assertNoStaticValueImport(source, modulePath) {
   );
 }
 
+function assertContactCardStaysServerRendered(contactCard) {
+  assert.doesNotMatch(
+    contactCard,
+    /^\s*(["'])use client\1;?\s*(?:\/\/.*)?$/m
+  );
+  assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
+}
+
+function assertInquiryModalStaysLazy(inquiryProvider) {
+  assertNoStaticValueImport(
+    inquiryProvider,
+    "@/components/ui/InquiryModal"
+  );
+  assertDefaultDynamicImport(inquiryProvider);
+  const [inquiryModalDynamicCall] = dynamicCallArgumentsForBinding(
+    inquiryProvider,
+    "InquiryModal"
+  );
+  assert.ok(inquiryModalDynamicCall, "const InquiryModal = dynamic(...) is required");
+  assert.match(
+    inquiryModalDynamicCall,
+    /\bimport\s*\(\s*["']@\/components\/ui\/InquiryModal["']\s*\)\s*\.then\s*\(\s*\(?\s*module\s*\)?\s*=>\s*module\.InquiryModal\s*\)/
+  );
+  assert.match(
+    inquiryModalDynamicCall,
+    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
+  );
+  assert.match(inquiryProvider, /\bopen\s*\?\s*\(\s*<InquiryModal\b/);
+}
+
+function assertStickyInquiryBarStaysLazy(stickyGate) {
+  assertDefaultDynamicImport(stickyGate);
+  assertNoStaticValueImport(stickyGate, "@/components/StickyInquiryBar");
+  const [stickyInquiryBarDynamicCall] = dynamicCallArgumentsForBinding(
+    stickyGate,
+    "StickyInquiryBar"
+  );
+  assert.ok(
+    stickyInquiryBarDynamicCall,
+    "const StickyInquiryBar = dynamic(...) is required"
+  );
+  assert.match(
+    stickyInquiryBarDynamicCall,
+    /\bimport\s*\(\s*["']@\/components\/StickyInquiryBar["']\s*\)/
+  );
+  assert.match(
+    stickyInquiryBarDynamicCall,
+    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
+  );
+  assert.match(stickyGate, /totalCount > 0 \? <StickyInquiryBar \/> : null/);
+}
+
 test("critical Hero images use responsive delivery and the approved mobile quality", async () => {
   const [config, landingHero, aboutPage] = await Promise.all([
     source("next.config.mjs"),
@@ -169,35 +221,13 @@ test("the current application ships no video code or video URL", async () => {
 test("below-the-fold contact content stays out of initial client JS", async () => {
   const contactCard = await source("components/ContactCard.tsx");
 
-  assert.doesNotMatch(
-    contactCard,
-    /^\s*(["'])use client\1;?\s*(?:\/\/.*)?$/m
-  );
-  assert.doesNotMatch(contactCard, /framer-motion|motion\.|useReducedMotion/);
+  assertContactCardStaysServerRendered(contactCard);
 });
 
 test("inquiry modal loads from a lazy client-only chunk", async () => {
   const inquiryProvider = await source("components/InquiryProvider.tsx");
 
-  assertNoStaticValueImport(
-    inquiryProvider,
-    "@/components/ui/InquiryModal"
-  );
-  assertDefaultDynamicImport(inquiryProvider);
-  const [inquiryModalDynamicCall] = dynamicCallArgumentsForBinding(
-    inquiryProvider,
-    "InquiryModal"
-  );
-  assert.ok(inquiryModalDynamicCall, "const InquiryModal = dynamic(...) is required");
-  assert.match(
-    inquiryModalDynamicCall,
-    /\bimport\s*\(\s*["']@\/components\/ui\/InquiryModal["']\s*\)\s*\.then\s*\(\s*\(?\s*module\s*\)?\s*=>\s*module\.InquiryModal\s*\)/
-  );
-  assert.match(
-    inquiryModalDynamicCall,
-    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
-  );
-  assert.match(inquiryProvider, /\bopen\s*\?\s*\(\s*<InquiryModal\b/);
+  assertInquiryModalStaysLazy(inquiryProvider);
 });
 
 test("deferred sticky inquiry bar loads from a lazy client-only chunk", async () => {
@@ -205,23 +235,17 @@ test("deferred sticky inquiry bar loads from a lazy client-only chunk", async ()
     "components/DeferredStickyInquiryBar.tsx"
   );
 
-  assertDefaultDynamicImport(stickyGate);
-  assertNoStaticValueImport(stickyGate, "@/components/StickyInquiryBar");
-  const [stickyInquiryBarDynamicCall] = dynamicCallArgumentsForBinding(
-    stickyGate,
-    "StickyInquiryBar"
-  );
-  assert.ok(
-    stickyInquiryBarDynamicCall,
-    "const StickyInquiryBar = dynamic(...) is required"
-  );
-  assert.match(
-    stickyInquiryBarDynamicCall,
-    /\bimport\s*\(\s*["']@\/components\/StickyInquiryBar["']\s*\)/
-  );
-  assert.match(
-    stickyInquiryBarDynamicCall,
-    /,\s*\{[\s\S]*\bssr\s*:\s*false\b[\s\S]*\}\s*$/
-  );
-  assert.match(stickyGate, /totalCount > 0 \? <StickyInquiryBar \/> : null/);
+  assertStickyInquiryBarStaysLazy(stickyGate);
+});
+
+test("below-the-fold contact and inquiry overlays stay out of initial client JS", async () => {
+  const [contactCard, inquiryProvider, stickyGate] = await Promise.all([
+    source("components/ContactCard.tsx"),
+    source("components/InquiryProvider.tsx"),
+    source("components/DeferredStickyInquiryBar.tsx"),
+  ]);
+
+  assertContactCardStaysServerRendered(contactCard);
+  assertInquiryModalStaysLazy(inquiryProvider);
+  assertStickyInquiryBarStaysLazy(stickyGate);
 });
