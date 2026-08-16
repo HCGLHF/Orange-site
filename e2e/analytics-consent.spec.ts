@@ -1,5 +1,7 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
+import { GTM_LCP_BUFFER_MS, GTM_MIN_REQUEST_TIME_MS } from "@/lib/analytics/bootstrap";
+
 const CONSENT_KEY = "orange-textile.analytics-consent";
 const GTM_ID = "GTM-5FHDLXGV";
 const BANNER_COPY =
@@ -176,7 +178,7 @@ async function expectSafeAreaSupport(page: Page) {
   ).toBe(true);
 }
 
-test("queues denied consent before GTM and loads one exact container without standalone GA", async ({
+test("queues denied consent before GTM and loads one delayed exact container without standalone GA", async ({
   context,
   page,
 }) => {
@@ -185,6 +187,29 @@ test("queues denied consent before GTM and loads one exact container without sta
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Privacy & analytics" })).toBeVisible();
+  expect(await page.locator("#google-tag-manager-bootstrap").count()).toBe(1);
+  expect(await page.locator("#google-tag-manager").count()).toBe(0);
+
+  await page.waitForFunction(
+    (checkpoint) => performance.now() >= checkpoint,
+    GTM_MIN_REQUEST_TIME_MS - 500,
+  );
+  expect(requests.gtmRequests, "GTM must not request before its floor").toHaveLength(0);
+
+  await expect.poll(() => requests.gtmRequests.length, { timeout: 8000 }).toBe(1);
+  const deferredTiming = await page.evaluate(() => {
+    const script = document.getElementById("google-tag-manager") as HTMLScriptElement | null;
+    const lcpEntries = performance.getEntriesByType("largest-contentful-paint") as PerformanceEntry[];
+
+    return {
+      loadedAt: Number(script?.dataset.orangeLoadedAt),
+      latestLcp: lcpEntries.reduce((latest, entry) => Math.max(latest, entry.startTime), 0),
+    };
+  });
+  expect(deferredTiming.loadedAt).toBeGreaterThanOrEqual(GTM_MIN_REQUEST_TIME_MS - 50);
+  expect(deferredTiming.loadedAt - deferredTiming.latestLcp).toBeGreaterThanOrEqual(
+    GTM_LCP_BUFFER_MS - 50,
+  );
 
   const snapshot = await dataLayerSnapshot(page);
   const defaultIndex = snapshot.findIndex(

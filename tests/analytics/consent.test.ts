@@ -1,6 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { buildAnalyticsHeadScript, buildGtmBootstrap } from "@/lib/analytics/bootstrap";
+import {
+  buildAnalyticsHeadScript,
+  buildGtmBootstrap,
+  GTM_LCP_BUFFER_MS,
+  GTM_MIN_REQUEST_TIME_MS,
+} from "@/lib/analytics/bootstrap";
 import { getGtmContainerId } from "@/lib/analytics/config";
 import {
   ANALYTICS_CONSENT_STORAGE_KEY,
@@ -16,6 +21,8 @@ import type {
 } from "@/types/analytics";
 
 type StorageDouble = Pick<Storage, "getItem" | "setItem">;
+
+afterEach(() => vi.useRealTimers());
 
 function asCall(item: unknown): unknown[] {
   return Array.from(item as unknown as ArrayLike<unknown>);
@@ -292,36 +299,154 @@ describe("buildAnalyticsHeadScript", () => {
 });
 
 describe("buildGtmBootstrap", () => {
-  it("inserts one asynchronous GTM request and queues one startup item", () => {
+  function createRuntime(
+    options: { performanceObserver?: "available" | "unavailable" | "observe-throws" } = {},
+  ) {
     const isolatedDocument = document.implementation.createHTMLDocument("analytics");
-    const seedScript = isolatedDocument.createElement("script");
-    isolatedDocument.head.append(seedScript);
-    const scriptWindow: { dataLayer?: AnalyticsDataLayer } = {};
+    let lcpCallback:
+      | ((entries: { getEntries(): Array<{ startTime: number }> }) => void)
+      | undefined;
+    class FakePerformanceObserver {
+      constructor(callback: (entries: { getEntries(): Array<{ startTime: number }> }) => void) {
+        lcpCallback = callback;
+      }
+
+      observe() {
+        if (options.performanceObserver === "observe-throws") throw new Error("unsupported");
+      }
+    }
+    const scriptWindow: {
+      dataLayer?: AnalyticsDataLayer;
+      performance: { now(): number };
+      setTimeout: typeof setTimeout;
+      clearTimeout: typeof clearTimeout;
+      PerformanceObserver?: typeof FakePerformanceObserver;
+    } = {
+      performance: { now: () => Date.now() },
+      setTimeout,
+      clearTimeout,
+      ...(options.performanceObserver === "unavailable"
+        ? {}
+        : { PerformanceObserver: FakePerformanceObserver }),
+    };
 
     Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
       scriptWindow,
       isolatedDocument,
     );
 
-    const insertedScripts = Array.from(isolatedDocument.scripts).filter(
-      (script) => script !== seedScript,
+    return {
+      isolatedDocument,
+      scriptWindow,
+      emitLcp(startTime: number) {
+        lcpCallback?.({ getEntries: () => [{ startTime }] });
+      },
+    };
+  }
+
+  function gtmScripts(documentUnderTest: Document) {
+    return Array.from(documentUnderTest.scripts).filter(
+      (script) => script.id === "google-tag-manager",
     );
-    expect(insertedScripts).toHaveLength(1);
-    expect(insertedScripts[0].async).toBe(true);
-    expect(insertedScripts[0].src).toBe(
-      "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
-    );
+  }
+
+  it("queues startup immediately but defers the external request until the floor", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const { isolatedDocument, scriptWindow } = createRuntime();
+
     expect(scriptWindow.dataLayer).toHaveLength(1);
-    const startup = scriptWindow.dataLayer?.[0] as
-      | { "gtm.start": number; event: "gtm.js" }
-      | undefined;
-    expect(startup?.event).toBe("gtm.js");
-    expect(startup?.["gtm.start"]).toEqual(expect.any(Number));
+    expect(scriptWindow.dataLayer?.[0]).toMatchObject({ event: "gtm.js" });
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+
+    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS - 1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+
+    vi.advanceTimersByTime(1);
+    const [script] = gtmScripts(isolatedDocument);
+    expect(script).toMatchObject({
+      id: "google-tag-manager",
+      async: true,
+      src: "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
+    });
+    expect(script?.dataset.orangeLoadedAt).toBe(String(GTM_MIN_REQUEST_TIME_MS));
+  });
+
+  it("reschedules the request after a buffered LCP candidate", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const { emitLcp, isolatedDocument } = createRuntime();
+
+    emitLcp(3500);
+    vi.advanceTimersByTime(4499);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+    vi.advanceTimersByTime(1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+    expect(gtmScripts(isolatedDocument)[0]?.dataset.orangeLoadedAt).toBe("4500");
+  });
+
+  it("uses the latest LCP candidate monotonically when rescheduling", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const { emitLcp, isolatedDocument } = createRuntime();
+
+    emitLcp(3500);
+    emitLcp(3200);
+    emitLcp(4200);
+    vi.advanceTimersByTime(5199);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+    vi.advanceTimersByTime(1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+    expect(gtmScripts(isolatedDocument)[0]?.dataset.orangeLoadedAt).toBe("5200");
+  });
+
+  it.each(["unavailable", "observe-throws"] as const)(
+    "falls back to the request floor when PerformanceObserver is %s",
+    (performanceObserver) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(0);
+      const { isolatedDocument } = createRuntime({ performanceObserver });
+
+      vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
+      expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+    },
+  );
+
+  it("does not append a duplicate request after repeated timer or observer activity", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const { emitLcp, isolatedDocument } = createRuntime();
+
+    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
+    emitLcp(6000);
+    vi.advanceTimersByTime(10000);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+  });
+
+  it("respects an existing external GTM script ID", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const isolatedDocument = document.implementation.createHTMLDocument("analytics");
+    const existing = isolatedDocument.createElement("script");
+    existing.id = "google-tag-manager";
+    isolatedDocument.head.append(existing);
+    const scriptWindow = {
+      performance: { now: () => Date.now() },
+      setTimeout,
+      clearTimeout,
+    };
+
+    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
+      scriptWindow,
+      isolatedDocument,
+    );
+    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
+    expect(gtmScripts(isolatedDocument)).toEqual([existing]);
   });
 
   it("starts GTM once after the consent default in the shared data layer", () => {
-    const isolatedDocument = document.implementation.createHTMLDocument("analytics");
-    isolatedDocument.head.append(isolatedDocument.createElement("script"));
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
     const scriptWindow: {
       dataLayer?: AnalyticsDataLayer;
       gtag?: GoogleTag;
@@ -330,12 +455,16 @@ describe("buildGtmBootstrap", () => {
     } = {
       localStorage: { getItem: () => null, setItem: vi.fn() },
     };
+    const isolatedDocument = document.implementation.createHTMLDocument("analytics");
 
     Function("window", buildAnalyticsHeadScript())(scriptWindow);
-    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
-      scriptWindow,
-      isolatedDocument,
-    );
+    const bootstrapWindow = Object.assign(scriptWindow, {
+      performance: { now: () => Date.now() },
+      setTimeout,
+      clearTimeout,
+    });
+    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(bootstrapWindow, isolatedDocument);
+    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
 
     const dataLayer = runtimeQueueItems(scriptWindow.dataLayer);
     const consentDefaultIndex = dataLayer.findIndex((item) => {

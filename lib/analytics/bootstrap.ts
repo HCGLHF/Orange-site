@@ -4,6 +4,9 @@ import {
   ANALYTICS_CONSENT_VERSION,
 } from "./consent";
 
+export const GTM_MIN_REQUEST_TIME_MS = 4000;
+export const GTM_LCP_BUFFER_MS = 1000;
+
 export function buildAnalyticsHeadScript(): string {
   const storageKey = JSON.stringify(ANALYTICS_CONSENT_STORAGE_KEY);
   const version = JSON.stringify(ANALYTICS_CONSENT_VERSION);
@@ -36,5 +39,5 @@ export function buildGtmBootstrap(id: string): string {
   const containerId = getGtmContainerId(id);
   if (!containerId) throw new Error("Invalid GTM container ID");
 
-  return `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({"gtm.start":new Date().getTime(),event:"gtm.js"});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!=="dataLayer"?"&l="+l:"";j.async=true;j.src="https://www.googletagmanager.com/gtm.js?id="+i+dl;f.parentNode.insertBefore(j,f);})(window,document,"script","dataLayer",${JSON.stringify(containerId)});`;
+  return `(function(w,d,i){w.dataLayer=w.dataLayer||[];w.dataLayer.push({"gtm.start":new Date().getTime(),event:"gtm.js"});var timer=0,lastLcp=0,loaded=false;function load(){if(loaded||d.getElementById("google-tag-manager")){loaded=true;return;}loaded=true;var script=d.createElement("script");script.id="google-tag-manager";script.async=true;script.src="https://www.googletagmanager.com/gtm.js?id="+i;script.setAttribute("data-orange-loaded-at",String(w.performance.now()));(d.head||d.documentElement).appendChild(script);}function schedule(){if(loaded)return;w.clearTimeout(timer);var eligibleAt=Math.max(${GTM_MIN_REQUEST_TIME_MS},lastLcp+${GTM_LCP_BUFFER_MS});timer=w.setTimeout(load,Math.max(0,eligibleAt-w.performance.now()));}if(w.PerformanceObserver){try{var observer=new w.PerformanceObserver(function(list){var entries=list.getEntries();for(var index=0;index<entries.length;index+=1){lastLcp=Math.max(lastLcp,entries[index].startTime||0);}schedule();});observer.observe({type:"largest-contentful-paint",buffered:true});}catch(error){}}schedule();})(window,document,${JSON.stringify(containerId)});`;
 }

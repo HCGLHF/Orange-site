@@ -35,7 +35,7 @@ export default function RootLayout({
         />
         {gtmContainerId ? (
           <script
-            id="google-tag-manager"
+            id="google-tag-manager-bootstrap"
             dangerouslySetInnerHTML={{ __html: buildGtmBootstrap(gtmContainerId) }}
           />
         ) : null}
