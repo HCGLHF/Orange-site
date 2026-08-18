@@ -69,11 +69,11 @@ export type PublicLandingPage = Omit<LandingPageRecord, "editorNotes">;
 
 export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
   home: {
-    purpose: "Present O'range as a premium finished knit and woven fabric supplier and direct global apparel buyers to the right development path.",
-    eyebrow: "Premium finished fabric development in Shaoxing Keqiao",
-    headline: "Premium Finished Fabrics for Global Apparel Sourcing",
+    purpose: "Present O'range as a premium finished knit fabric supplier and direct global apparel buyers to the right sourcing or development path.",
+    eyebrow: "Premium finished knit fabric development in Shaoxing Keqiao",
+    headline: "Premium Finished Knit Fabrics for Global Apparel Sourcing",
     summary:
-      "Source premium finished knit and finished woven fabrics through a specification-led route in Shaoxing Keqiao. Start from a catalogue article, reference sample or garment brief, then confirm exact requirements in the current quotation.",
+      "Source premium finished knit fabrics through a specification-led route in Shaoxing Keqiao. Start from a documented catalogue article, reference sample or garment brief, then confirm the exact composition, GSM, usable width, finish, colour, quantity and testing requirements in the current quotation.",
     heroImage: {
       src: "/images/finished-fabrics/finished-double-knit-factory.webp",
       mobileSrc:
@@ -83,7 +83,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     },
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },
-      { label: "Finished-fabric scope", value: "Knit and woven development directions", enabled: true },
+      { label: "Finished-knit scope", value: "11 documented knit development series", enabled: true },
       { label: "Parent-company machine record", value: `${manufacturingScale[0].value} documented circular knitting machines`, enabled: true },
       { label: "Export experience", value: "Bangladesh, Russia, Nepal, Europe, the United States and South America", enabled: true },
     ],
@@ -107,7 +107,7 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
     checklist: [],
     process: [],
     faq: [],
-    primaryCta: { label: "Send a finished-fabric inquiry", href: "/fabrics#inquiry-form" },
+    primaryCta: { label: "Send a finished-knit inquiry", href: "/fabrics#inquiry-form" },
     secondaryCta: { label: "Review finished knit fabrics", href: "/fabrics" },
     editorNotes: [
       "The supplied A-J knit archive and Jincang woven catalogue are approved as O'range sales and development evidence.",

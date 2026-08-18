@@ -81,20 +81,35 @@ test("privacy and terms pages own exact navigational legal records", async () =>
   });
 });
 
-test("homepage owns the commercial finished fabric supplier query", async () => {
+test("homepage owns the commercial finished knit fabric supplier query", async () => {
   const { getPublicPageSeo } = await loadSeo();
   const page = getPublicPageSeo("/");
 
-  assert.equal(page.primaryKeyword, "finished fabric supplier");
-  assert.ok(page.secondaryKeywords.includes("finished knit fabric supplier"));
-  assert.ok(page.secondaryKeywords.includes("finished woven fabric supplier"));
+  assert.equal(page.primaryKeyword, "finished knit fabric supplier");
+  assert.ok(page.secondaryKeywords.includes("premium finished knit fabrics"));
+  assert.ok(page.secondaryKeywords.includes("China finished knit fabric supplier"));
+  assert.ok(!page.secondaryKeywords.some((keyword) => /woven/i.test(keyword)));
   assert.equal(
     page.metaTitle,
-    "Finished Fabric Supplier for Apparel Brands | O'range Textile"
+    "Finished Knit Fabric Supplier for Apparel Brands | O'range Textile"
   );
-  assert.equal(page.h1, "Finished Fabric Supplier for Premium Global Apparel Sourcing");
+  assert.equal(
+    page.h1,
+    "Finished Knit Fabric Supplier for Global Apparel Sourcing"
+  );
+  assert.doesNotMatch(page.metaDescription, /woven/i);
   assert.equal(page.searchIntent, "commercial");
   assert.equal(page.targetPageType, "homepage");
+});
+
+test("woven comparison intent remains public after homepage demotion", async () => {
+  const { getPublicPageSeo } = await loadSeo();
+  const comparison = getPublicPageSeo(
+    "/blog/jacquard-knit-vs-woven-jacquard"
+  );
+
+  assert.equal(comparison.primaryKeyword, "jacquard knit vs woven jacquard");
+  assert.equal(comparison.searchIntent, "informational");
 });
 
 test("procurement guides own distinct buyer-decision queries", async () => {
@@ -255,7 +270,7 @@ test("crawl fields use the production origin and stable valid values", async () 
 test("updated catalogue entry points expose their reviewed sitemap dates", async () => {
   const { getPublicPageSeo } = await loadSeo();
   const expectedUpdatedAt = new Map([
-    ["/", "2026-08-01"],
+    ["/", "2026-08-18"],
     ["/fabrics/fleece-french-terry", "2026-07-28"],
     ["/fabrics/cotton-jersey", "2026-07-28"],
     ["/fabrics/interlock-fabric", "2026-07-28"],

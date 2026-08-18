@@ -1,4 +1,4 @@
-import type { Fabric } from "@/lib/data";
+import type { Fabric, FabricConstruction } from "@/lib/data";
 import finishedFabricCatalogue from "../content/finished-fabric-catalogue.json" with { type: "json" };
 
 export type FabricCategory = {
@@ -39,9 +39,51 @@ export type FabricCategory = {
   }>;
 };
 
-export const publicFabrics: Fabric[] = finishedFabricCatalogue;
+export const publicFabrics: Fabric[] = finishedFabricCatalogue.map((fabric) => ({
+  ...fabric,
+  construction: fabric.construction as FabricConstruction,
+}));
 
 export const INITIAL_CATALOGUE_SIZE = 4;
+
+export function selectRepresentativeFabricsByConstruction(
+  fabrics: readonly Fabric[],
+  construction: FabricConstruction,
+  limit: number
+): Fabric[] {
+  const matchingFabrics = fabrics.filter(
+    (fabric) => fabric.construction === construction
+  );
+  const representativeFabrics = new Map<string, Fabric>();
+
+  for (const fabric of matchingFabrics) {
+    const seriesKey = fabric.series?.trim() || fabric.id;
+    if (!representativeFabrics.has(seriesKey)) {
+      representativeFabrics.set(seriesKey, fabric);
+    }
+  }
+
+  const selected = Array.from(representativeFabrics.values()).slice(0, limit);
+  const selectedIds = new Set(selected.map((fabric) => fabric.id));
+
+  for (const fabric of matchingFabrics) {
+    if (selected.length >= limit) break;
+    if (!selectedIds.has(fabric.id)) {
+      selected.push(fabric);
+      selectedIds.add(fabric.id);
+    }
+  }
+
+  return selected;
+}
+
+export function getHomepageFeaturedFabrics(limit = 3): Fabric[] {
+  return selectRepresentativeFabricsByConstruction(
+    publicFabrics,
+    "knit",
+    limit
+  );
+}
 
 export function getInitialPublicFabrics(): Fabric[] {
   const representativeFabrics = new Map<string, Fabric>();

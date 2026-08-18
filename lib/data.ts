@@ -1,6 +1,9 @@
+export type FabricConstruction = "knit" | "woven";
+
 export type Fabric = {
   id: string;
   name: string;
+  construction: FabricConstruction;
   composition: string;
   weight: number;
   width: number;

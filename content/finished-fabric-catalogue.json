@@ -20,7 +20,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2515",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2516",
@@ -43,7 +44,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2516",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2517",
@@ -66,7 +68,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2517",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2518",
@@ -89,7 +92,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2518",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2519",
@@ -112,7 +116,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2519",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2523",
@@ -135,7 +140,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2523",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2532",
@@ -158,7 +164,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2532",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2569",
@@ -181,7 +188,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2569",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2576",
@@ -204,7 +212,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2576",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2572",
@@ -227,7 +236,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2572",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2575",
@@ -250,7 +260,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2575",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2638",
@@ -273,7 +284,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2638",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2571",
@@ -296,7 +308,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2571",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2663",
@@ -319,7 +332,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2663",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2665",
@@ -342,7 +356,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2665",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2666",
@@ -365,7 +380,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2666",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2667",
@@ -388,7 +404,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2667",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2668",
@@ -411,7 +428,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2668",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2671",
@@ -434,7 +452,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2671",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2673",
@@ -457,7 +476,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2673",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2670",
@@ -480,7 +500,8 @@
       "Air-layer"
     ],
     "articleNumber": "GD2670",
-    "series": "Air-layer"
+    "series": "Air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2672",
@@ -503,7 +524,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2672",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2685",
@@ -526,7 +548,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2685",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2686",
@@ -549,7 +572,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2686",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2687",
@@ -572,7 +596,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2687",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2697",
@@ -595,7 +620,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2697",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2698",
@@ -618,7 +644,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2698",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2701",
@@ -641,7 +668,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2701",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2702",
@@ -664,7 +692,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2702",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2709",
@@ -687,7 +716,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2709",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2710",
@@ -710,7 +740,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2710",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2721",
@@ -733,7 +764,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2721",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2725",
@@ -756,7 +788,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2725",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2736",
@@ -779,7 +812,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2736",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2722",
@@ -802,7 +836,8 @@
       "Yarn-dyed wool-blend air-layer"
     ],
     "articleNumber": "GD2722",
-    "series": "Yarn-dyed wool-blend air-layer"
+    "series": "Yarn-dyed wool-blend air-layer",
+    "construction": "knit"
   },
   {
     "id": "finished-6128",
@@ -825,7 +860,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "6128",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-61281",
@@ -848,7 +884,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "61281",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2688",
@@ -871,7 +908,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "GD2688",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2689",
@@ -894,7 +932,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "GD2689",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2206",
@@ -917,7 +956,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "GD2206",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd22061",
@@ -940,7 +980,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "GD22061",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2591",
@@ -963,7 +1004,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "GD2591",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2608",
@@ -986,7 +1028,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "GD2608",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-2608fh",
@@ -1009,7 +1052,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "2608FH",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-2608fs",
@@ -1032,7 +1076,8 @@
       "Structured polyester-viscose"
     ],
     "articleNumber": "2608FS",
-    "series": "Structured polyester-viscose"
+    "series": "Structured polyester-viscose",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2502",
@@ -1055,7 +1100,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2502",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2503",
@@ -1078,7 +1124,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2503",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2505",
@@ -1101,7 +1148,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2505",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2506",
@@ -1124,7 +1172,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2506",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2507",
@@ -1147,7 +1196,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2507",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2508",
@@ -1170,7 +1220,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2508",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2509",
@@ -1193,7 +1244,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2509",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2558",
@@ -1216,7 +1268,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2558",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2559",
@@ -1239,7 +1292,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2559",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2573",
@@ -1262,7 +1316,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2573",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2586",
@@ -1285,7 +1340,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2586",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2636",
@@ -1308,7 +1364,8 @@
       "Faux-cashmere"
     ],
     "articleNumber": "GD2636",
-    "series": "Faux-cashmere"
+    "series": "Faux-cashmere",
+    "construction": "knit"
   },
   {
     "id": "finished-2552-240g",
@@ -1331,7 +1388,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2552-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2553-240g",
@@ -1354,7 +1412,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2553-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2555-240g",
@@ -1377,7 +1436,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2555-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2556-240g",
@@ -1400,7 +1460,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2556-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2557-240g-mini",
@@ -1423,7 +1484,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2557-240g-mini",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2562fh",
@@ -1446,7 +1508,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2562FH",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2563fh",
@@ -1469,7 +1532,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2563FH",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2566-240g",
@@ -1492,7 +1556,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2566-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2578-240g",
@@ -1515,7 +1580,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2578-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2637-260g",
@@ -1538,7 +1604,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2637-260g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2656-240g",
@@ -1561,7 +1628,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2656-240g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2690-260g",
@@ -1584,7 +1652,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2690-260g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-2691-260g",
@@ -1607,7 +1676,8 @@
       "Acrylic-wool"
     ],
     "articleNumber": "2691-260g",
-    "series": "Acrylic-wool"
+    "series": "Acrylic-wool",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2712",
@@ -1630,7 +1700,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2712",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2718",
@@ -1653,7 +1724,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2718",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2723",
@@ -1676,7 +1748,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2723",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2738",
@@ -1699,7 +1772,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2738",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2739",
@@ -1722,7 +1796,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2739",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2753",
@@ -1745,7 +1820,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2753",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2750",
@@ -1768,7 +1844,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2750",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2752",
@@ -1791,7 +1868,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2752",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2755",
@@ -1814,7 +1892,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2755",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-2661-250",
@@ -1837,7 +1916,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "2661-250",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2703",
@@ -1860,7 +1940,8 @@
       "Lyocell-acetate-wool composite"
     ],
     "articleNumber": "GD2703",
-    "series": "Lyocell-acetate-wool composite"
+    "series": "Lyocell-acetate-wool composite",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2706",
@@ -1883,7 +1964,8 @@
       "Acetate brushed"
     ],
     "articleNumber": "GD2706",
-    "series": "Acetate brushed"
+    "series": "Acetate brushed",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2707",
@@ -1906,7 +1988,8 @@
       "Acetate brushed"
     ],
     "articleNumber": "GD2707",
-    "series": "Acetate brushed"
+    "series": "Acetate brushed",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2717",
@@ -1929,7 +2012,8 @@
       "Acetate brushed"
     ],
     "articleNumber": "GD2717",
-    "series": "Acetate brushed"
+    "series": "Acetate brushed",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2692",
@@ -1952,7 +2036,8 @@
       "Acetate brushed"
     ],
     "articleNumber": "GD2692",
-    "series": "Acetate brushed"
+    "series": "Acetate brushed",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2705",
@@ -1975,7 +2060,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2705",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2708",
@@ -1998,7 +2084,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2708",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2726",
@@ -2021,7 +2108,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2726",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2727",
@@ -2044,7 +2132,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2727",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2728",
@@ -2067,7 +2156,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2728",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2729",
@@ -2090,7 +2180,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2729",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2730",
@@ -2113,7 +2204,8 @@
       "Lyocell-acetate-wool texture"
     ],
     "articleNumber": "GD2730",
-    "series": "Lyocell-acetate-wool texture"
+    "series": "Lyocell-acetate-wool texture",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2650",
@@ -2136,7 +2228,8 @@
       "Raised-pile"
     ],
     "articleNumber": "GD2650",
-    "series": "Raised-pile"
+    "series": "Raised-pile",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2652",
@@ -2159,7 +2252,8 @@
       "Raised-pile"
     ],
     "articleNumber": "GD2652",
-    "series": "Raised-pile"
+    "series": "Raised-pile",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2590",
@@ -2182,7 +2276,8 @@
       "Cashmere blend"
     ],
     "articleNumber": "GD2590",
-    "series": "Cashmere blend"
+    "series": "Cashmere blend",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2602",
@@ -2205,7 +2300,8 @@
       "Cashmere blend"
     ],
     "articleNumber": "GD2602",
-    "series": "Cashmere blend"
+    "series": "Cashmere blend",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2605",
@@ -2228,7 +2324,8 @@
       "Cashmere blend"
     ],
     "articleNumber": "GD2605",
-    "series": "Cashmere blend"
+    "series": "Cashmere blend",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2653",
@@ -2251,7 +2348,8 @@
       "Cashmere blend"
     ],
     "articleNumber": "GD2653",
-    "series": "Cashmere blend"
+    "series": "Cashmere blend",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2655",
@@ -2274,7 +2372,8 @@
       "Cashmere blend"
     ],
     "articleNumber": "GD2655",
-    "series": "Cashmere blend"
+    "series": "Cashmere blend",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2657",
@@ -2297,7 +2396,8 @@
       "Cashmere blend"
     ],
     "articleNumber": "GD2657",
-    "series": "Cashmere blend"
+    "series": "Cashmere blend",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2579",
@@ -2320,7 +2420,8 @@
       "Wool-blend jacquard"
     ],
     "articleNumber": "GD2579",
-    "series": "Wool-blend jacquard"
+    "series": "Wool-blend jacquard",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2583",
@@ -2343,7 +2444,8 @@
       "Wool-blend jacquard"
     ],
     "articleNumber": "GD2583",
-    "series": "Wool-blend jacquard"
+    "series": "Wool-blend jacquard",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2681",
@@ -2366,7 +2468,8 @@
       "Wool-blend jacquard"
     ],
     "articleNumber": "GD2681",
-    "series": "Wool-blend jacquard"
+    "series": "Wool-blend jacquard",
+    "construction": "knit"
   },
   {
     "id": "finished-gd2683",
@@ -2389,6 +2492,7 @@
       "Wool-blend jacquard"
     ],
     "articleNumber": "GD2683",
-    "series": "Wool-blend jacquard"
+    "series": "Wool-blend jacquard",
+    "construction": "knit"
   }
 ]

@@ -111,7 +111,8 @@ test("AI-search FAQ legal names do not produce duplicate punctuation", async () 
   )?.answer;
 
   assert.ok(supplierAnswer);
-  assert.match(supplierAnswer, /finished knit and woven fabrics/i);
+  assert.match(supplierAnswer, /finished knit fabrics/i);
+  assert.doesNotMatch(supplierAnswer, /woven/i);
   assert.ok(supplierAnswer.includes(evidence.companyRelationship.exportCompany));
   assert.doesNotMatch(supplierAnswer, /Ltd\.\.|Ltd\.,/);
 });
