@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readdir, readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -451,23 +452,64 @@ function assertStickyInquiryBarStaysLazy(stickyGate) {
   );
 }
 
-test("critical Hero images use responsive delivery and the approved mobile quality", async () => {
-  const [config, landingHero, aboutPage] = await Promise.all([
-    source("next.config.mjs"),
-    source("components/landing/LandingHero.tsx"),
-    source("components/company/AboutPage.tsx"),
-  ]);
+test("critical Hero images use one media-qualified mobile AVIF without losing the desktop fallback", async () => {
+  const responsiveHeroPath = path.join(
+    root,
+    "components/media/ResponsivePriorityHeroImage.tsx"
+  );
+  assert.ok(
+    existsSync(responsiveHeroPath),
+    "ResponsivePriorityHeroImage must exist before mobile renditions are wired"
+  );
+
+  const assets = [
+    "public/images/finished-fabrics/finished-double-knit-factory-mobile.avif",
+    "public/images/company/about-circular-knitting-floor-mobile.avif",
+    "public/images/finished-fabrics/double-knit-interlock-comparison-mobile.avif",
+  ];
+  for (const asset of assets) {
+    const absolute = path.join(root, asset);
+    assert.ok(existsSync(absolute), `${asset} must exist`);
+    const info = await stat(absolute);
+    assert.ok(info.size <= 25_600, `${asset} exceeds 25,600 bytes`);
+    const header = await readFile(absolute);
+    assert.equal(
+      header.subarray(4, 12).toString("ascii"),
+      "ftypavif",
+      `${asset} must be an AVIF file`
+    );
+  }
+
+  const [config, responsiveHero, landingHero, aboutPage, landingContent] =
+    await Promise.all([
+      source("next.config.mjs"),
+      readFile(responsiveHeroPath, "utf8"),
+      source("components/landing/LandingHero.tsx"),
+      source("components/company/AboutPage.tsx"),
+      source("content/landing-pages.ts"),
+    ]);
 
   assert.doesNotMatch(config, /unoptimized\s*:\s*true/);
-  for (const component of [landingHero, aboutPage]) {
-    const priorityImage = selfClosingTags(component, "Image").find((tag) =>
-      hasEnabledPriorityProp(tag)
-    );
-    assert.ok(priorityImage, "a priority Image tag is required");
-    assert.ok(hasEnabledPriorityProp(priorityImage));
-    assert.match(priorityImage, /\bsizes\s*=\s*["']100vw["']/);
-    assert.match(priorityImage, /\bquality\s*=\s*\{\s*35\s*\}/);
-  }
+  assert.match(responsiveHero, /getImageProps/);
+  assert.match(responsiveHero, /<picture>/);
+  assert.match(responsiveHero, /media=["']\(max-width: 767px\)["']/);
+  assert.match(responsiveHero, /media=["']\(min-width: 768px\)["']/);
+  assert.match(responsiveHero, /type=["']image\/avif["']/);
+  assert.match(responsiveHero, /imageSrcSet=/);
+  assert.match(responsiveHero, /imageSizes=/);
+  assert.match(responsiveHero, /fetchPriority=["']high["']/);
+  assert.match(responsiveHero, /<img\s+\{\.\.\.props\}\s+alt=\{alt\}\s*\/>/);
+  assert.match(landingHero, /ResponsivePriorityHeroImage/);
+  assert.match(aboutPage, /ResponsivePriorityHeroImage/);
+  assert.match(aboutPage, /about-circular-knitting-floor-mobile\.avif/);
+  assert.match(
+    landingContent,
+    /home:\s*\{[\s\S]*?finished-double-knit-factory-mobile\.avif[\s\S]*?decoding:\s*["']async["']/
+  );
+  assert.match(
+    landingContent,
+    /readyStock:\s*\{[\s\S]*?double-knit-interlock-comparison-mobile\.avif[\s\S]*?decoding:\s*["']sync["']/
+  );
 });
 
 test("initial-shell and above-the-fold secondary links do not auto-prefetch", async () => {
@@ -504,7 +546,7 @@ test("the current application ships no video code or video URL", async () => {
     )
   ).flat();
   const prohibited =
-    /<video\b|<source\b|HTMLVideoElement|HTMLMediaElement|requestVideoFrameCallback|\.(?:mp4|webm|m3u8)(?:[?"'`]|$)/i;
+    /<video\b|HTMLVideoElement|HTMLMediaElement|requestVideoFrameCallback|\.(?:mp4|webm|m3u8)(?:[?"'`]|$)/i;
 
   for (const file of files) {
     assert.doesNotMatch(

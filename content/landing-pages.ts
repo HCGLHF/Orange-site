@@ -45,7 +45,9 @@ export type LandingPageRecord = {
   summary: string;
   heroImage: {
     src: string;
+    mobileSrc?: string;
     alt: string;
+    decoding?: "async" | "sync" | "auto";
   };
   proofPoints: LandingProofPoint[];
   advantages: LandingContentBlock[];
@@ -74,7 +76,10 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
       "Source premium finished knit and finished woven fabrics through a specification-led route in Shaoxing Keqiao. Start from a catalogue article, reference sample or garment brief, then confirm exact requirements in the current quotation.",
     heroImage: {
       src: "/images/finished-fabrics/finished-double-knit-factory.webp",
+      mobileSrc:
+        "/images/finished-fabrics/finished-double-knit-factory-mobile.avif",
       alt: "Premium finished fabric rolls and swatches displayed in a Shaoxing textile production setting",
+      decoding: "async",
     },
     proofPoints: [
       { label: "Location", value: "Shaoxing Keqiao, China", enabled: true },
@@ -119,7 +124,10 @@ export const landingPages: Record<LandingPageKey, LandingPageRecord> = {
       "The supplied 104-record finished-fabric catalogue documents articles across 11 series. Review the listed construction, composition, GSM and usable width, then contact the sourcing team to confirm the exact article, colour and quantity. Greige fabric and finished garment requirements can also be discussed through a private inquiry.",
     heroImage: {
       src: "/images/finished-fabrics/double-knit-interlock-comparison.webp",
+      mobileSrc:
+        "/images/finished-fabrics/double-knit-interlock-comparison-mobile.avif",
       alt: "Finished knit fabric swatches prepared for stock and sample comparison",
+      decoding: "sync",
     },
     proofPoints: [
       { label: "Catalogue", value: "104 documented finished-fabric articles", enabled: true },

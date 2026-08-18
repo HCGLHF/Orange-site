@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 import ContactCard from "@/components/ContactCard";
 import { StructuredData } from "@/components/geo/StructuredData";
+import { ResponsivePriorityHeroImage } from "@/components/media/ResponsivePriorityHeroImage";
 import {
   certificationEvidence,
   companyRelationship,
@@ -37,14 +37,14 @@ export function AboutPage({ seo }: { seo: PublicPageSeo }) {
 
       <article>
         <header className="relative isolate h-[clamp(26rem,58svh,35rem)] overflow-hidden border-b border-brand-soft bg-brand-charcoal lg:h-[clamp(34rem,75svh,49rem)]">
-          <Image
+          <ResponsivePriorityHeroImage
             src="/images/company/about-circular-knitting-floor.png"
+            mobileSrc="/images/company/about-circular-knitting-floor-mobile.avif"
             alt="Rows of circular knitting machines inside a modern knitting factory"
-            fill
-            priority
             quality={35}
             sizes="100vw"
             className="object-cover object-center"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-black/45" aria-hidden />
           <div className="relative z-10 flex h-full items-center justify-center px-4 sm:px-6 lg:px-8">

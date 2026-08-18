@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { ResponsivePriorityHeroImage } from "@/components/media/ResponsivePriorityHeroImage";
 import { SampleRequestCta } from "@/components/SampleRequestCta";
 import type { PublicLandingPage } from "@/lib/landing-page-content";
 
@@ -13,15 +14,27 @@ export function LandingHero({
 }) {
   return (
     <header className="relative isolate min-h-[620px] overflow-hidden bg-brand-charcoal text-white md:min-h-[680px]">
-      <Image
-        src={page.heroImage.src}
-        alt={page.heroImage.alt}
-        fill
-        priority
-        quality={35}
-        sizes="100vw"
-        className="object-cover object-center"
-      />
+      {page.heroImage.mobileSrc ? (
+        <ResponsivePriorityHeroImage
+          src={page.heroImage.src}
+          mobileSrc={page.heroImage.mobileSrc}
+          alt={page.heroImage.alt}
+          quality={35}
+          sizes="100vw"
+          className="object-cover object-center"
+          decoding={page.heroImage.decoding}
+        />
+      ) : (
+        <Image
+          src={page.heroImage.src}
+          alt={page.heroImage.alt}
+          fill
+          priority
+          quality={35}
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+      )}
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(25,27,39,0.94)_0%,rgba(25,27,39,0.78)_46%,rgba(25,27,39,0.20)_78%,rgba(25,27,39,0.08)_100%)]" />
       <div className="relative mx-auto flex min-h-[620px] max-w-7xl items-end px-5 pb-16 pt-28 sm:px-6 md:min-h-[680px] md:pb-20 lg:px-8">
         <div className="max-w-3xl">

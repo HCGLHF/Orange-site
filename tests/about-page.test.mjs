@@ -265,7 +265,11 @@ test("About uses a full-bleed cinematic image hero before the company introducti
     "utf8"
   );
 
-  assert.match(component, /import Image from ["']next\/image["']/);
+  assert.match(
+    component,
+    /import \{ ResponsivePriorityHeroImage \} from ["']@\/components\/media\/ResponsivePriorityHeroImage["']/
+  );
+  assert.match(component, /<ResponsivePriorityHeroImage\b/);
   assert.match(
     component,
     /<header\b[^>]*h-\[clamp\(26rem,58svh,35rem\)\][^>]*lg:h-\[clamp\(34rem,75svh,49rem\)\]/
@@ -273,6 +277,10 @@ test("About uses a full-bleed cinematic image hero before the company introducti
   assert.match(
     component,
     /src=["']\/images\/company\/about-circular-knitting-floor\.png["']/
+  );
+  assert.match(
+    component,
+    /mobileSrc=["']\/images\/company\/about-circular-knitting-floor-mobile\.avif["']/
   );
   assert.match(
     component,
