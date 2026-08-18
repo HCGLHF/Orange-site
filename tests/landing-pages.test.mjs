@@ -32,12 +32,16 @@ test("landing registry exposes four unique buyer purposes without editor notes",
   assert.ok(pages.every((page) => page.secondaryCta.href));
 });
 
-test("homepage content contract covers premium finished knit and woven fabrics", async () => {
-  const { landingPages } = await import("../content/landing-pages.ts");
+test("homepage content contract promotes premium finished knit fabrics", async () => {
+  const { getPublicLandingPage, landingPages } = await import(
+    "../content/landing-pages.ts"
+  );
 
-  const homeText = JSON.stringify(landingPages.home);
-  assert.match(landingPages.home.summary, /finished knit/i);
-  assert.match(landingPages.home.summary, /finished woven/i);
+  const home = getPublicLandingPage("home");
+  const homeText = JSON.stringify(home);
+  assert.match(home.purpose, /finished knit/i);
+  assert.match(home.summary, /finished knit/i);
+  assert.doesNotMatch(homeText, /woven/i);
   assert.match(landingPages.home.heroImage.alt, /finished fabric/i);
   assert.match(
     homeText,
@@ -88,11 +92,26 @@ test("catalogue provenance is neutral in landing, hero, and category fallback co
   );
 });
 
-test("homepage hero uses the runtime catalogue provenance contract", async () => {
-  const { heroContent } = await import("../lib/geo-content.ts");
+test("homepage machine-readable content uses a knit-first positioning", async () => {
+  const {
+    aiSearchFaq,
+    capabilityCards,
+    companyProfile,
+    entityFacts,
+    heroContent,
+  } = await import("../lib/geo-content.ts");
 
   assert.match(heroContent.description, /finished knit/i);
-  assert.match(heroContent.description, /finished woven/i);
+  assert.doesNotMatch(
+    JSON.stringify({
+      aiSearchFaq,
+      capabilityCards,
+      companyProfile,
+      entityFacts,
+      heroContent,
+    }),
+    /woven/i
+  );
   assert.match(
     heroContent.description,
     /supplied catalogue evidence/i
@@ -128,6 +147,10 @@ test("landing copy reflects the supplied export, production and inquiry evidence
 test("homepage renders its SEO H1, broad sourcing routes, and a contextual double-knit link", async () => {
   const geoHomeSource = await readFile(
     new URL("../components/geo/GeoHomePage.tsx", import.meta.url),
+    "utf8"
+  );
+  const homeRouteSource = await readFile(
+    new URL("../app/page.tsx", import.meta.url),
     "utf8"
   );
   const landingHeroSource = await readFile(
@@ -167,11 +190,17 @@ test("homepage renders its SEO H1, broad sourcing routes, and a contextual doubl
   );
   for (const routeTitle of [
     "Finished knit fabrics",
-    "Finished woven fabrics",
-    "Custom fabric development",
+    "Finished double-knit and specialty knit fabrics",
+    "Custom knit fabric development",
   ]) {
     assert.match(geoHomeSource, new RegExp(`title:\\s*"${routeTitle}"`, "i"));
   }
+  assert.doesNotMatch(geoHomeSource, /title:\s*"Finished woven fabrics"/i);
+  assert.match(homeRouteSource, /getHomepageFeaturedFabrics/);
+  assert.match(
+    homeRouteSource,
+    /<GeoHomePage\s+initialFabrics=\{getHomepageFeaturedFabrics\(\)\}\s*\/>/
+  );
   assert.match(
     geoHomeSource,
     /(?:href:\s*|href=)"\/finished-double-knit-fabrics"/i
@@ -190,6 +219,8 @@ test("shared homepage contact and footer copy support all finished fabrics", asy
 
   assert.match(contactCardSource, /Request Finished Fabric Samples/i);
   assert.match(contactCardSource, /Finished%20fabric%20sample%20request/i);
+  assert.match(contactCardSource, /finished knit and woven fabric samples/i);
+  assert.match(contactCardSource, /finished%20knit%20or%20woven%20fabrics/i);
   assert.doesNotMatch(contactCardSource, /Request Knit Fabric Samples/i);
   assert.match(siteFooterSource, /premium finished knit and\s+woven fabric/i);
   assert.doesNotMatch(siteFooterSource, /Export-focused knit fabric sourcing/i);

@@ -13,6 +13,7 @@ import { OPEN_BATCH_INQUIRY_EVENT } from "@/lib/inquiry-events";
 const testFabric: Fabric = {
   id: "private-fabric-article",
   name: "Private Fabric Article",
+  construction: "knit",
   composition: "Sensitive composition",
   weight: 280,
   width: 160,

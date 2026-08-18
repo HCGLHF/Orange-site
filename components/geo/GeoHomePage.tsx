@@ -34,14 +34,14 @@ const buyerRoutes: LandingRoute[] = [
     icon: "stock",
   },
   {
-    title: "Finished woven fabrics",
-    description: "Source structure, stretch and medium-to-heavy woven directions from the approved partner-supply catalogue, with exact article evidence confirmed during inquiry.",
-    href: "/fabrics#inquiry-form",
-    action: "Send a woven fabric brief",
+    title: "Finished double-knit and specialty knit fabrics",
+    description: "Compare interlock, Ponte Roma, scuba, air-layer, jacquard and other structured knit directions before confirming the exact article and approval route.",
+    href: "/finished-double-knit-fabrics",
+    action: "Explore specialty knits",
     icon: "range",
   },
   {
-    title: "Custom fabric development",
+    title: "Custom knit fabric development",
     description: "Start from an image, hand feel, reference sample, garment brief or functional target and let the sourcing team translate it into an executable fabric direction.",
     href: "/custom-knit-fabric-development",
     action: "Start a development brief",
@@ -97,7 +97,7 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
               <p className="text-sm font-semibold uppercase text-brand-orange">Finished-fabric starting points</p>
               <h2 className="mt-3 text-3xl font-semibold">Selected finished knit articles</h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-brand-charcoal/70">
-                These knit articles are selected from the current online library. Use one as a sample reference, explore the dedicated double-knit catalogue, or send a woven or custom fabric brief when the required direction is not shown.
+                These knit articles are selected from the current online library. Use one as a sample reference, explore the dedicated double-knit catalogue, or send a custom knit brief when the required direction is not shown.
               </p>
             </div>
             <Link href="/finished-double-knit-fabrics" className="text-sm font-semibold text-brand-orange hover:underline">

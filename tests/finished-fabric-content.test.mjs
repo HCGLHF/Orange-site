@@ -6,6 +6,11 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const contentPath = path.join(root, "content", "finished-fabrics.json");
+const cataloguePath = path.join(
+  root,
+  "content",
+  "finished-fabric-catalogue.json"
+);
 
 const requiredRoutes = [
   "/finished-double-knit-fabrics",
@@ -44,6 +49,11 @@ const procurementGuideRoutes = [
 function loadPages() {
   assert.ok(existsSync(contentPath), "finished-fabrics.json must exist");
   return JSON.parse(readFileSync(contentPath, "utf8"));
+}
+
+function loadCatalogue() {
+  assert.ok(existsSync(cataloguePath), "finished-fabric-catalogue.json must exist");
+  return JSON.parse(readFileSync(cataloguePath, "utf8"));
 }
 
 function flattenText(value) {
@@ -163,6 +173,44 @@ test("content registry contains every approved finished-fabric route", () => {
   assert.deepEqual(
     pages.map((page) => page.url).sort(),
     [...requiredRoutes].sort()
+  );
+});
+
+test("every supplied catalogue record declares an explicit construction", () => {
+  const catalogue = loadCatalogue();
+
+  assert.ok(
+    catalogue.length >= 104,
+    "the catalogue must retain the 104 supplied finished-knit records"
+  );
+  for (const fabric of catalogue) {
+    assert.ok(
+      fabric.construction === "knit" || fabric.construction === "woven",
+      `${fabric.id} must declare knit or woven construction`
+    );
+  }
+  assert.ok(
+    catalogue.filter((fabric) => fabric.construction === "knit").length >= 104,
+    "the catalogue must retain the 104 supplied finished-knit records"
+  );
+});
+
+test("construction-aware representative selection excludes other constructions", async () => {
+  const { selectRepresentativeFabricsByConstruction } = await import(
+    "../lib/public-catalog.ts"
+  );
+  const mixedCatalogue = [
+    { id: "knit-air-1", series: "Air layer", construction: "knit" },
+    { id: "woven-twill-1", series: "Twill", construction: "woven" },
+    { id: "knit-air-2", series: "Air layer", construction: "knit" },
+    { id: "knit-jacquard-1", series: "Jacquard", construction: "knit" },
+  ];
+
+  assert.deepEqual(
+    selectRepresentativeFabricsByConstruction(mixedCatalogue, "knit", 3).map(
+      (fabric) => fabric.id
+    ),
+    ["knit-air-1", "knit-jacquard-1", "knit-air-2"]
   );
 });
 
