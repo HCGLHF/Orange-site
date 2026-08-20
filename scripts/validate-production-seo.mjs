@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { INDEXNOW_KEY } from "../lib/indexnow.ts";
 import { NAVIGATION_DISCOVERY_HREFS } from "../lib/navigation.ts";
 import {
   SEO_SITE_ORIGIN,
@@ -32,6 +33,7 @@ function getBuildPublicRoutes() {
   );
   const excludedRoutes = new Set([
     "/_not-found",
+    `/${INDEXNOW_KEY}.txt`,
     "/icon.svg",
     "/llms.txt",
     "/robots.txt",

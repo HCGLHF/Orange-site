@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit",
     "test:html-density": "node scripts/measure-production-density.mjs",
     "test:seo:production": "node scripts/run-production-seo-audit.mjs",
+    "indexnow:submit": "node scripts/submit-indexnow.mjs",
     "deploy": "vercel --prod"
   },
   "dependencies": {

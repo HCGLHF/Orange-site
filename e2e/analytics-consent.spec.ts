@@ -573,7 +573,7 @@ test("a successful production single-inquiry UI path emits only the controlled l
 
   await page
     .locator("header")
-    .getByRole("button", { name: "Send a finished-fabric inquiry" })
+    .getByRole("button", { name: "Send a finished-knit inquiry" })
     .click();
   const dialog = page.getByRole("dialog", { name: "Request free samples" });
   await expect(dialog).toBeVisible();
