@@ -301,6 +301,7 @@ describe("buildGtmBootstrap", () => {
     const isolatedDocument = document.implementation.createHTMLDocument("analytics");
     const scriptWindow: {
       dataLayer?: AnalyticsDataLayer;
+      // Retained so reverts to the retired delayed loader fail assertions, not harness errors.
       performance: { now(): number };
       setTimeout: typeof setTimeout;
       clearTimeout: typeof clearTimeout;

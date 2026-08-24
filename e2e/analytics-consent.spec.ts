@@ -191,7 +191,7 @@ test("queues denied consent before one immediate GTM request without standalone 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Privacy & analytics" })).toBeVisible();
   expect(await page.locator("#google-tag-manager-bootstrap").count()).toBe(1);
-  await expect.poll(() => requests.gtmRequests.length, { timeout: 12000 }).toBe(1);
+  await expect.poll(() => requests.gtmRequests.length, { timeout: 3000 }).toBe(1);
   await expect(page.locator("#google-tag-manager")).toHaveCount(1);
   const requestStartTimes = await page.evaluate(() =>
     performance
