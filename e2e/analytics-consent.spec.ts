@@ -1,10 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
-import {
-  GTM_LCP_BUFFER_MS,
-  GTM_MAX_REQUEST_TIME_MS,
-} from "@/lib/analytics/bootstrap";
-
 const CONSENT_KEY = "orange-textile.analytics-consent";
 const GTM_ID = "GTM-5FHDLXGV";
 const BANNER_COPY =
@@ -53,6 +48,12 @@ async function protectAnalyticsRequests(context: BrowserContext) {
   });
 
   return { gtmRequests, prohibitedRequests };
+}
+
+async function analyticsCookieNames(context: BrowserContext) {
+  return (await context.cookies())
+    .map((cookie) => cookie.name)
+    .filter((name) => name === "_ga" || name.startsWith("_ga_"));
 }
 
 function captureRuntimeFailures(page: Page) {
@@ -181,64 +182,25 @@ async function expectSafeAreaSupport(page: Page) {
   ).toBe(true);
 }
 
-test("queues denied consent before GTM and loads one delayed exact container without standalone GA", async ({
+test("queues denied consent before one immediate GTM request without standalone GA", async ({
   context,
   page,
 }) => {
   const requests = await protectAnalyticsRequests(context);
   const failures = captureRuntimeFailures(page);
-  await page.addInitScript(() => {
-    const lcpState = { startTimes: [] as number[], latest: 0 };
-    Reflect.set(window, "__orangeE2ELcpState", lcpState);
-    try {
-      new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          lcpState.startTimes.push(entry.startTime);
-          lcpState.latest = Math.max(lcpState.latest, entry.startTime);
-        }
-      }).observe({ type: "largest-contentful-paint", buffered: true });
-    } catch {}
-  });
-
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Privacy & analytics" })).toBeVisible();
   expect(await page.locator("#google-tag-manager-bootstrap").count()).toBe(1);
-  expect(await page.locator("#google-tag-manager").count()).toBe(0);
-
   await expect.poll(() => requests.gtmRequests.length, { timeout: 12000 }).toBe(1);
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        performance
-          .getEntriesByType("resource")
-          .filter((entry) => /googletagmanager\.com\/gtm\.js(?:\?|$)/.test(entry.name))
-          .map((entry) => entry.startTime),
-      ),
-    )
-    .toHaveLength(1);
-  const deferredTiming = await page.evaluate(() => {
-    const script = document.getElementById("google-tag-manager") as HTMLScriptElement | null;
-    const lcpState = Reflect.get(window, "__orangeE2ELcpState") as {
-      startTimes: number[];
-      latest: number;
-    };
-    return {
-      loadedAt: Number(script?.dataset.orangeLoadedAt),
-      lcpStartTimes: lcpState.startTimes,
-      latestObservedLcp: lcpState.latest,
-      requestStartTimes: performance
-        .getEntriesByType("resource")
-        .filter((entry) => /googletagmanager\.com\/gtm\.js(?:\?|$)/.test(entry.name))
-        .map((entry) => entry.startTime),
-    };
-  });
-  expect(deferredTiming.requestStartTimes).toHaveLength(1);
-  expect(deferredTiming.requestStartTimes[0]).toBeGreaterThanOrEqual(GTM_MAX_REQUEST_TIME_MS);
-  expect(deferredTiming.loadedAt).toBeGreaterThanOrEqual(GTM_MAX_REQUEST_TIME_MS);
-  expect(
-    deferredTiming.loadedAt - deferredTiming.latestObservedLcp >= GTM_LCP_BUFFER_MS ||
-      deferredTiming.loadedAt >= GTM_MAX_REQUEST_TIME_MS,
-  ).toBe(true);
+  await expect(page.locator("#google-tag-manager")).toHaveCount(1);
+  const requestStartTimes = await page.evaluate(() =>
+    performance
+      .getEntriesByType("resource")
+      .filter((entry) => /googletagmanager\.com\/gtm\.js(?:\?|$)/.test(entry.name))
+      .map((entry) => entry.startTime),
+  );
+  expect(requestStartTimes).toHaveLength(1);
+  expect(requestStartTimes[0]).toBeLessThanOrEqual(1000);
 
   const snapshot = await dataLayerSnapshot(page);
   const defaultIndex = snapshot.findIndex(
@@ -274,6 +236,7 @@ test("queues denied consent before GTM and loads one delayed exact container wit
     snapshot.filter((item) => Array.isArray(item) && item[0] === "config"),
     "the application must not queue a standalone GA config",
   ).toEqual([]);
+  expect(await analyticsCookieNames(context)).toEqual([]);
   await expectNoRuntimeFailures(failures);
 });
 
@@ -296,6 +259,8 @@ test("shows the exact first-visit choices and Accept grants only analytics witho
   );
   await expect(banner.getByRole("button")).toHaveCount(2);
   await expect(banner.getByRole("button", { name: /close/i })).toHaveCount(0);
+  await expect.poll(async () => (await pageViews(page)).length).toBe(1);
+  const viewsBeforeAccept = await pageViews(page);
 
   const assertSameDocument = await installNoReloadWitness(page);
   await banner.getByRole("button", { name: "Accept analytics cookies" }).click();
@@ -314,10 +279,12 @@ test("shows the exact first-visit choices and Accept grants only analytics witho
       ad_personalization: "denied",
     },
   ]);
+  expect(await pageViews(page)).toEqual(viewsBeforeAccept);
   await assertSameDocument();
 
   await page.reload();
   await expect(banner).toBeHidden();
+  await expect.poll(async () => (await pageViews(page)).length).toBe(1);
   const commandsAfterRefresh = await consentCommands(page, "update");
   expect(commandsAfterRefresh[0]).toEqual([
     "consent",
@@ -364,6 +331,7 @@ test("Decline keeps all consent denied and remains hidden after refresh", async 
   await banner.getByRole("button", { name: "Decline analytics cookies" }).click();
   await expect(banner).toBeHidden();
   await assertSameDocument();
+  expect(await analyticsCookieNames(context)).toEqual([]);
   expect(await page.evaluate((key) => localStorage.getItem(key), CONSENT_KEY)).toBe(
     '{"version":1,"analytics":"denied"}',
   );
@@ -380,6 +348,7 @@ test("Decline keeps all consent denied and remains hidden after refresh", async 
 
   await page.reload();
   await expect(banner).toBeHidden();
+  expect(await analyticsCookieNames(context)).toEqual([]);
   await expectNoRuntimeFailures(failures);
 });
 

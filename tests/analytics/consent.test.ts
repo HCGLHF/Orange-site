@@ -3,9 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildAnalyticsHeadScript,
   buildGtmBootstrap,
-  GTM_LCP_BUFFER_MS,
-  GTM_MAX_REQUEST_TIME_MS,
-  GTM_MIN_REQUEST_TIME_MS,
 } from "@/lib/analytics/bootstrap";
 import { getGtmContainerId } from "@/lib/analytics/config";
 import {
@@ -300,40 +297,8 @@ describe("buildAnalyticsHeadScript", () => {
 });
 
 describe("buildGtmBootstrap", () => {
-  function createRuntime(
-    options: {
-      performanceObserver?: "available" | "unavailable" | "observe-throws";
-      now?: () => number;
-      visibilityState?: "visible" | "hidden";
-      existingExternal?: boolean;
-    } = {},
-  ) {
+  function createRuntime(options: { existingExternal?: boolean } = {}) {
     const isolatedDocument = document.implementation.createHTMLDocument("analytics");
-    let visibilityState = options.visibilityState ?? "visible";
-    Object.defineProperty(isolatedDocument, "visibilityState", {
-      configurable: true,
-      get: () => visibilityState,
-    });
-    let lcpCallback:
-      | ((entries: { getEntries(): Array<{ startTime: number }> }) => void)
-      | undefined;
-    const observers: Array<{ observe: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
-    const windowListeners = new Map<
-      string,
-      Array<{ callback: () => void; once: boolean }>
-    >();
-    class FakePerformanceObserver {
-      constructor(callback: (entries: { getEntries(): Array<{ startTime: number }> }) => void) {
-        lcpCallback = callback;
-        observers.push({ observe: this.observe, disconnect: this.disconnect });
-      }
-
-      observe = vi.fn(() => {
-        if (options.performanceObserver === "observe-throws") throw new Error("unsupported");
-      });
-
-      disconnect = vi.fn();
-    }
     const scriptWindow: {
       dataLayer?: AnalyticsDataLayer;
       performance: { now(): number };
@@ -341,28 +306,12 @@ describe("buildGtmBootstrap", () => {
       clearTimeout: typeof clearTimeout;
       addEventListener: (...args: any[]) => void;
       removeEventListener: (...args: any[]) => void;
-      PerformanceObserver?: typeof FakePerformanceObserver;
     } = {
-      performance: { now: options.now ?? (() => Date.now()) },
+      performance: { now: () => Date.now() },
       setTimeout,
       clearTimeout,
-      addEventListener: vi.fn((type: string, callback: () => void, eventOptions?: boolean | AddEventListenerOptions) => {
-        const listeners = windowListeners.get(type) ?? [];
-        listeners.push({
-          callback,
-          once: typeof eventOptions === "object" && eventOptions.once === true,
-        });
-        windowListeners.set(type, listeners);
-      }),
-      removeEventListener: vi.fn((type: string, callback: () => void) => {
-        windowListeners.set(
-          type,
-          (windowListeners.get(type) ?? []).filter((listener) => listener.callback !== callback),
-        );
-      }),
-      ...(options.performanceObserver === "unavailable"
-        ? {}
-        : { PerformanceObserver: FakePerformanceObserver }),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     };
 
     if (options.existingExternal) {
@@ -370,37 +319,14 @@ describe("buildGtmBootstrap", () => {
       existing.id = "google-tag-manager";
       isolatedDocument.head.append(existing);
     }
-    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
-      scriptWindow,
-      isolatedDocument,
-    );
-
     return {
       isolatedDocument,
       scriptWindow,
-      observers,
-      emitLcp(startTime: number) {
-        lcpCallback?.({ getEntries: () => [{ startTime }] });
-      },
-      emitInteraction(type: "pointerdown" | "keydown" | "touchstart" = "pointerdown") {
-        const listeners = [...(windowListeners.get(type) ?? [])];
-        for (const listener of listeners) {
-          listener.callback();
-          if (listener.once) {
-            windowListeners.set(
-              type,
-              (windowListeners.get(type) ?? []).filter((item) => item.callback !== listener.callback),
-            );
-          }
-        }
-      },
-      setVisibility(nextVisibilityState: "visible" | "hidden") {
-        visibilityState = nextVisibilityState;
-        isolatedDocument.dispatchEvent(new Event("visibilitychange"));
-      },
-      emitPageHide() {
-        const listeners = [...(windowListeners.get("pagehide") ?? [])];
-        for (const listener of listeners) listener.callback();
+      execute() {
+        Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(
+          scriptWindow,
+          isolatedDocument,
+        );
       },
     };
   }
@@ -411,237 +337,67 @@ describe("buildGtmBootstrap", () => {
     );
   }
 
-  it("queues startup immediately but defers an unfinalized visible page until the hard cap", () => {
+  it("appends one startup event and one async GTM request immediately without scheduling a timer", () => {
     vi.useFakeTimers();
     vi.setSystemTime(0);
-    const { isolatedDocument, scriptWindow } = createRuntime();
+    const { execute, isolatedDocument, scriptWindow } = createRuntime();
+    execute();
 
     expect(scriptWindow.dataLayer).toHaveLength(1);
-    expect(scriptWindow.dataLayer?.[0]).toMatchObject({ event: "gtm.js" });
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-
-    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-
-    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS - GTM_MIN_REQUEST_TIME_MS);
+    expect(scriptWindow.dataLayer?.[0]).toMatchObject({ "gtm.start": 0, event: "gtm.js" });
     const [script] = gtmScripts(isolatedDocument);
     expect(script).toMatchObject({
       id: "google-tag-manager",
       async: true,
       src: "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
     });
-    expect(script?.dataset.orangeLoadedAt).toBe(String(GTM_MAX_REQUEST_TIME_MS));
+    expect(vi.getTimerCount()).toBe(0);
   });
 
-  it("reschedules when the floor timer fires a fraction early", () => {
+  it("does nothing when the GTM external script already exists", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(0);
-    let now = 0;
-    const { emitInteraction, isolatedDocument } = createRuntime({ now: () => now });
-    emitInteraction();
-
-    now = GTM_MIN_REQUEST_TIME_MS - 0.1;
-    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-
-    now = GTM_MIN_REQUEST_TIME_MS;
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-  });
-
-  it("reschedules when the latest LCP buffer timer fires a fraction early", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    let now = 0;
-    const { emitInteraction, emitLcp, isolatedDocument } = createRuntime({ now: () => now });
-
-    emitLcp(3500);
-    emitInteraction();
-    now = 4499.9;
-    vi.advanceTimersByTime(4500);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-
-    now = 4500;
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-  });
-
-  it("reschedules the request after a buffered LCP candidate", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, emitLcp, isolatedDocument } = createRuntime();
-
-    emitLcp(3500);
-    emitInteraction();
-    vi.advanceTimersByTime(4499);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-    expect(gtmScripts(isolatedDocument)[0]?.dataset.orangeLoadedAt).toBe("4500");
-  });
-
-  it("uses the latest LCP candidate monotonically when rescheduling", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, emitLcp, isolatedDocument } = createRuntime();
-
-    emitLcp(3500);
-    emitLcp(3200);
-    emitLcp(4200);
-    emitInteraction();
-    vi.advanceTimersByTime(5199);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-    expect(gtmScripts(isolatedDocument)[0]?.dataset.orangeLoadedAt).toBe("5200");
-  });
-
-  it("loads at the floor after a qualifying interaction", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, isolatedDocument } = createRuntime();
-
-    emitInteraction("keydown");
-    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS - 1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-  });
-
-  it("waits for a late LCP candidate before loading after finalization", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, emitLcp, isolatedDocument } = createRuntime();
-
-    vi.advanceTimersByTime(4500);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    emitLcp(4500);
-    emitInteraction();
-    vi.advanceTimersByTime(999);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)[0]?.dataset.orangeLoadedAt).toBe("5500");
-  });
-
-  it("gives an initially hidden page a fresh hard cap after its first visible render", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { isolatedDocument, setVisibility } = createRuntime({ visibilityState: "hidden" });
-
-    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS + 1000);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    setVisibility("visible");
-    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS - 1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
-    vi.advanceTimersByTime(1);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-  });
-
-  it("documents that the hard cap may override a final-second LCP quiet buffer", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitLcp, isolatedDocument } = createRuntime();
-
-    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS - 100);
-    emitLcp(GTM_MAX_REQUEST_TIME_MS - 100);
-    vi.advanceTimersByTime(100);
-    expect(gtmScripts(isolatedDocument)[0]?.dataset.orangeLoadedAt).toBe(
-      String(GTM_MAX_REQUEST_TIME_MS),
-    );
-  });
-
-  it("cleans up observers, timers, and listeners after inserting GTM", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, isolatedDocument, observers, scriptWindow } = createRuntime();
-
-    emitInteraction();
-    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-    expect(observers[0]?.disconnect).toHaveBeenCalledOnce();
-    expect(scriptWindow.removeEventListener).toHaveBeenCalledTimes(4);
-  });
-
-  it.each(["unavailable", "observe-throws"] as const)(
-    "uses the hard cap when PerformanceObserver is %s",
-    (performanceObserver) => {
-      vi.useFakeTimers();
-      vi.setSystemTime(0);
-      const { isolatedDocument } = createRuntime({ performanceObserver });
-
-      vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS);
-      expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-    },
-  );
-
-  it("does not append a duplicate request after repeated timer or observer activity", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, emitLcp, isolatedDocument } = createRuntime();
-
-    emitInteraction();
-    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
-    emitLcp(6000);
-    vi.advanceTimersByTime(10000);
-    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
-  });
-
-  it("respects an existing external GTM script ID", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(0);
-    const { emitInteraction, isolatedDocument } = createRuntime({ existingExternal: true });
+    const { execute, isolatedDocument, scriptWindow } = createRuntime({ existingExternal: true });
     const [existing] = gtmScripts(isolatedDocument);
-    emitInteraction();
-    vi.advanceTimersByTime(GTM_MIN_REQUEST_TIME_MS);
+    execute();
     expect(gtmScripts(isolatedDocument)).toEqual([existing]);
+    expect(runtimeQueueItems(scriptWindow.dataLayer)).toEqual([]);
+    expect(vi.getTimerCount()).toBe(0);
   });
 
-  it("starts GTM once after the consent default in the shared data layer", () => {
+  it("is idempotent when executed twice", () => {
     vi.useFakeTimers();
     vi.setSystemTime(0);
-    const scriptWindow: {
-      dataLayer?: AnalyticsDataLayer;
-      gtag?: GoogleTag;
-      localStorage: StorageDouble;
-      __orangeAnalyticsBootstrap?: AnalyticsBootstrapStatus;
-    } = {
-      localStorage: { getItem: () => null, setItem: vi.fn() },
-    };
-    const isolatedDocument = document.implementation.createHTMLDocument("analytics");
+    const { execute, isolatedDocument, scriptWindow } = createRuntime();
+    execute();
+    execute();
+
+    expect(runtimeQueueItems(scriptWindow.dataLayer)).toHaveLength(1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("queues denied privacy settings before one immediate GTM startup event", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const { execute, isolatedDocument, scriptWindow } = createRuntime();
+    Object.assign(scriptWindow, { localStorage: { getItem: () => null, setItem: vi.fn() } });
 
     Function("window", buildAnalyticsHeadScript())(scriptWindow);
-    const bootstrapWindow = Object.assign(scriptWindow, {
-      performance: { now: () => Date.now() },
-      setTimeout,
-      clearTimeout,
-      addEventListener: () => undefined,
-      removeEventListener: () => undefined,
-    });
-    Function("window", "document", buildGtmBootstrap("GTM-5FHDLXGV"))(bootstrapWindow, isolatedDocument);
-    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS);
+    execute();
 
-    const dataLayer = runtimeQueueItems(scriptWindow.dataLayer);
-    const consentDefaultIndex = dataLayer.findIndex((item) => {
-      const call = asCall(item);
-      return call[0] === "consent" && call[1] === "default";
-    });
-    const gtmStartItems = dataLayer.filter(
-      (item) =>
-        typeof item === "object" &&
-        item !== null &&
-        "event" in item &&
-        item.event === "gtm.js",
-    );
-    const gtmStartIndex = dataLayer.indexOf(gtmStartItems[0]);
-    const gtmScripts = Array.from(isolatedDocument.scripts).filter(
-      (script) =>
-        script.src === "https://www.googletagmanager.com/gtm.js?id=GTM-5FHDLXGV",
-    );
-
-    expect(consentDefaultIndex).toBeGreaterThanOrEqual(0);
-    expect(gtmStartItems).toHaveLength(1);
-    expect(gtmStartIndex).toBeGreaterThan(consentDefaultIndex);
-    expect(gtmScripts).toHaveLength(1);
+    expect(runtimeQueueItems(scriptWindow.dataLayer).map(asCall).slice(0, 3)).toEqual([
+      ["consent", "default", {
+        analytics_storage: "denied",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+      }],
+      ["set", "allow_ad_personalization_signals", false],
+      ["set", "ads_data_redaction", true],
+    ]);
+    expect(runtimeQueueItems(scriptWindow.dataLayer)[3]).toMatchObject({ event: "gtm.js" });
+    expect(gtmScripts(isolatedDocument)).toHaveLength(1);
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it("emits one startup event and one GTM request for a validated ID without consent logic", () => {
@@ -651,6 +407,7 @@ describe("buildGtmBootstrap", () => {
     expect(script.match(/googletagmanager\.com\/gtm\.js/g)).toHaveLength(1);
     expect(script).toContain("GTM-5FHDLXGV");
     expect(script).not.toContain("consent");
+    expect(script).not.toMatch(/setTimeout|PerformanceObserver|largest-contentful-paint/);
   });
 
   it.each(["", " GTM-5FHDLXGV", "gtm-5FHDLXGV", "GTM-5FHDLXGV';alert(1)//"])(
