@@ -8,7 +8,9 @@ import {
 export const dynamic = "force-dynamic";
 
 const SUBMISSION_ID_PATTERN = /^[A-Za-z0-9_-]{16,100}$/;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_LOCAL_PART_PATTERN = /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$/;
+const EMAIL_DOMAIN_LABEL_PATTERN =
+  /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 const ITEM_METADATA_FIELDS = [
   "quantity",
   "composition",
@@ -43,6 +45,29 @@ function readString(
 
 function hasOwn(record: JsonRecord, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(record, key);
+}
+
+function isReasonableEmail(value: string): boolean {
+  const atIndex = value.indexOf("@");
+  if (atIndex <= 0 || atIndex !== value.lastIndexOf("@")) return false;
+
+  const localPart = value.slice(0, atIndex);
+  const domain = value.slice(atIndex + 1);
+  if (
+    localPart.length > 64 ||
+    localPart.startsWith(".") ||
+    localPart.endsWith(".") ||
+    localPart.includes("..") ||
+    !EMAIL_LOCAL_PART_PATTERN.test(localPart)
+  ) {
+    return false;
+  }
+
+  const domainLabels = domain.split(".");
+  return (
+    domainLabels.length >= 2 &&
+    domainLabels.every((label) => EMAIL_DOMAIN_LABEL_PATTERN.test(label))
+  );
 }
 
 function normalizeItem(value: unknown): InquiryItem | null {
@@ -101,7 +126,7 @@ function normalizeInput(value: unknown): InquiryEmailInput | null {
     !SUBMISSION_ID_PATTERN.test(submissionId) ||
     !customer ||
     !email ||
-    !EMAIL_PATTERN.test(email) ||
+    !isReasonableEmail(email) ||
     company === null ||
     phone === null ||
     notes === null ||
@@ -133,8 +158,12 @@ function invalidRequest() {
 }
 
 export async function POST(request: Request) {
-  const contentType = request.headers.get("content-type")?.toLowerCase();
-  if (!contentType?.startsWith("application/json")) {
+  const mediaType = request.headers
+    .get("content-type")
+    ?.split(";", 1)[0]
+    ?.trim()
+    .toLowerCase();
+  if (mediaType !== "application/json") {
     return NextResponse.json(
       { success: false, error: "Unsupported content type." },
       { status: 415 },

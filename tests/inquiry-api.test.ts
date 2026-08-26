@@ -59,6 +59,21 @@ describe("POST /api/inquiry", () => {
     expect(mockedSendInquiryEmail).not.toHaveBeenCalled();
   });
 
+  it("rejects lookalike JSON media types without sending", async () => {
+    mockedSendInquiryEmail.mockResolvedValue({ id: "email_123" });
+
+    const response = await POST(
+      makeRequest(validBody, "application/jsonp; charset=UTF-8"),
+    );
+
+    expect(response.status).toBe(415);
+    await expect(response.json()).resolves.toEqual({
+      success: false,
+      error: "Unsupported content type.",
+    });
+    expect(mockedSendInquiryEmail).not.toHaveBeenCalled();
+  });
+
   it("rejects malformed JSON with the stable public error", async () => {
     await expectInvalid("{not-json");
   });
@@ -140,6 +155,37 @@ describe("POST /api/inquiry", () => {
     ],
   ])("rejects %s without sending", async (_label, body) => {
     await expectInvalid(body);
+  });
+
+  it.each([
+    ".buyer@example.com",
+    "buyer@example..com",
+    "buyer@-example.com",
+  ])("rejects the clearly invalid email %s without sending", async (email) => {
+    mockedSendInquiryEmail.mockResolvedValue({ id: "email_123" });
+
+    await expectInvalid({ ...validBody, email });
+  });
+
+  it.each([
+    "buyer.name+rfq@example.co.uk",
+    "buyer_name@example-domain.com",
+    "buyer-name@sub.example.com",
+  ])("accepts the representative valid email %s", async (email) => {
+    mockedSendInquiryEmail.mockResolvedValue({ id: "email_123" });
+
+    const response = await POST(
+      makeRequest({ ...validBody, email: `  ${email}  ` }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      success: true,
+      inquiryId: "email_123",
+    });
+    expect(mockedSendInquiryEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ email }),
+    );
   });
 
   it("rejects a populated honeypot without sending", async () => {
