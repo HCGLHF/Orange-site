@@ -124,6 +124,16 @@ function resetSharedBatchDraft() {
   setSharedBatchSnapshot(idleBatchSnapshot);
 }
 
+export function resetBatchInquiryStateForTests() {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error("Batch inquiry state can only be reset by tests");
+  }
+
+  const operation = sharedBatchSnapshot.operation;
+  setSharedBatchSnapshot(idleBatchSnapshot);
+  operation?.controller.abort();
+}
+
 function claimSubmittedCartReconciliation(snapshot: SharedBatchSnapshot) {
   const currentSnapshot = sharedBatchSnapshot;
   if (
@@ -197,7 +207,6 @@ function startSharedBatchOperation(
 
   const submissionId = sharedBatchSnapshot.submissionId ?? crypto.randomUUID();
   const controller = new AbortController();
-  let operation!: SharedBatchOperation;
   const promise: Promise<BatchInquiryOutcome> = submitBatchInquiryRequest(
     { ...payload, submissionId },
     controller,
@@ -205,7 +214,7 @@ function startSharedBatchOperation(
     .catch(() => ({ status: "error" as const }))
     .then((outcome) => {
       const currentSnapshot = sharedBatchSnapshot;
-      if (currentSnapshot.operation !== operation) return outcome;
+      if (currentSnapshot.operation?.controller !== controller) return outcome;
 
       if (outcome.status === "success") {
         pushGenerateLead("batch_inquiry");
@@ -226,7 +235,7 @@ function startSharedBatchOperation(
 
       return outcome;
     });
-  operation = { controller, promise };
+  const operation = { controller, promise };
   setSharedBatchSnapshot({
     status: "pending",
     submissionId,

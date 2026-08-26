@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { InquiryBar } from "@/components/InquiryBar";
+import {
+  InquiryBar,
+  resetBatchInquiryStateForTests,
+} from "@/components/InquiryBar";
 import { InquiryCartProvider, useInquiryCart } from "@/components/InquiryCartProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import type { Fabric } from "@/lib/data";
@@ -117,6 +120,13 @@ function InquiryHarness({ allowRemount = false }: { allowRemount?: boolean }) {
         </>
       )}
       <span aria-label="Cart item count">{items.length}</span>
+      <div aria-label="Cart items">
+        {items.map((item) => (
+          <span key={item.id} data-cart-item-id={item.id}>
+            {item.name}: {item.quantity}
+          </span>
+        ))}
+      </div>
       {barMounted && <InquiryBar />}
     </>
   );
@@ -171,25 +181,14 @@ function closeBatchInquiry() {
   fireEvent.keyDown(document, { key: "Escape" });
 }
 
-afterEach(() => {
-  vi.useRealTimers();
-  let dialog = screen.queryByRole("dialog");
-  if (!dialog) {
-    const toggleButton = screen.queryByRole("button", {
-      name: "Toggle inquiry bar",
+afterEach(async () => {
+  try {
+    await act(async () => {
+      resetBatchInquiryStateForTests();
+      await Promise.resolve();
     });
-    if (toggleButton) {
-      fireEvent.click(toggleButton);
-      dialog = screen.queryByRole("dialog");
-    }
-  }
-  if (!dialog || dialog.getAttribute("aria-busy") === "true") return;
-
-  const okButton = screen.queryByRole("button", { name: "OK" });
-  if (okButton) {
-    fireEvent.click(okButton);
-  } else {
-    closeBatchInquiry();
+  } finally {
+    vi.useRealTimers();
   }
 });
 
@@ -490,7 +489,56 @@ describe("InquiryBar server submission and conversion analytics", () => {
     expect(countAfterSecondRemount).toBe("3");
   });
 
-  it("restores a zero-subscriber StrictMode failure and retries it with the same UUID", async () => {
+  it("removes unchanged submitted entries once while retaining an item added during submission", async () => {
+    const pendingResponse = deferred<Response>();
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry({
+      allowRemount: true,
+      strictMode: true,
+    });
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    await user.click(screen.getByRole("button", { name: "Add later fabric" }));
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("3");
+
+    await act(async () => {
+      pendingResponse.resolve(jsonResponse({ success: true, inquiryId: "inquiry_123" }));
+      await pendingResponse.promise;
+    });
+    await waitFor(() => expect(window.dataLayer).toHaveLength(1));
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("3");
+
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    await waitFor(() =>
+      expect(screen.getByLabelText("Cart item count")).toHaveTextContent("1"),
+    );
+    expect(
+      document.querySelector('[data-cart-item-id="private-fabric-article"]'),
+    ).not.toBeInTheDocument();
+    expect(
+      document.querySelector('[data-cart-item-id="second-fabric-article"]'),
+    ).not.toBeInTheDocument();
+    expect(
+      document.querySelector('[data-cart-item-id="later-fabric-article"]'),
+    ).toHaveTextContent("Later Fabric Article: 100");
+
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("1");
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+  });
+
+  it("restores the latest pending draft after a second zero-subscriber failure and retries the same UUID", async () => {
     const pendingResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
@@ -507,6 +555,30 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
     await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
 
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    const customerInput = screen.getByPlaceholderText("Your full name");
+    const companyInput = screen.getByPlaceholderText("Company name");
+    const phoneInput = screen.getByPlaceholderText("+1 or +86");
+    const emailInput = screen.getByPlaceholderText("example@company.com");
+    const notesInput = screen.getByPlaceholderText(
+      "Special requirements, delivery timeline, target price",
+    );
+    await user.clear(customerInput);
+    await user.type(customerInput, "Latest Buyer");
+    await user.clear(companyInput);
+    await user.type(companyInput, "Latest Company");
+    await user.clear(phoneInput);
+    await user.type(phoneInput, "+61 400 000 001");
+    await user.clear(emailInput);
+    await user.type(emailInput, "latest@example.com");
+    await user.clear(notesInput);
+    await user.type(notesInput, "Latest delivery requirement");
+    const pendingHoneypot = document.querySelector<HTMLInputElement>(
+      'input[name="website"]',
+    );
+    fireEvent.change(pendingHoneypot!, { target: { value: "latest-bot.example" } });
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+
     await act(async () => {
       pendingResponse.resolve(jsonResponse({ success: false }, { ok: false }));
       await pendingResponse.promise;
@@ -517,8 +589,25 @@ describe("InquiryBar server submission and conversion analytics", () => {
 
     await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
-    expectPrivateDraftPreserved();
+    expect(screen.getByPlaceholderText("Your full name")).toHaveValue("Latest Buyer");
+    expect(screen.getByPlaceholderText("Company name")).toHaveValue("Latest Company");
+    expect(screen.getByPlaceholderText("+1 or +86")).toHaveValue(
+      "+61 400 000 001",
+    );
+    expect(screen.getByPlaceholderText("example@company.com")).toHaveValue(
+      "latest@example.com",
+    );
+    expect(
+      screen.getByPlaceholderText(
+        "Special requirements, delivery timeline, target price",
+      ),
+    ).toHaveValue("Latest delivery requirement");
+    const restoredHoneypot = document.querySelector<HTMLInputElement>(
+      'input[name="website"]',
+    );
+    expect(restoredHoneypot).toHaveValue("latest-bot.example");
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+    fireEvent.change(restoredHoneypot!, { target: { value: "" } });
     await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
 
     expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
@@ -526,6 +615,14 @@ describe("InquiryBar server submission and conversion analytics", () => {
     const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
     expect(retryBody.submissionId).toBe(firstBody.submissionId);
     expect(retryBody.submissionId).toBe(SUBMISSION_ID);
+    expect(retryBody).toMatchObject({
+      customer: "Latest Buyer",
+      company: "Latest Company",
+      phone: "+61 400 000 001",
+      email: "latest@example.com",
+      notes: "Latest delivery requirement",
+      honeypot: "",
+    });
     expect(uuidSpy).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
     expect(window.dataLayer).toEqual([
@@ -533,6 +630,44 @@ describe("InquiryBar server submission and conversion analytics", () => {
     ]);
 
     await user.click(screen.getByRole("button", { name: "OK" }));
+  });
+
+  it("invalidates a pending operation before test reset so its late success has no side effects", async () => {
+    const lateResponse = deferred<Response>();
+    let requestSignal: AbortSignal | null = null;
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation((_url, request) => {
+        requestSignal = request?.signal ?? null;
+        return lateResponse.promise;
+      });
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry();
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    expect(resetBatchInquiryStateForTests).toBeTypeOf("function");
+    await act(async () => {
+      resetBatchInquiryStateForTests();
+      await Promise.resolve();
+    });
+    expect(requestSignal).not.toBeNull();
+    expect(requestSignal!.aborted).toBe(true);
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "false");
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+
+    await act(async () => {
+      lateResponse.resolve(jsonResponse({ success: true, inquiryId: "late_inquiry" }));
+      await lateResponse.promise;
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(window.dataLayer).toEqual([]);
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    closeBatchInquiry();
   });
 
   it("times out body parsing, allows retry with the same ID, and ignores the late result", async () => {
