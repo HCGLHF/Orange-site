@@ -77,6 +77,26 @@ function setSharedInquirySnapshot(snapshot: SharedInquirySnapshot) {
   sharedInquiryListeners.forEach((listener) => listener());
 }
 
+function updateSharedInquiryDraft<K extends keyof SharedInquiryDraft>(
+  field: K,
+  value: SharedInquiryDraft[K],
+) {
+  const snapshot = sharedInquirySnapshot;
+
+  if (
+    !snapshot.draft ||
+    (snapshot.status !== "pending" && snapshot.status !== "error") ||
+    snapshot.draft[field] === value
+  ) {
+    return;
+  }
+
+  setSharedInquirySnapshot({
+    ...snapshot,
+    draft: { ...snapshot.draft, [field]: value },
+  });
+}
+
 function subscribeToSharedInquiry(listener: () => void) {
   sharedInquiryListeners.add(listener);
   return () => {
@@ -150,7 +170,8 @@ function startSharedInquiryOperation(
   )
     .catch(() => ({ status: "error" as const }))
     .then((outcome) => {
-      if (sharedInquirySnapshot.operation !== operation) return outcome;
+      const currentSnapshot = sharedInquirySnapshot;
+      if (currentSnapshot.operation !== operation) return outcome;
 
       if (outcome.status === "success") {
         pushGenerateLead("single_inquiry");
@@ -162,10 +183,9 @@ function startSharedInquiryOperation(
         });
       } else {
         setSharedInquirySnapshot({
+          ...currentSnapshot,
           status: "error",
-          submissionId,
           operation: null,
-          draft,
         });
       }
 
@@ -379,7 +399,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                 name="website"
                 type="text"
                 value={website}
-                onChange={(e) => setWebsite(e.target.value)}
+                onChange={(e) => {
+                  setWebsite(e.target.value);
+                  updateSharedInquiryDraft("website", e.target.value);
+                }}
                 autoComplete="off"
                 tabIndex={-1}
               />
@@ -401,7 +424,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                   id="inquiry-name"
                   name="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    updateSharedInquiryDraft("name", e.target.value);
+                  }}
                   autoComplete="name"
                   placeholder=" "
                   className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
@@ -422,7 +448,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                   name="phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    updateSharedInquiryDraft("phone", e.target.value);
+                  }}
                   autoComplete="tel"
                   placeholder=" "
                   className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
@@ -445,7 +474,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                 name="notes"
                 rows={3}
                 value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+                onChange={(e) => {
+                  setNotes(e.target.value);
+                  updateSharedInquiryDraft("notes", e.target.value);
+                }}
                 placeholder={t("inquiryBatchNotesPlaceholder")}
                 className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
               />
@@ -458,7 +490,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                   name="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    updateSharedInquiryDraft("email", e.target.value);
+                  }}
                   autoComplete="email"
                   placeholder=" "
                   className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
@@ -478,7 +513,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                   id="inquiry-company"
                   name="company"
                   value={company}
-                  onChange={(e) => setCompany(e.target.value)}
+                  onChange={(e) => {
+                    setCompany(e.target.value);
+                    updateSharedInquiryDraft("company", e.target.value);
+                  }}
                   autoComplete="organization"
                   placeholder=" "
                   className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
@@ -500,7 +538,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                 id="inquiry-fabric"
                 name="fabric"
                 value={fabricId}
-                onChange={(e) => setFabricId(e.target.value)}
+                onChange={(e) => {
+                  setFabricId(e.target.value);
+                  updateSharedInquiryDraft("fabricId", e.target.value);
+                }}
                 className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
               >
                 {inquiryOptions.map((option) => (
@@ -517,7 +558,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                   id="inquiry-qty"
                   name="quantity"
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  onChange={(e) => {
+                    setQuantity(e.target.value);
+                    updateSharedInquiryDraft("quantity", e.target.value);
+                  }}
                   placeholder=" "
                   className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
                 />
