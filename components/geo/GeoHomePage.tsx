@@ -1,7 +1,6 @@
 import Link from "next/link";
 import ContactCard from "@/components/ContactCard";
 import { HomeCertificateSection } from "@/components/company/HomeCertificateSection";
-import { InquiryBar } from "@/components/InquiryBar";
 import { LandingCtaBand } from "@/components/landing/LandingCtaBand";
 import { LandingHero } from "@/components/landing/LandingHero";
 import { LandingProofStrip } from "@/components/landing/LandingProofStrip";
@@ -136,7 +135,6 @@ export function GeoHomePage({ initialFabrics, notionEmpty = false }: GeoHomePage
       <LandingCtaBand page={page} />
       <ContactCard />
 
-      <InquiryBar />
       <BottomNav />
     </div>
   );

@@ -315,7 +315,7 @@ export function MobileNavigationDrawer({
               ) : null}
             </Link>
             <RequestQuoteButton
-              onBeforeOpen={onRouteSelect}
+              onBeforeOpen={closeAndRestoreFocus}
               className="flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-orange px-4 py-3 text-center text-base font-bold text-white outline-none transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
             >
               Request a Quote

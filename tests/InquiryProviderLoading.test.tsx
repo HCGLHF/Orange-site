@@ -11,6 +11,10 @@ vi.mock("@/components/DeferredStickyInquiryBar", () => ({
   DeferredStickyInquiryBar: () => null,
 }));
 
+vi.mock("@/components/InquiryBar", () => ({
+  InquiryBar: () => null,
+}));
+
 vi.mock("@/components/InquiryCartProvider", () => ({
   InquiryCartProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

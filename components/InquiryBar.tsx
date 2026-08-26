@@ -277,6 +277,10 @@ export function InquiryBar() {
   );
   const [error, setError] = useState<string | null>(null);
   const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(showForm);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const submitting = sharedSubmission.status === "pending";
@@ -300,8 +304,46 @@ export function InquiryBar() {
 
   useEffect(() => {
     if (!showForm) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeForm();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeForm();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const panel = panelRef.current;
+      const focusableElements = Array.from(
+        panel?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter(
+        (element) =>
+          !element.closest('[hidden], [aria-hidden="true"]'),
+      );
+
+      if (!panel || focusableElements.length === 0) return;
+
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (
+        event.shiftKey &&
+        (activeElement === firstFocusable || !panel.contains(activeElement))
+      ) {
+        event.preventDefault();
+        lastFocusable.focus();
+        return;
+      }
+
+      if (
+        !event.shiftKey &&
+        (activeElement === lastFocusable || !panel.contains(activeElement))
+      ) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -310,6 +352,36 @@ export function InquiryBar() {
       document.body.style.overflow = "";
     };
   }, [closeForm, showForm]);
+
+  useEffect(() => {
+    if (!showForm) return;
+
+    if (!openerRef.current) {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement &&
+        !panelRef.current?.contains(activeElement)
+      ) {
+        openerRef.current = activeElement;
+      }
+    }
+
+    if (submitted || visibleError) return;
+    closeButtonRef.current?.focus();
+  }, [showForm, submitted, visibleError]);
+
+  useEffect(() => {
+    if (showForm) {
+      wasOpenRef.current = true;
+      return;
+    }
+
+    if (!wasOpenRef.current) return;
+    wasOpenRef.current = false;
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (opener?.isConnected) opener.focus();
+  }, [showForm]);
 
   useEffect(() => {
     if (showForm) setError(null);
@@ -339,7 +411,16 @@ export function InquiryBar() {
   }, [items, removeItem, sharedSubmission]);
 
   useEffect(() => {
-    const open = () => setShowForm(true);
+    const open = () => {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement &&
+        !panelRef.current?.contains(activeElement)
+      ) {
+        openerRef.current = activeElement;
+      }
+      setShowForm(true);
+    };
     window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
     return () => window.removeEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
   }, []);
@@ -429,7 +510,10 @@ export function InquiryBar() {
             onClick={closeForm}
             disabled={submitting}
           />
-          <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl">
+          <div
+            ref={panelRef}
+            className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl"
+          >
             <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-gray-200 bg-white p-6">
               <div>
                 <h2 id={titleId} className="text-xl font-bold text-gray-900">
@@ -438,6 +522,7 @@ export function InquiryBar() {
                 <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
               </div>
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={closeForm}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200"

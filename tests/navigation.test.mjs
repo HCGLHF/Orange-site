@@ -23,6 +23,18 @@ const requestQuoteButtonUrl = new URL(
   "../components/RequestQuoteButton.tsx",
   import.meta.url
 );
+const inquiryProviderUrl = new URL(
+  "../components/InquiryProvider.tsx",
+  import.meta.url
+);
+const fabricsInquiryAnchorUrl = new URL(
+  "../components/FabricsInquiryAnchor.tsx",
+  import.meta.url
+);
+const geoHomePageUrl = new URL(
+  "../components/geo/GeoHomePage.tsx",
+  import.meta.url
+);
 const bottomNavigationUrl = new URL(
   "../components/ui/BottomNav.tsx",
   import.meta.url
@@ -755,7 +767,7 @@ const assertMobileDrawerStructure = (source, primaryNavigation) => {
   assert.match(source, /\{\s*totalCount\s*\}/);
   assert.match(source, />\s*Request a Quote\s*</);
   assert.match(source, />\s*Inquiry cart\s*</);
-  assert.match(source, /onBeforeOpen=\{\s*onRouteSelect\s*\}/);
+  assert.match(source, /onBeforeOpen=\{\s*closeAndRestoreFocus\s*\}/);
   assert.match(source, /const\s+onRouteSelect\s*=\s*\(\s*\)\s*=>\s*\{\s*onClose\s*\(\s*\)/);
   assert.match(source, /\bborder-l-4\b/);
   assert.match(source, /aria-current=\{/);
@@ -774,6 +786,23 @@ test("request quote button routes empty and populated carts without a dead link"
   assert.match(source, /openInquiry\s*\(\s*\)/);
   assert.match(source, /<button\b[^>]*type=["']button["']/);
   assert.doesNotMatch(source, /<Link\b|<a\b/);
+});
+
+test("the inquiry provider owns the only global batch inquiry host", async () => {
+  const [provider, anchor, home] = await Promise.all([
+    readFile(inquiryProviderUrl, "utf8"),
+    readFile(fabricsInquiryAnchorUrl, "utf8"),
+    readFile(geoHomePageUrl, "utf8"),
+  ]);
+
+  assert.match(
+    provider,
+    /import\s*\{\s*InquiryBar\s*\}\s*from\s*["']@\/components\/InquiryBar["']/,
+  );
+  assert.equal([...provider.matchAll(/<InquiryBar\s*\/>/g)].length, 1);
+  assert.match(anchor, /id=["']inquiry-form["']/);
+  assert.doesNotMatch(anchor, /InquiryBar/);
+  assert.doesNotMatch(home, /InquiryBar/);
 });
 
 const assertMobileDrawerFocusContract = (source) => {
