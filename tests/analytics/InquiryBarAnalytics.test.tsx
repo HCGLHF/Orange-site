@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { InquiryBar } from "@/components/InquiryBar";
 import { InquiryCartProvider, useInquiryCart } from "@/components/InquiryCartProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
@@ -44,6 +44,20 @@ const testFabrics: Fabric[] = [
   },
 ];
 
+const laterFabric: Fabric = {
+  id: "later-fabric-article",
+  name: "Later Fabric Article",
+  construction: "knit",
+  composition: "Later composition",
+  weight: 210,
+  width: 165,
+  tags: [],
+  textureImage: "/later-texture.jpg",
+  sceneImage: "/later-scene.jpg",
+  description: "Later fabric description",
+  stockStatus: "Later stock status",
+};
+
 function jsonResponse(
   body: unknown,
   { ok = true }: { ok?: boolean } = {},
@@ -63,7 +77,7 @@ function deferred<T>() {
 }
 
 function InquiryHarness({ allowRemount = false }: { allowRemount?: boolean }) {
-  const { addItem, items } = useInquiryCart();
+  const { addItem, items, removeItem, updateQuantity } = useInquiryCart();
   const [barMounted, setBarMounted] = useState(true);
 
   return (
@@ -78,9 +92,29 @@ function InquiryHarness({ allowRemount = false }: { allowRemount?: boolean }) {
         Open batch inquiry
       </button>
       {allowRemount && (
-        <button type="button" onClick={() => setBarMounted((mounted) => !mounted)}>
-          Toggle inquiry bar
-        </button>
+        <>
+          <button type="button" onClick={() => setBarMounted((mounted) => !mounted)}>
+            Toggle inquiry bar
+          </button>
+          <button type="button" onClick={() => addItem(laterFabric)}>
+            Add later fabric
+          </button>
+          <button
+            type="button"
+            onClick={() => updateQuantity(testFabrics[0].id, 750)}
+          >
+            Edit submitted quantity
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              removeItem(testFabrics[1].id);
+              addItem(testFabrics[1]);
+            }}
+          >
+            Replace submitted fabric
+          </button>
+        </>
       )}
       <span aria-label="Cart item count">{items.length}</span>
       {barMounted && <InquiryBar />}
@@ -88,14 +122,20 @@ function InquiryHarness({ allowRemount = false }: { allowRemount?: boolean }) {
   );
 }
 
-async function renderOpenBatchInquiry({ allowRemount = false } = {}) {
+async function renderOpenBatchInquiry({
+  allowRemount = false,
+  strictMode = false,
+} = {}) {
   const user = userEvent.setup();
-  const view = render(
+  const content = (
     <LocaleProvider>
       <InquiryCartProvider>
         <InquiryHarness allowRemount={allowRemount} />
       </InquiryCartProvider>
-    </LocaleProvider>,
+    </LocaleProvider>
+  );
+  const view = render(
+    strictMode ? <React.StrictMode>{content}</React.StrictMode> : content,
   );
   await user.click(screen.getByRole("button", { name: "Open batch inquiry" }));
   await screen.findByRole("dialog", { name: "Batch inquiry" });
@@ -130,6 +170,28 @@ function expectPrivateDraftPreserved() {
 function closeBatchInquiry() {
   fireEvent.keyDown(document, { key: "Escape" });
 }
+
+afterEach(() => {
+  vi.useRealTimers();
+  let dialog = screen.queryByRole("dialog");
+  if (!dialog) {
+    const toggleButton = screen.queryByRole("button", {
+      name: "Toggle inquiry bar",
+    });
+    if (toggleButton) {
+      fireEvent.click(toggleButton);
+      dialog = screen.queryByRole("dialog");
+    }
+  }
+  if (!dialog || dialog.getAttribute("aria-busy") === "true") return;
+
+  const okButton = screen.queryByRole("button", { name: "OK" });
+  if (okButton) {
+    fireEvent.click(okButton);
+  } else {
+    closeBatchInquiry();
+  }
+});
 
 describe("InquiryBar server submission and conversion analytics", () => {
   it("posts exactly one complete batch inquiry and clears the cart only after confirmed success", async () => {
@@ -349,6 +411,130 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
+  it("defers unchanged-cart reconciliation until a StrictMode remount after zero-subscriber success", async () => {
+    const pendingResponse = deferred<Response>();
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry({
+      allowRemount: true,
+      strictMode: true,
+    });
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    await act(async () => {
+      pendingResponse.resolve(jsonResponse({ success: true, inquiryId: "inquiry_123" }));
+      await pendingResponse.promise;
+    });
+    await waitFor(() => expect(window.dataLayer).toHaveLength(1));
+    const countBeforeRemount = screen.getByLabelText("Cart item count").textContent;
+
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    await waitFor(() =>
+      expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0"),
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+    expect(countBeforeRemount).toBe("2");
+  });
+
+  it("preserves later, quantity-edited, and replaced cart entries during deferred reconciliation", async () => {
+    const pendingResponse = deferred<Response>();
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry({
+      allowRemount: true,
+      strictMode: true,
+    });
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    await user.click(screen.getByRole("button", { name: "Edit submitted quantity" }));
+    await user.click(screen.getByRole("button", { name: "Replace submitted fabric" }));
+    await user.click(screen.getByRole("button", { name: "Add later fabric" }));
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("3");
+
+    await act(async () => {
+      pendingResponse.resolve(jsonResponse({ success: true, inquiryId: "inquiry_123" }));
+      await pendingResponse.promise;
+    });
+    await waitFor(() => expect(window.dataLayer).toHaveLength(1));
+    const countBeforeRemount = screen.getByLabelText("Cart item count").textContent;
+
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    const countAfterReconciliation = screen.getByLabelText("Cart item count").textContent;
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    const countAfterSecondRemount = screen.getByLabelText("Cart item count").textContent;
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+    expect(countBeforeRemount).toBe("3");
+    expect(countAfterReconciliation).toBe("3");
+    expect(countAfterSecondRemount).toBe("3");
+  });
+
+  it("restores a zero-subscriber StrictMode failure and retries it with the same UUID", async () => {
+    const pendingResponse = deferred<Response>();
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockReturnValueOnce(pendingResponse.promise)
+      .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_retry" }));
+    const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry({
+      allowRemount: true,
+      strictMode: true,
+    });
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+
+    await act(async () => {
+      pendingResponse.resolve(jsonResponse({ success: false }, { ok: false }));
+      await pendingResponse.promise;
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+    expect(window.dataLayer).toEqual([]);
+
+    await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    expectPrivateDraftPreserved();
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(retryBody.submissionId).toBe(firstBody.submissionId);
+    expect(retryBody.submissionId).toBe(SUBMISSION_ID);
+    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+  });
+
   it("times out body parsing, allows retry with the same ID, and ignores the late result", async () => {
     const lateBody = deferred<unknown>();
     let requestSignal: AbortSignal | null = null;
@@ -408,11 +594,70 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
+  it("times out an unresolved fetch, retries with the same ID, and ignores the late response", async () => {
+    const lateFetch = deferred<Response>();
+    let requestSignal: AbortSignal | null = null;
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementationOnce((_url, request) => {
+        requestSignal = request?.signal ?? null;
+        return lateFetch.promise;
+      })
+      .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_retry" }));
+    const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry();
+    await completeBatchInquiry(user);
+
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(15_000);
+    });
+    vi.useRealTimers();
+
+    expect(requestSignal).not.toBeNull();
+    expect(requestSignal!.aborted).toBe(true);
+    expect(screen.getByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "false");
+    expectPrivateDraftPreserved();
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+    expect(window.dataLayer).toEqual([]);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(retryBody.submissionId).toBe(firstBody.submissionId);
+    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+
+    await act(async () => {
+      lateFetch.resolve(jsonResponse({ success: true, inquiryId: "late_inquiry" }));
+      await lateFetch.promise;
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
+    expect(window.dataLayer).toHaveLength(1);
+    expect(screen.getByRole("status")).toHaveTextContent("Submitted");
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+  });
+
   it("maps a populated hidden website field to the honeypot payload", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      jsonResponse({ success: true, inquiryId: "inquiry_123" }),
-    );
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(jsonResponse({ success: false }, { ok: false }))
+      .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_retry" }));
+    const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
     const { user } = await renderOpenBatchInquiry();
     await completeBatchInquiry(user);
     const honeypot = document.querySelector<HTMLInputElement>('input[name="website"]');
@@ -425,7 +670,24 @@ describe("InquiryBar server submission and conversion analytics", () => {
     expect(JSON.parse(String(fetchSpy.mock.calls[0][1]?.body))).toMatchObject({
       honeypot: "bot.example",
     });
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    expectPrivateDraftPreserved();
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+    expect(window.dataLayer).toEqual([]);
+
+    fireEvent.change(honeypot!, { target: { value: "" } });
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
     expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    expect(JSON.parse(String(fetchSpy.mock.calls[1][1]?.body))).toMatchObject({
+      submissionId: SUBMISSION_ID,
+      honeypot: "",
+    });
+    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
 
     await user.click(screen.getByRole("button", { name: "OK" }));
   });

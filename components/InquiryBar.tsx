@@ -11,7 +11,10 @@ import {
 } from "react";
 import { Check, Package, Send, X } from "lucide-react";
 import { useLocale } from "@/components/LocaleProvider";
-import { useInquiryCart } from "@/components/InquiryCartProvider";
+import {
+  useInquiryCart,
+  type CartItem,
+} from "@/components/InquiryCartProvider";
 import { OPEN_BATCH_INQUIRY_EVENT } from "@/lib/inquiry-events";
 import { pushGenerateLead } from "@/lib/analytics/events";
 
@@ -56,11 +59,18 @@ type SharedBatchDraft = {
   website: string;
 };
 
+type SubmittedCartEntry = {
+  id: string;
+  quantity: number;
+  identity: CartItem;
+};
+
 type SharedBatchSnapshot = {
   status: "idle" | "pending" | "success" | "error";
   submissionId: string | null;
   operation: SharedBatchOperation | null;
   draft: SharedBatchDraft | null;
+  submittedCart: SubmittedCartEntry[] | null;
 };
 
 const idleBatchSnapshot: SharedBatchSnapshot = {
@@ -68,6 +78,7 @@ const idleBatchSnapshot: SharedBatchSnapshot = {
   submissionId: null,
   operation: null,
   draft: null,
+  submittedCart: null,
 };
 
 let sharedBatchSnapshot = idleBatchSnapshot;
@@ -111,6 +122,24 @@ function updateSharedBatchDraft<K extends keyof SharedBatchDraft>(
 function resetSharedBatchDraft() {
   if (sharedBatchSnapshot.status === "pending") return;
   setSharedBatchSnapshot(idleBatchSnapshot);
+}
+
+function claimSubmittedCartReconciliation(snapshot: SharedBatchSnapshot) {
+  const currentSnapshot = sharedBatchSnapshot;
+  if (
+    currentSnapshot !== snapshot ||
+    currentSnapshot.status !== "success" ||
+    currentSnapshot.submittedCart === null
+  ) {
+    return null;
+  }
+
+  const submittedCart = currentSnapshot.submittedCart;
+  setSharedBatchSnapshot({
+    ...currentSnapshot,
+    submittedCart: null,
+  });
+  return submittedCart;
 }
 
 async function submitBatchInquiryRequest(
@@ -162,7 +191,7 @@ async function submitBatchInquiryRequest(
 function startSharedBatchOperation(
   payload: Omit<BatchInquiryPayload, "submissionId">,
   draft: SharedBatchDraft,
-  onSuccess: () => void,
+  submittedCart: SubmittedCartEntry[],
 ) {
   if (sharedBatchSnapshot.operation) return sharedBatchSnapshot.operation;
 
@@ -185,8 +214,8 @@ function startSharedBatchOperation(
           submissionId: null,
           operation: null,
           draft: null,
+          submittedCart: currentSnapshot.submittedCart,
         });
-        onSuccess();
       } else {
         setSharedBatchSnapshot({
           ...currentSnapshot,
@@ -198,14 +227,19 @@ function startSharedBatchOperation(
       return outcome;
     });
   operation = { controller, promise };
-  setSharedBatchSnapshot({ status: "pending", submissionId, operation, draft });
+  setSharedBatchSnapshot({
+    status: "pending",
+    submissionId,
+    operation,
+    draft,
+    submittedCart,
+  });
   return operation;
 }
 
 export function InquiryBar() {
   const { t } = useLocale();
-  const { items, totalCount, removeItem, updateQuantity, clearCart } =
-    useInquiryCart();
+  const { items, totalCount, removeItem, updateQuantity } = useInquiryCart();
   const sharedSubmission = useSyncExternalStore(
     subscribeToSharedBatch,
     getSharedBatchSnapshot,
@@ -281,6 +315,21 @@ export function InquiryBar() {
   }, [visibleError]);
 
   useEffect(() => {
+    const submittedCart = claimSubmittedCartReconciliation(sharedSubmission);
+    if (!submittedCart) return;
+
+    for (const submittedEntry of submittedCart) {
+      const currentItem = items.find((item) => item.id === submittedEntry.id);
+      if (
+        currentItem === submittedEntry.identity &&
+        currentItem.quantity === submittedEntry.quantity
+      ) {
+        removeItem(submittedEntry.id);
+      }
+    }
+  }, [items, removeItem, sharedSubmission]);
+
+  useEffect(() => {
     const open = () => setShowForm(true);
     window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
     return () => window.removeEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
@@ -346,7 +395,11 @@ export function InquiryBar() {
         })),
       },
       draft,
-      clearCart,
+      items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        identity: item,
+      })),
     );
   };
 
