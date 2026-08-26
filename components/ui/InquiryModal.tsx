@@ -163,7 +163,6 @@ function startSharedInquiryOperation(
 
   const submissionId = sharedInquirySnapshot.submissionId ?? crypto.randomUUID();
   const controller = new AbortController();
-  let operation!: SharedInquiryOperation;
   const promise: Promise<InquirySubmissionOutcome> = submitInquiryRequest(
     { ...payload, submissionId },
     controller,
@@ -171,7 +170,7 @@ function startSharedInquiryOperation(
     .catch(() => ({ status: "error" as const }))
     .then((outcome) => {
       const currentSnapshot = sharedInquirySnapshot;
-      if (currentSnapshot.operation !== operation) return outcome;
+      if (currentSnapshot.operation?.controller !== controller) return outcome;
 
       if (outcome.status === "success") {
         pushGenerateLead("single_inquiry");
@@ -191,7 +190,7 @@ function startSharedInquiryOperation(
 
       return outcome;
     });
-  operation = { controller, promise };
+  const operation = { controller, promise };
   setSharedInquirySnapshot({ status: "pending", submissionId, operation, draft });
   return operation;
 }
