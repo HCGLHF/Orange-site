@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/LocaleProvider";
 import { pushGenerateLead } from "@/lib/analytics/events";
 
+let pendingSingleInquiryOwner: symbol | null = null;
+
 type InquiryModalProps = {
   open: boolean;
   onClose: () => void;
@@ -100,7 +102,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (submittingRef.current) return;
+    if (submittingRef.current || pendingSingleInquiryOwner) return;
     setError(null);
 
     if (!name.trim() || !email.trim()) {
@@ -119,6 +121,8 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
     const formData = new FormData(e.currentTarget);
     const honeypot = String(formData.get("website") ?? "").trim();
     const lifecycleVersion = lifecycleVersionRef.current;
+    const pendingOwner = Symbol("single-inquiry");
+    pendingSingleInquiryOwner = pendingOwner;
 
     try {
       submittingRef.current = true;
@@ -147,26 +151,23 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
         success?: unknown;
         inquiryId?: unknown;
       } | null;
-      if (
-        !mountedRef.current ||
-        !openRef.current ||
-        lifecycleVersionRef.current !== lifecycleVersion
-      ) {
-        return;
-      }
-      if (
-        !response.ok ||
-        !result ||
-        result.success !== true ||
-        typeof result.inquiryId !== "string" ||
-        !result.inquiryId.trim()
-      ) {
-        setError(t("inquirySubmitFailed"));
+      const isCurrentLifecycle =
+        mountedRef.current &&
+        openRef.current &&
+        lifecycleVersionRef.current === lifecycleVersion;
+      const isConfirmedSuccess =
+        response.ok &&
+        result?.success === true &&
+        typeof result.inquiryId === "string" &&
+        Boolean(result.inquiryId.trim());
+
+      if (!isConfirmedSuccess) {
+        if (isCurrentLifecycle) setError(t("inquirySubmitFailed"));
         return;
       }
 
       pushGenerateLead("single_inquiry");
-      setSubmitted(true);
+      if (isCurrentLifecycle) setSubmitted(true);
     } catch {
       if (
         mountedRef.current &&
@@ -176,6 +177,9 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
         setError(t("inquirySubmitFailed"));
       }
     } finally {
+      if (pendingSingleInquiryOwner === pendingOwner) {
+        pendingSingleInquiryOwner = null;
+      }
       submittingRef.current = false;
       if (mountedRef.current) setSubmitting(false);
     }

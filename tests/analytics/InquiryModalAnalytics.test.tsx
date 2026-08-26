@@ -176,31 +176,60 @@ describe("InquiryModal server submission and conversion analytics", () => {
     });
   });
 
-  it("ignores a successful pending response after external unmount", async () => {
-    const pendingResponse = deferred<Response>();
-    vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
-    const onClose = vi.fn();
-    const view = render(
+  it("keeps one pending submission across unmount and releases it after settlement", async () => {
+    const originalResponse = deferred<Response>();
+    const laterResponse = deferred<Response>();
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockReturnValueOnce(originalResponse.promise)
+      .mockReturnValueOnce(laterResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce("123e4567-e89b-42d3-a456-426614174001");
+    const firstView = render(
       <LocaleProvider>
-        <InquiryModal open onClose={onClose} />
+        <InquiryModal open onClose={vi.fn()} />
       </LocaleProvider>,
     );
-    const user = await completeModalInquiry();
+    const firstUser = await completeModalInquiry();
 
-    await user.click(screen.getByRole("button", { name: "Submit" }));
-    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
-    view.unmount();
+    await firstUser.click(screen.getByRole("button", { name: "Submit" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    firstView.unmount();
+
+    render(
+      <LocaleProvider>
+        <InquiryModal open onClose={vi.fn()} />
+      </LocaleProvider>,
+    );
+    const remountedUser = await completeModalInquiry();
+    await remountedUser.click(screen.getByRole("button", { name: "Submit" }));
+    const callsWhileOriginalPending = fetchSpy.mock.calls.length;
 
     await act(async () => {
-      pendingResponse.resolve(
+      originalResponse.resolve(
         jsonResponse({ success: true, inquiryId: "inquiry_123" }),
       );
-      await pendingResponse.promise;
+      await originalResponse.promise;
+    });
+    const leadsAfterOriginalSettled = Array.from(window.dataLayer ?? []);
+
+    await remountedUser.click(screen.getByRole("button", { name: "Submit" }));
+    const callsAfterLaterSubmit = fetchSpy.mock.calls.length;
+
+    await act(async () => {
+      laterResponse.resolve(
+        jsonResponse({ success: true, inquiryId: "inquiry_456" }),
+      );
+      await laterResponse.promise;
     });
 
-    expect(window.dataLayer).toEqual([]);
-    expect(onClose).not.toHaveBeenCalled();
+    const lead = { event: "orange_generate_lead", form_name: "single_inquiry" };
+    expect(callsWhileOriginalPending).toBe(1);
+    expect(leadsAfterOriginalSettled).toEqual([lead]);
+    expect(callsAfterLaterSubmit).toBe(2);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(window.dataLayer).toEqual([lead, lead]);
   });
 
   it("renders the localized success detail for the active locale", async () => {
