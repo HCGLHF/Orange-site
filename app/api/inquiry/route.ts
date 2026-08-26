@@ -1,131 +1,170 @@
 import { NextResponse } from "next/server";
 import {
-  createNotionInquiryPage,
-  isNotionInquiryConfigured,
-  type InquiryLineItem,
-} from "@/lib/notion-inquiry-api";
+  sendInquiryEmail,
+  type InquiryEmailInput,
+  type InquiryItem,
+} from "@/lib/inquiry-email";
 
 export const dynamic = "force-dynamic";
 
-type LegacyBody = {
-  customer?: string;
-  company?: string;
-  phone?: string;
-  email?: string;
-  notes?: string;
-  fabricIds?: string[];
-  quantities?: Record<string, number>;
-  items?: InquiryLineItem[];
-};
+const SUBMISSION_ID_PATTERN = /^[A-Za-z0-9_-]{16,100}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ITEM_METADATA_FIELDS = [
+  "quantity",
+  "composition",
+  "weight",
+  "stockStatus",
+] as const;
 
-function toLineItems(body: LegacyBody): InquiryLineItem[] | null {
-  if (Array.isArray(body.items) && body.items.length > 0) {
-    return body.items.map((it) => ({
-      notionPageId: it.notionPageId,
-      name: String(it.name ?? "").trim() || "Unnamed fabric",
-      quantityMeters:
-        typeof it.quantityMeters === "number" && Number.isFinite(it.quantityMeters)
-          ? Math.max(1, it.quantityMeters)
-          : 100,
-      composition: it.composition,
-      weight: it.weight,
-      stockStatus: it.stockStatus,
-    }));
+type JsonRecord = Record<string, unknown>;
+type ReadStringResult = string | undefined | null;
+
+function isRecord(value: unknown): value is JsonRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function readString(
+  value: unknown,
+  maxLength: number,
+  required = false,
+): ReadStringResult {
+  if (value === undefined || value === null) {
+    return required ? null : undefined;
   }
 
-  const fabricIds = body.fabricIds;
-  if (!Array.isArray(fabricIds) || fabricIds.length === 0) return null;
+  if (typeof value !== "string") return null;
 
-  const quantities = body.quantities ?? {};
-  return fabricIds.map((id, index) => ({
-    notionPageId: id,
-    name: `Fabric ${index + 1}`,
-    quantityMeters:
-      typeof quantities[id] === "number" && Number.isFinite(quantities[id])
-        ? Math.max(1, quantities[id]!)
-        : 100,
-  }));
+  const normalized = value.trim();
+  if (!normalized) return required ? null : undefined;
+  if (normalized.length > maxLength) return null;
+
+  return normalized;
+}
+
+function hasOwn(record: JsonRecord, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(record, key);
+}
+
+function normalizeItem(value: unknown): InquiryItem | null {
+  if (!isRecord(value)) return null;
+
+  const name = readString(value.name, 240, true);
+  if (!name) return null;
+
+  const normalized: InquiryItem = { name };
+
+  for (const field of ITEM_METADATA_FIELDS) {
+    if (!hasOwn(value, field)) continue;
+
+    const fieldValue = readString(value[field], 240);
+    if (fieldValue === null) return null;
+    normalized[field] = fieldValue;
+  }
+
+  return normalized;
+}
+
+function normalizeItems(value: unknown): InquiryItem[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > 50) return null;
+
+  const items: InquiryItem[] = [];
+  for (const item of value) {
+    const normalized = normalizeItem(item);
+    if (!normalized) return null;
+    items.push(normalized);
+  }
+
+  return items;
+}
+
+function normalizeInput(value: unknown): InquiryEmailInput | null {
+  if (!isRecord(value)) return null;
+
+  if (value.honeypot !== undefined) {
+    if (typeof value.honeypot !== "string" || value.honeypot.trim()) return null;
+  }
+
+  const type = readString(value.type, 6, true);
+  const submissionId = readString(value.submissionId, 100, true);
+  const customer = readString(value.customer, 120, true);
+  const email = readString(value.email, 254, true);
+  const company = readString(value.company, 160);
+  const phone = readString(value.phone, 60);
+  const notes = readString(value.notes, 4000);
+  const sourceUrl = readString(value.sourceUrl, 500);
+  const items = normalizeItems(value.items);
+
+  if (
+    (type !== "single" && type !== "batch") ||
+    !submissionId ||
+    !SUBMISSION_ID_PATTERN.test(submissionId) ||
+    !customer ||
+    !email ||
+    !EMAIL_PATTERN.test(email) ||
+    company === null ||
+    phone === null ||
+    notes === null ||
+    sourceUrl === null ||
+    !items ||
+    (type === "batch" && items.length === 0)
+  ) {
+    return null;
+  }
+
+  return {
+    type,
+    submissionId,
+    customer,
+    email,
+    company,
+    phone,
+    notes,
+    sourceUrl,
+    items,
+  };
+}
+
+function invalidRequest() {
+  return NextResponse.json(
+    { success: false, error: "Invalid request." },
+    { status: 400 },
+  );
 }
 
 export async function POST(request: Request) {
-  try {
-    if (!isNotionInquiryConfigured()) {
-      return NextResponse.json({
-        success: true,
-        skipped: true,
-        message: "Notion inquiry database is not configured; sync was skipped.",
-      });
-    }
-
-    let body: LegacyBody;
-    try {
-      body = (await request.json()) as LegacyBody;
-    } catch {
-      return NextResponse.json(
-        { success: false, error: "Invalid JSON request body." },
-        { status: 400 }
-      );
-    }
-
-    const customer = String(body.customer ?? "").trim();
-    const phone = String(body.phone ?? "").trim();
-    const items = toLineItems(body);
-
-    if (!customer || !phone) {
-      return NextResponse.json(
-        { success: false, error: "Please enter customer name and phone number." },
-        { status: 400 }
-      );
-    }
-
-    if (!items || items.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Please select at least one fabric or submit items / fabricIds.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const result = await createNotionInquiryPage({
-      customer,
-      company: body.company ? String(body.company) : undefined,
-      phone,
-      email: body.email ? String(body.email) : undefined,
-      notes: body.notes ? String(body.notes) : undefined,
-      items,
-    });
-
-    if (!result.ok) {
-      console.error(
-        "Notion inquiry creation failed:",
-        result.notionCode ?? "?",
-        result.message,
-        result.notionError
-      );
-      return NextResponse.json(
-        {
-          success: false,
-          error: result.message,
-          notionCode: result.notionCode,
-          details: result.notionError,
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Inquiry synced to Notion.",
-      inquiryId: result.pageId,
-      inquiryUrl: result.pageUrl,
-    });
-  } catch (error) {
-    console.error("POST /api/inquiry:", error);
+  const contentType = request.headers.get("content-type")?.toLowerCase();
+  if (!contentType?.startsWith("application/json")) {
     return NextResponse.json(
-      { success: false, error: "Server error. Please try again later." },
-      { status: 500 }
+      { success: false, error: "Unsupported content type." },
+      { status: 415 },
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return invalidRequest();
+  }
+
+  const input = normalizeInput(body);
+  if (!input) return invalidRequest();
+
+  try {
+    const result = await sendInquiryEmail(input);
+    return NextResponse.json({ success: true, inquiryId: result.id });
+  } catch (error) {
+    console.error("Inquiry email delivery failed.", {
+      submissionId: input.submissionId,
+      errorType: error instanceof Error ? "Error" : "Unknown",
+    });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Submission failed. Please try again or email us directly.",
+      },
+      { status: 502 },
     );
   }
 }
