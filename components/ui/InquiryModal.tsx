@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
   type FormEvent,
 } from "react";
 import { CheckCircle2, X } from "lucide-react";
@@ -15,7 +16,156 @@ import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/LocaleProvider";
 import { pushGenerateLead } from "@/lib/analytics/events";
 
-let pendingSingleInquiryOwner: symbol | null = null;
+const INQUIRY_SUBMISSION_TIMEOUT_MS = 15_000;
+
+type InquirySubmissionPayload = {
+  type: "single";
+  submissionId: string;
+  customer: string;
+  email: string;
+  company: string;
+  phone: string;
+  notes: string;
+  sourceUrl: string;
+  honeypot: string;
+  items: Array<{ name: string; quantity: string }>;
+};
+
+type InquirySubmissionOutcome =
+  | { status: "success"; inquiryId: string }
+  | { status: "error" };
+
+type SharedInquiryOperation = {
+  controller: AbortController;
+  promise: Promise<InquirySubmissionOutcome>;
+};
+
+type SharedInquirySnapshot = {
+  status: "idle" | "pending" | "success" | "error";
+  submissionId: string | null;
+  operation: SharedInquiryOperation | null;
+};
+
+const idleInquirySnapshot: SharedInquirySnapshot = {
+  status: "idle",
+  submissionId: null,
+  operation: null,
+};
+
+let sharedInquirySnapshot = idleInquirySnapshot;
+const sharedInquiryListeners = new Set<() => void>();
+
+function getSharedInquirySnapshot() {
+  return sharedInquirySnapshot;
+}
+
+function setSharedInquirySnapshot(snapshot: SharedInquirySnapshot) {
+  sharedInquirySnapshot = snapshot;
+  sharedInquiryListeners.forEach((listener) => listener());
+}
+
+function subscribeToSharedInquiry(listener: () => void) {
+  sharedInquiryListeners.add(listener);
+  return () => {
+    sharedInquiryListeners.delete(listener);
+    if (
+      sharedInquiryListeners.size === 0 &&
+      sharedInquirySnapshot.status === "success" &&
+      sharedInquirySnapshot.submissionId === null
+    ) {
+      sharedInquirySnapshot = idleInquirySnapshot;
+    }
+  };
+}
+
+function resetSharedInquiryDraft() {
+  if (sharedInquirySnapshot.status === "pending") return;
+  setSharedInquirySnapshot(idleInquirySnapshot);
+}
+
+async function submitInquiryRequest(
+  payload: InquirySubmissionPayload,
+  controller: AbortController,
+): Promise<InquirySubmissionOutcome> {
+  const request = (async () => {
+    const response = await fetch("/api/inquiry", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    const result = (await response.json()) as {
+      success?: unknown;
+      inquiryId?: unknown;
+    } | null;
+
+    if (
+      response.ok &&
+      result?.success === true &&
+      typeof result.inquiryId === "string" &&
+      result.inquiryId.trim()
+    ) {
+      return { status: "success", inquiryId: result.inquiryId } as const;
+    }
+
+    return { status: "error" } as const;
+  })();
+
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error("Inquiry submission timed out"));
+    }, INQUIRY_SUBMISSION_TIMEOUT_MS);
+  });
+
+  try {
+    return await Promise.race([request, timeout]);
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  }
+}
+
+function startSharedInquiryOperation(
+  payload: Omit<InquirySubmissionPayload, "submissionId">,
+) {
+  if (sharedInquirySnapshot.operation) return sharedInquirySnapshot.operation;
+
+  const submissionId = sharedInquirySnapshot.submissionId ?? crypto.randomUUID();
+  const controller = new AbortController();
+  let operation!: SharedInquiryOperation;
+  const promise: Promise<InquirySubmissionOutcome> = submitInquiryRequest(
+    { ...payload, submissionId },
+    controller,
+  )
+    .catch(() => ({ status: "error" as const }))
+    .then((outcome) => {
+      if (sharedInquirySnapshot.operation !== operation) return outcome;
+
+      if (outcome.status === "success") {
+        pushGenerateLead("single_inquiry");
+        setSharedInquirySnapshot({
+          status: "success",
+          submissionId: null,
+          operation: null,
+        });
+      } else {
+        setSharedInquirySnapshot({
+          status: "error",
+          submissionId,
+          operation: null,
+        });
+      }
+
+      return outcome;
+    });
+  operation = { controller, promise };
+  setSharedInquirySnapshot({ status: "pending", submissionId, operation });
+  return operation;
+}
 
 type InquiryModalProps = {
   open: boolean;
@@ -24,10 +174,14 @@ type InquiryModalProps = {
 };
 
 export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalProps) {
-  const { locale, t } = useLocale();
+  const { t } = useLocale();
   const titleId = useId();
-  void locale;
   const inquiryOptions = finishedFabricInquiryOptions;
+  const sharedSubmission = useSyncExternalStore(
+    subscribeToSharedInquiry,
+    getSharedInquirySnapshot,
+    () => idleInquirySnapshot,
+  );
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
@@ -35,22 +189,21 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
   const [notes, setNotes] = useState("");
   const [fabricId, setFabricId] = useState("finished-range");
   const [quantity, setQuantity] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const submittingRef = useRef(false);
-  const mountedRef = useRef(false);
-  const openRef = useRef(open);
-  const lifecycleVersionRef = useRef(0);
-  openRef.current = open;
+  const successRef = useRef<HTMLDivElement>(null);
+  const submitting = sharedSubmission.status === "pending";
+  const submitted = sharedSubmission.status === "success";
+  const visibleError =
+    error ?? (sharedSubmission.status === "error" ? t("inquirySubmitFailed") : null);
 
   const selectedFabric =
     inquiryOptions.find((option) => option.id === fabricId) ?? inquiryOptions[0];
   const fabricLabel = selectedFabric?.name ?? "";
 
   const handleClose = useCallback(() => {
-    if (submittingRef.current) return;
-    setSubmitted(false);
+    if (sharedInquirySnapshot.status === "pending") return;
+    resetSharedInquiryDraft();
+    setError(null);
     setName("");
     setEmail("");
     setCompany("");
@@ -62,16 +215,8 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
   }, [onClose]);
 
   useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      lifecycleVersionRef.current += 1;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!open) lifecycleVersionRef.current += 1;
-  }, [open]);
+    if (open && submitted) successRef.current?.focus();
+  }, [open, submitted]);
 
   useEffect(() => {
     if (!open) return;
@@ -88,7 +233,6 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
   useEffect(() => {
     if (open) {
-      setSubmitted(false);
       setError(null);
       setFabricId(
         initialFabricId && inquiryOptions.some((option) => option.id === initialFabricId)
@@ -102,7 +246,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (submittingRef.current || pendingSingleInquiryOwner) return;
+    if (sharedInquirySnapshot.status === "pending") return;
     setError(null);
 
     if (!name.trim() || !email.trim()) {
@@ -120,69 +264,17 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
     const formData = new FormData(e.currentTarget);
     const honeypot = String(formData.get("website") ?? "").trim();
-    const lifecycleVersion = lifecycleVersionRef.current;
-    const pendingOwner = Symbol("single-inquiry");
-    pendingSingleInquiryOwner = pendingOwner;
-
-    try {
-      submittingRef.current = true;
-      setSubmitting(true);
-      const response = await fetch("/api/inquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          type: "single",
-          submissionId: crypto.randomUUID(),
-          customer: name.trim(),
-          email: email.trim(),
-          company: company.trim(),
-          phone: phone.trim(),
-          notes: notes.trim(),
-          sourceUrl: typeof window === "undefined" ? "" : window.location.href,
-          honeypot,
-          items: [{ name: fabricLabel, quantity: quantity.trim() }],
-        }),
-      });
-
-      const result = (await response.json()) as {
-        success?: unknown;
-        inquiryId?: unknown;
-      } | null;
-      const isCurrentLifecycle =
-        mountedRef.current &&
-        openRef.current &&
-        lifecycleVersionRef.current === lifecycleVersion;
-      const isConfirmedSuccess =
-        response.ok &&
-        result?.success === true &&
-        typeof result.inquiryId === "string" &&
-        Boolean(result.inquiryId.trim());
-
-      if (!isConfirmedSuccess) {
-        if (isCurrentLifecycle) setError(t("inquirySubmitFailed"));
-        return;
-      }
-
-      pushGenerateLead("single_inquiry");
-      if (isCurrentLifecycle) setSubmitted(true);
-    } catch {
-      if (
-        mountedRef.current &&
-        openRef.current &&
-        lifecycleVersionRef.current === lifecycleVersion
-      ) {
-        setError(t("inquirySubmitFailed"));
-      }
-    } finally {
-      if (pendingSingleInquiryOwner === pendingOwner) {
-        pendingSingleInquiryOwner = null;
-      }
-      submittingRef.current = false;
-      if (mountedRef.current) setSubmitting(false);
-    }
+    startSharedInquiryOperation({
+      type: "single",
+      customer: name.trim(),
+      email: email.trim(),
+      company: company.trim(),
+      phone: phone.trim(),
+      notes: notes.trim(),
+      sourceUrl: typeof window === "undefined" ? "" : window.location.href,
+      honeypot,
+      items: [{ name: fabricLabel, quantity: quantity.trim() }],
+    });
   };
 
   return (
@@ -191,6 +283,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
+      aria-busy={submitting}
     >
       <button
         type="button"
@@ -225,7 +318,13 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
         </div>
 
         {submitted ? (
-          <div className="py-6 text-center">
+          <div
+            ref={successRef}
+            role="status"
+            aria-live="polite"
+            tabIndex={-1}
+            className="py-6 text-center outline-none"
+          >
             <div className="mb-3 flex justify-center">
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
@@ -251,8 +350,14 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
               />
             </div>
 
-            {error && (
-              <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+            {visibleError && (
+              <p
+                role="alert"
+                aria-live="assertive"
+                className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"
+              >
+                {visibleError}
+              </p>
             )}
 
             <div>
@@ -405,8 +510,6 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                 {t("inquirySubmit")}
               </Button>
             </div>
-
-            <p className="text-center text-xs text-brand-charcoal/50">{t("inquiryFootnote")}</p>
           </form>
         )}
       </div>

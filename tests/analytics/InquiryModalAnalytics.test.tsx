@@ -29,8 +29,7 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-async function completeModalInquiry() {
-  const user = userEvent.setup();
+async function completeModalInquiry(user = userEvent.setup()) {
   await user.type(screen.getByLabelText(/^Name/), "Buyer Name");
   await user.type(screen.getByLabelText(/^Email/), "buyer@example.com");
   await user.type(screen.getByLabelText(/^Company/), "Private Company");
@@ -65,12 +64,16 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(honeypot).not.toBeNull();
     expect(honeypot).toHaveAttribute("autocomplete", "off");
     expect(honeypot).toHaveAttribute("tabindex", "-1");
+    expect(
+      screen.queryByText("Submissions are saved on this device"),
+    ).not.toBeInTheDocument();
 
     const submitButton = screen.getByRole("button", { name: "Submit" });
     await user.click(submitButton);
 
     await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
     expect(submitButton).toBeDisabled();
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
     expect(window.dataLayer).toEqual([]);
     expect(screen.queryByText("Submitted successfully")).not.toBeInTheDocument();
 
@@ -111,7 +114,12 @@ describe("InquiryModal server submission and conversion analytics", () => {
       await pendingResponse.promise;
     });
 
-    expect(await screen.findByText("Submitted successfully")).toBeInTheDocument();
+    const success = await screen.findByRole("status");
+    expect(success).toHaveTextContent("Submitted successfully");
+    expect(success).toHaveAttribute("aria-live", "polite");
+    expect(success).toHaveAttribute("tabindex", "-1");
+    expect(success).toHaveFocus();
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "false");
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(alertSpy).not.toHaveBeenCalled();
@@ -126,6 +134,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(analyticsPayload).not.toContain("buyer@example.com");
     expect(analyticsPayload).not.toContain("Private Company");
     expect(analyticsPayload).not.toContain("500 kg confidential");
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
   it("keeps the accepted-submission success flow when the analytics queue is frozen", async () => {
@@ -144,6 +154,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(await screen.findByText("Submitted successfully")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(window.alert).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
   it("blocks every user close path while a submission is pending", async () => {
@@ -174,18 +186,16 @@ describe("InquiryModal server submission and conversion analytics", () => {
       );
       await pendingResponse.promise;
     });
+
+    await user.click(await screen.findByRole("button", { name: "OK" }));
   });
 
-  it("keeps one pending submission across unmount and releases it after settlement", async () => {
+  it("shares a pending operation and its confirmed result across unmount and remount", async () => {
     const originalResponse = deferred<Response>();
-    const laterResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
-      .mockReturnValueOnce(originalResponse.promise)
-      .mockReturnValueOnce(laterResponse.promise);
-    vi.spyOn(globalThis.crypto, "randomUUID")
-      .mockReturnValueOnce(SUBMISSION_ID)
-      .mockReturnValueOnce("123e4567-e89b-42d3-a456-426614174001");
+      .mockReturnValue(originalResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
     const firstView = render(
       <LocaleProvider>
         <InquiryModal open onClose={vi.fn()} />
@@ -202,9 +212,18 @@ describe("InquiryModal server submission and conversion analytics", () => {
         <InquiryModal open onClose={vi.fn()} />
       </LocaleProvider>,
     );
-    const remountedUser = await completeModalInquiry();
-    await remountedUser.click(screen.getByRole("button", { name: "Submit" }));
-    const callsWhileOriginalPending = fetchSpy.mock.calls.length;
+    const remountedUser = userEvent.setup();
+    const dialog = screen.getByRole("dialog");
+    const submitButton = screen.getByRole("button", { name: "Submit" });
+
+    expect(dialog).toHaveAttribute("aria-busy", "true");
+    expect(submitButton).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+    for (const closeButton of screen.getAllByRole("button", { name: "Close" })) {
+      expect(closeButton).toBeDisabled();
+    }
+    await remountedUser.click(submitButton);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       originalResponse.resolve(
@@ -212,24 +231,141 @@ describe("InquiryModal server submission and conversion analytics", () => {
       );
       await originalResponse.promise;
     });
-    const leadsAfterOriginalSettled = Array.from(window.dataLayer ?? []);
-
-    await remountedUser.click(screen.getByRole("button", { name: "Submit" }));
-    const callsAfterLaterSubmit = fetchSpy.mock.calls.length;
-
-    await act(async () => {
-      laterResponse.resolve(
-        jsonResponse({ success: true, inquiryId: "inquiry_456" }),
-      );
-      await laterResponse.promise;
-    });
 
     const lead = { event: "orange_generate_lead", form_name: "single_inquiry" };
-    expect(callsWhileOriginalPending).toBe(1);
-    expect(leadsAfterOriginalSettled).toEqual([lead]);
-    expect(callsAfterLaterSubmit).toBe(2);
+    const success = await screen.findByRole("status");
+    expect(success).toHaveTextContent("Submitted successfully");
+    expect(success).toHaveFocus();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([lead]);
+
+    await remountedUser.click(screen.getByRole("button", { name: "OK" }));
+  });
+
+  it("reuses a draft submission ID after failure and rotates it after confirmed success", async () => {
+    const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        jsonResponse({ success: false }, { ok: false }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_new" }),
+      );
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(nextSubmissionId);
+    const firstView = render(
+      <LocaleProvider>
+        <InquiryModal open onClose={vi.fn()} />
+      </LocaleProvider>,
+    );
+    const firstUser = await completeModalInquiry();
+
+    await firstUser.click(screen.getByRole("button", { name: "Submit" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    firstView.unmount();
+
+    renderModal();
+    expect(screen.getByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    const retryUser = await completeModalInquiry();
+    await retryUser.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(retryBody.submissionId).toBe(firstBody.submissionId);
+    expect(retryBody.submissionId).toBe(SUBMISSION_ID);
+    expect(uuidSpy).toHaveBeenCalledTimes(1);
+
+    await retryUser.click(screen.getByRole("button", { name: "OK" }));
+    const newDraftUser = await completeModalInquiry();
+    await newDraftUser.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    const newDraftBody = JSON.parse(String(fetchSpy.mock.calls[2][1]?.body));
+    expect(newDraftBody.submissionId).toBe(nextSubmissionId);
+    expect(newDraftBody.submissionId).not.toBe(SUBMISSION_ID);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
+
+    await newDraftUser.click(screen.getByRole("button", { name: "OK" }));
+  });
+
+  it("times out hung response parsing and retries with the same submission ID", async () => {
+    const lateBody = deferred<unknown>();
+    let requestSignal: AbortSignal | null = null;
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementationOnce((_url, request) => {
+        requestSignal = request?.signal ?? null;
+        return Promise.resolve({
+          ok: true,
+          json: vi.fn().mockReturnValue(lateBody.promise),
+        } as unknown as Response);
+      })
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      );
+    const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    renderModal();
+    await completeModalInquiry();
+
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(15_000);
+    });
+    vi.useRealTimers();
+
+    expect(requestSignal).not.toBeNull();
+    expect(requestSignal!.aborted).toBe(true);
+    expect(screen.getByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
+    expect(screen.getByLabelText(/^Email/)).toHaveValue("buyer@example.com");
+    expect(screen.getByLabelText(/^Quantity needed/)).toHaveValue(
+      "500 kg confidential",
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "false");
+    expect(screen.getByRole("button", { name: "Submit" })).toBeEnabled();
+    expect(window.dataLayer).toEqual([]);
+
+    const retryUser = userEvent.setup();
+    await retryUser.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-    expect(window.dataLayer).toEqual([lead, lead]);
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(retryBody.submissionId).toBe(firstBody.submissionId);
+    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "single_inquiry" },
+    ]);
+
+    await act(async () => {
+      lateBody.resolve({ success: true, inquiryId: "late_inquiry" });
+      await lateBody.promise;
+    });
+    expect(window.dataLayer).toHaveLength(1);
+    expect(screen.getByRole("status")).toHaveTextContent("Submitted successfully");
+
+    await retryUser.click(screen.getByRole("button", { name: "OK" }));
   });
 
   it("renders the localized success detail for the active locale", async () => {
@@ -248,6 +384,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
 
     expect(await screen.findByText("Submitted successfully")).toBeInTheDocument();
     expect(screen.getByText(messages.zh.inquirySuccess)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: messages.zh.inquiryOk }));
   });
 
   it("maps a populated website field to the API honeypot field", async () => {
@@ -268,6 +406,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(JSON.parse(String(request?.body))).toMatchObject({
       honeypot: "bot.example",
     });
+
+    await user.click(await screen.findByRole("button", { name: "OK" }));
   });
 
   it("does not push a lead when validation fails", async () => {
@@ -277,6 +417,7 @@ describe("InquiryModal server submission and conversion analytics", () => {
     await userEvent.click(screen.getByRole("button", { name: "Submit" }));
 
     expect(fetchSpy).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
     expect(window.dataLayer).toEqual([]);
   });
 
@@ -291,7 +432,9 @@ describe("InquiryModal server submission and conversion analytics", () => {
 
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    expect(await screen.findByText(SUBMIT_ERROR)).toBeInTheDocument();
+    const error = await screen.findByRole("alert");
+    expect(error).toHaveTextContent(SUBMIT_ERROR);
+    expect(error).toHaveAttribute("aria-live", "assertive");
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
     expect(screen.getByLabelText(/^Email/)).toHaveValue("buyer@example.com");
@@ -305,6 +448,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(alertSpy).not.toHaveBeenCalled();
     expect(window.dataLayer).toEqual([]);
     expect(localStorage).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
   });
 
   it("keeps the dialog and form values after a network rejection", async () => {
@@ -330,6 +475,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(alertSpy).not.toHaveBeenCalled();
     expect(window.dataLayer).toEqual([]);
     expect(localStorage).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
   });
 
   it.each([
@@ -355,5 +502,7 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
     expect(window.dataLayer).toEqual([]);
     expect(localStorage).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
   });
 });
