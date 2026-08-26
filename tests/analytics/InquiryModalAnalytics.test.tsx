@@ -242,6 +242,87 @@ describe("InquiryModal server submission and conversion analytics", () => {
     await remountedUser.click(screen.getByRole("button", { name: "OK" }));
   });
 
+  it("keeps a zero-subscriber success through StrictMode remounts until explicit reset", async () => {
+    const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
+    const pendingResponse = deferred<Response>();
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockReturnValueOnce(pendingResponse.promise)
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_new" }),
+      );
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(nextSubmissionId);
+    const firstView = render(
+      <React.StrictMode>
+        <LocaleProvider>
+          <InquiryModal open onClose={vi.fn()} />
+        </LocaleProvider>
+      </React.StrictMode>,
+    );
+    const firstUser = await completeModalInquiry();
+
+    await firstUser.click(screen.getByRole("button", { name: "Submit" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    firstView.unmount();
+
+    await act(async () => {
+      pendingResponse.resolve(
+        jsonResponse({ success: true, inquiryId: "inquiry_123" }),
+      );
+      await pendingResponse.promise;
+    });
+
+    const transientView = render(
+      <React.StrictMode>
+        <LocaleProvider>
+          <InquiryModal open onClose={vi.fn()} />
+        </LocaleProvider>
+      </React.StrictMode>,
+    );
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    transientView.unmount();
+
+    const onClose = vi.fn();
+    render(
+      <React.StrictMode>
+        <LocaleProvider>
+          <InquiryModal open onClose={onClose} />
+        </LocaleProvider>
+      </React.StrictMode>,
+    );
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "single_inquiry" },
+    ]);
+
+    const remountedUser = userEvent.setup();
+    await remountedUser.click(screen.getByRole("button", { name: "OK" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    const newDraftUser = await completeModalInquiry();
+    await newDraftUser.click(screen.getByRole("button", { name: "Submit" }));
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const nextBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(firstBody.submissionId).toBe(SUBMISSION_ID);
+    expect(nextBody.submissionId).toBe(nextSubmissionId);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
+
+    await newDraftUser.click(screen.getByRole("button", { name: "OK" }));
+  });
+
   it("reuses a draft submission ID after failure and rotates it after confirmed success", async () => {
     const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
     const fetchSpy = vi

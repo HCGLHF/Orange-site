@@ -68,13 +68,6 @@ function subscribeToSharedInquiry(listener: () => void) {
   sharedInquiryListeners.add(listener);
   return () => {
     sharedInquiryListeners.delete(listener);
-    if (
-      sharedInquiryListeners.size === 0 &&
-      sharedInquirySnapshot.status === "success" &&
-      sharedInquirySnapshot.submissionId === null
-    ) {
-      sharedInquirySnapshot = idleInquirySnapshot;
-    }
   };
 }
 
