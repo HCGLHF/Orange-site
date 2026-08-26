@@ -83,7 +83,7 @@ test("typed legal content contains every reviewed section and required disclosur
     "Vercel",
     "advertising or cross-site profiling",
     "We do not add IP addresses to Google Analytics event data.",
-    "uses the source IP at collection time",
+    "may use the source IP at collection time",
     "discards the IP before Analytics data is logged",
     "does not create a separate application IP database",
     "no more than 30 days",
