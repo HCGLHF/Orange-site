@@ -54,6 +54,42 @@ test("typed legal content contains every reviewed section and required disclosur
   const privacy = PRIVACY_CONTENT.sections.flatMap((section) => section.paragraphs).join("\n");
   const terms = TERMS_CONTENT.sections.flatMap((section) => section.paragraphs).join("\n");
 
+  const essentialSecurityLogs = PRIVACY_CONTENT.sections.find(
+    (section) => section.id === "essential-security-logs"
+  );
+  assert.ok(essentialSecurityLogs, "essential security logs section must exist");
+  assert.equal(
+    essentialSecurityLogs.paragraphs[0],
+    "When you visit the website, our hosting and security provider may process your IP address, request date and time, User-Agent, requested path, response status, referrer where available, and related security signals. This processing continues if you decline Analytics cookies or have not made a choice. We use this information only to deliver and protect the website, identify automated or abusive traffic, investigate security incidents, and diagnose availability or technical problems. We do not use these logs for advertising or cross-site profiling. We do not add IP addresses to Google Analytics event data. When your browser connects to Google Analytics, Google may use the source IP at collection time to derive location information and states that it discards the IP before Analytics data is logged. Full IP addresses used for our own security analysis remain within Vercel's hosting and security layer; O'range Textile does not create a separate application IP database. Security logs available to us are retained for no more than 30 days, or for a shorter period when required by platform availability."
+  );
+
+  const providers = PRIVACY_CONTENT.sections.find(
+    (section) => section.id === "providers-and-international-processing"
+  );
+  assert.ok(providers, "providers section must exist");
+  assert.equal(
+    providers.paragraphs[0],
+    "Vercel hosts and protects the website and may process the essential security and server-log information described above. Google provides GA4 and Google Tag Manager. Formspree receives website inquiry submissions, and Notion may receive them when that integration is configured. These providers may process information in countries outside your location under their own terms and privacy arrangements."
+  );
+
+  const retention = PRIVACY_CONTENT.sections.find(
+    (section) => section.id === "retention"
+  );
+  assert.ok(retention, "retention section must exist");
+  assert.equal(
+    retention.paragraphs[0],
+    "Security logs available to us are retained for no more than 30 days, or for a shorter period when required by platform availability. GA4 event-level data retention is set to two months. Inquiry information is retained only for as long as reasonably required to respond, keep business records and meet applicable obligations; O'range Textile has not represented a more specific public retention schedule."
+  );
+
+  const choices = PRIVACY_CONTENT.sections.find(
+    (section) => section.id === "your-choices-and-requests"
+  );
+  assert.ok(choices, "your choices section must exist");
+  assert.equal(
+    choices.paragraphs[0],
+    "You can reopen the choice bar at any time through Privacy settings in the footer. Declining withdraws permission for Analytics cookies but retains the limited cookieless measurement described above. Declining Analytics cookies or not making a choice does not stop necessary security logging described in this policy."
+  );
+
   for (const required of [
     "Shaoxing Shicheng Textile Products Co., Ltd.",
     "Google Analytics 4",
