@@ -13,7 +13,7 @@ import { PrivacySettingsButton } from "@/components/ui/PrivacySettingsButton";
 import { ANALYTICS_CONSENT_STORAGE_KEY } from "@/lib/analytics/consent";
 
 const BODY =
-  "We use basic cookieless measurement by default. Accepting enables analytics cookies for more complete traffic and conversion reporting. You can change your choice at any time through Privacy settings in the footer. Read our terms.";
+  "We use basic cookieless measurement by default. Accepting enables analytics cookies for more complete traffic and conversion reporting. Essential security logs operate regardless of your Analytics choice. You can change your choice at any time through Privacy settings in the footer. Read our Privacy Policy.";
 const PERSISTENCE_ERROR =
   "We could not save your analytics choice in this browser. Analytics cookies remain off; please try again.";
 const DENIED_UPDATE = {
@@ -91,8 +91,8 @@ describe("AnalyticsConsentProvider", () => {
     expect(region).toHaveTextContent(BODY);
     const links = within(region).getAllByRole("link");
     expect(links).toHaveLength(1);
-    expect(links[0]).toHaveAccessibleName("terms");
-    expect(links[0]).toHaveAttribute("href", "/terms");
+    expect(links[0]).toHaveAccessibleName("Privacy Policy");
+    expect(links[0]).toHaveAttribute("href", "/privacy");
     expect(within(region).getByRole("button", { name: "Decline analytics cookies" })).toHaveTextContent(
       "Decline",
     );
@@ -138,7 +138,7 @@ describe("AnalyticsConsentProvider", () => {
       "class",
       "mt-2 text-sm leading-6 text-white/90 sm:text-[15px]",
     );
-    expect(screen.getByRole("link", { name: "terms" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
       "class",
       "underline underline-offset-4",
     );

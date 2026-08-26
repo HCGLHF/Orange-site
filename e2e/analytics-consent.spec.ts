@@ -3,7 +3,7 @@ import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 const CONSENT_KEY = "orange-textile.analytics-consent";
 const GTM_ID = "GTM-5FHDLXGV";
 const BANNER_COPY =
-  "We use basic cookieless measurement by default. Accepting enables analytics cookies for more complete traffic and conversion reporting. You can change your choice at any time through Privacy settings in the footer. Read our terms.";
+  "We use basic cookieless measurement by default. Accepting enables analytics cookies for more complete traffic and conversion reporting. Essential security logs operate regardless of your Analytics choice. You can change your choice at any time through Privacy settings in the footer. Read our Privacy Policy.";
 const ALL_DENIED_UPDATE = [
   "consent",
   "update",
@@ -251,6 +251,10 @@ test("shows the exact first-visit choices and Accept grants only analytics witho
   const banner = page.getByRole("region", { name: "Analytics privacy choices" });
   await expect(banner.getByRole("heading", { name: "Privacy & analytics" })).toBeVisible();
   await expect(banner.getByText(BANNER_COPY)).toBeVisible();
+  await expect(banner.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+    "href",
+    "/privacy",
+  );
   await expect(banner.getByRole("button", { name: "Accept analytics cookies" })).toHaveText(
     "Accept",
   );

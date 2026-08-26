@@ -32,10 +32,11 @@ export function AnalyticsConsentBanner({
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/90 sm:text-[15px]">
             We use basic cookieless measurement by default. Accepting enables analytics cookies
-            for more complete traffic and conversion reporting. You can change your choice at any
-            time through Privacy settings in the footer. Read our{" "}
-            <Link href="/terms" prefetch={false} className="underline underline-offset-4">
-              terms
+            for more complete traffic and conversion reporting. Essential security logs operate
+            regardless of your Analytics choice. You can change your choice at any time through
+            Privacy settings in the footer. Read our{" "}
+            <Link href="/privacy" prefetch={false} className="underline underline-offset-4">
+              Privacy Policy
             </Link>
             .
           </p>
