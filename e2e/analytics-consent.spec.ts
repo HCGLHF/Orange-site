@@ -1,4 +1,8 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import {
+  GTM_MAX_REQUEST_TIME_MS,
+  GTM_MIN_REQUEST_TIME_MS,
+} from "@/lib/analytics/bootstrap";
 
 const CONSENT_KEY = "orange-textile.analytics-consent";
 const GTM_ID = "GTM-5FHDLXGV";
@@ -182,7 +186,7 @@ async function expectSafeAreaSupport(page: Page) {
   ).toBe(true);
 }
 
-test("queues denied consent before one immediate GTM request without standalone GA", async ({
+test("queues denied consent before one post-critical-path GTM request without standalone GA", async ({
   context,
   page,
 }) => {
@@ -191,7 +195,17 @@ test("queues denied consent before one immediate GTM request without standalone 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Privacy & analytics" })).toBeVisible();
   expect(await page.locator("#google-tag-manager-bootstrap").count()).toBe(1);
-  await expect.poll(() => requests.gtmRequests.length, { timeout: 3000 }).toBe(1);
+  expect(requests.gtmRequests).toHaveLength(0);
+  await expect(page.locator("#google-tag-manager")).toHaveCount(0);
+
+  const elapsed = await page.evaluate(() => performance.now());
+  if (elapsed < GTM_MIN_REQUEST_TIME_MS - 100) {
+    await page.waitForTimeout(GTM_MIN_REQUEST_TIME_MS - elapsed - 100);
+    expect(requests.gtmRequests).toHaveLength(0);
+    await expect(page.locator("#google-tag-manager")).toHaveCount(0);
+  }
+
+  await expect.poll(() => requests.gtmRequests.length, { timeout: 12000 }).toBe(1);
   await expect(page.locator("#google-tag-manager")).toHaveCount(1);
   const requestStartTimes = await page.evaluate(() =>
     performance
@@ -200,7 +214,8 @@ test("queues denied consent before one immediate GTM request without standalone 
       .map((entry) => entry.startTime),
   );
   expect(requestStartTimes).toHaveLength(1);
-  expect(requestStartTimes[0]).toBeLessThanOrEqual(1000);
+  expect(requestStartTimes[0]).toBeGreaterThanOrEqual(GTM_MIN_REQUEST_TIME_MS);
+  expect(requestStartTimes[0]).toBeLessThanOrEqual(GTM_MAX_REQUEST_TIME_MS + 500);
 
   const snapshot = await dataLayerSnapshot(page);
   const defaultIndex = snapshot.findIndex(

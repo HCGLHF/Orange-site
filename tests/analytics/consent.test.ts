@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildAnalyticsHeadScript,
   buildGtmBootstrap,
+  GTM_MAX_REQUEST_TIME_MS,
 } from "@/lib/analytics/bootstrap";
 import { getGtmContainerId } from "@/lib/analytics/config";
 import {
@@ -338,7 +339,7 @@ describe("buildGtmBootstrap", () => {
     );
   }
 
-  it("appends one startup event and one async GTM request immediately without scheduling a timer", () => {
+  it("queues startup immediately but keeps the GTM request off the critical path until the hard cap", () => {
     vi.useFakeTimers();
     vi.setSystemTime(0);
     const { execute, isolatedDocument, scriptWindow } = createRuntime();
@@ -346,6 +347,12 @@ describe("buildGtmBootstrap", () => {
 
     expect(scriptWindow.dataLayer).toHaveLength(1);
     expect(scriptWindow.dataLayer?.[0]).toMatchObject({ "gtm.start": 0, event: "gtm.js" });
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+
+    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS - 1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+
+    vi.advanceTimersByTime(1);
     const [script] = gtmScripts(isolatedDocument);
     expect(script).toMatchObject({
       id: "google-tag-manager",
@@ -373,6 +380,10 @@ describe("buildGtmBootstrap", () => {
     execute();
 
     expect(runtimeQueueItems(scriptWindow.dataLayer)).toHaveLength(1);
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+    expect(vi.getTimerCount()).toBe(1);
+
+    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS);
     expect(gtmScripts(isolatedDocument)).toHaveLength(1);
     expect(vi.getTimerCount()).toBe(0);
   });
@@ -397,6 +408,10 @@ describe("buildGtmBootstrap", () => {
       ["set", "ads_data_redaction", true],
     ]);
     expect(runtimeQueueItems(scriptWindow.dataLayer)[3]).toMatchObject({ event: "gtm.js" });
+    expect(gtmScripts(isolatedDocument)).toHaveLength(0);
+    expect(vi.getTimerCount()).toBe(1);
+
+    vi.advanceTimersByTime(GTM_MAX_REQUEST_TIME_MS);
     expect(gtmScripts(isolatedDocument)).toHaveLength(1);
     expect(vi.getTimerCount()).toBe(0);
   });
@@ -408,7 +423,9 @@ describe("buildGtmBootstrap", () => {
     expect(script.match(/googletagmanager\.com\/gtm\.js/g)).toHaveLength(1);
     expect(script).toContain("GTM-5FHDLXGV");
     expect(script).not.toContain("consent");
-    expect(script).not.toMatch(/setTimeout|PerformanceObserver|largest-contentful-paint/);
+    expect(script).toContain("setTimeout");
+    expect(script).toContain("PerformanceObserver");
+    expect(script).toContain("largest-contentful-paint");
   });
 
   it.each(["", " GTM-5FHDLXGV", "gtm-5FHDLXGV", "GTM-5FHDLXGV';alert(1)//"])(
