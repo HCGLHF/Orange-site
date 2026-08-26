@@ -63,6 +63,18 @@ describe("inquiry email transport", () => {
     );
   });
 
+  it("normalizes a rejected provider call to the public delivery failure", async () => {
+    const sender = {
+      emails: {
+        send: vi.fn().mockRejectedValue(new Error("network secret")),
+      },
+    };
+
+    await expect(sendInquiryEmail(input, sender)).rejects.toThrowError(
+      /^Inquiry delivery failed\.$/,
+    );
+  });
+
   it("rejects a provider response that has no message ID", async () => {
     const sender = {
       emails: {
@@ -77,6 +89,15 @@ describe("inquiry email transport", () => {
 
   it("rejects default delivery when the Resend key is not configured", async () => {
     vi.stubEnv("RESEND_API_KEY", "");
+
+    await expect(sendInquiryEmail(input)).rejects.toThrowError(
+      /^Inquiry delivery is not configured\.$/,
+    );
+  });
+
+  it("rejects default delivery when the Resend key is whitespace only", async () => {
+    vi.stubEnv("RESEND_API_KEY", "   \t  ");
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("must not fetch"));
 
     await expect(sendInquiryEmail(input)).rejects.toThrowError(
       /^Inquiry delivery is not configured\.$/,

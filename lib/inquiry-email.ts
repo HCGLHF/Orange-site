@@ -86,7 +86,7 @@ export async function sendInquiryEmail(
   let sender = injectedSender;
 
   if (!sender) {
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = process.env.RESEND_API_KEY?.trim();
     if (!apiKey) {
       throw new Error("Inquiry delivery is not configured.");
     }
@@ -94,24 +94,28 @@ export async function sendInquiryEmail(
   }
 
   const rendered = renderInquiryEmail(input);
-  const { data, error } = await sender.emails.send(
-    {
-      from: INQUIRY_FROM,
-      to: [INQUIRY_TO],
-      replyTo: input.email,
-      subject: rendered.subject,
-      text: rendered.text,
-    },
-    {
-      headers: {
-        "Idempotency-Key": `inquiry-${input.submissionId}`,
+  try {
+    const { data, error } = await sender.emails.send(
+      {
+        from: INQUIRY_FROM,
+        to: [INQUIRY_TO],
+        replyTo: input.email,
+        subject: rendered.subject,
+        text: rendered.text,
       },
-    },
-  );
+      {
+        headers: {
+          "Idempotency-Key": `inquiry-${input.submissionId}`,
+        },
+      },
+    );
 
-  if (error || !data?.id) {
+    if (error || !data?.id) {
+      throw new Error("Inquiry delivery failed.");
+    }
+
+    return { id: data.id };
+  } catch {
     throw new Error("Inquiry delivery failed.");
   }
-
-  return { id: data.id };
 }
