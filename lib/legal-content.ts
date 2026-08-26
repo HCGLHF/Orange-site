@@ -11,7 +11,7 @@ export type LegalPageContent = {
 };
 
 export const PRIVACY_CONTENT = {
-  effectiveDate: "August 3, 2026",
+  effectiveDate: "August 25, 2026",
   introduction:
     "This policy explains how O'range Textile handles inquiry information and uses privacy-conscious website measurement.",
   sections: [
@@ -34,6 +34,13 @@ export const PRIVACY_CONTENT = {
       title: "Browser storage",
       paragraphs: [
         "The website stores your Analytics choice in a dedicated versioned localStorage record. Existing inquiry functionality separately stores a copy of submitted inquiry details in your browser until that browser storage is cleared and sends inquiry details to Formspree and, when configured, Notion and the business email workflow. Analytics code does not read those inquiry records.",
+      ],
+    },
+    {
+      id: "essential-security-logs",
+      title: "Essential security and server logs",
+      paragraphs: [
+        "When you visit the website, our hosting and security provider may process your IP address, request date and time, User-Agent, requested path, response status, referrer where available, and related security signals. This processing continues if you decline Analytics cookies or have not made a choice. We use this information only to deliver and protect the website, identify automated or abusive traffic, investigate security incidents, and diagnose availability or technical problems. We do not use these logs for advertising or cross-site profiling. We do not add IP addresses to Google Analytics event data. When your browser connects to Google Analytics, Google uses the source IP at collection time to derive location information and states that it discards the IP before Analytics data is logged. Full IP addresses used for our own security analysis remain within Vercel's hosting and security layer; O'range Textile does not create a separate application IP database. Security logs available to us are retained for no more than 30 days, or for a shorter period when required by platform availability.",
       ],
     },
     {
@@ -61,21 +68,21 @@ export const PRIVACY_CONTENT = {
       id: "providers-and-international-processing",
       title: "Providers and international processing",
       paragraphs: [
-        "Google provides GA4 and Google Tag Manager. Formspree receives website inquiry submissions, and Notion may receive them when that integration is configured. These providers may process information in countries outside your location under their own terms and privacy arrangements.",
+        "Vercel hosts and protects the website and may process the essential security and server-log information described above. Google provides GA4 and Google Tag Manager. Formspree receives website inquiry submissions, and Notion may receive them when that integration is configured. These providers may process information in countries outside your location under their own terms and privacy arrangements.",
       ],
     },
     {
       id: "retention",
       title: "Retention",
       paragraphs: [
-        "GA4 event-level data retention is set to two months. Inquiry information is retained only for as long as reasonably required to respond, keep business records and meet applicable obligations; O'range Textile has not represented a more specific public retention schedule.",
+        "Security logs available to us are retained for no more than 30 days, or for a shorter period when required by platform availability. GA4 event-level data retention is set to two months. Inquiry information is retained only for as long as reasonably required to respond, keep business records and meet applicable obligations; O'range Textile has not represented a more specific public retention schedule.",
       ],
     },
     {
       id: "your-choices-and-requests",
       title: "Your choices and requests",
       paragraphs: [
-        "You can reopen the choice bar at any time through Privacy settings in the footer. Declining withdraws permission for Analytics cookies but retains the limited cookieless measurement described above.",
+        "You can reopen the choice bar at any time through Privacy settings in the footer. Declining withdraws permission for Analytics cookies but retains the limited cookieless measurement described above. Declining Analytics cookies or not making a choice does not stop necessary security logging described in this policy.",
         "You may contact Shaoxing Shicheng Textile Products Co., Ltd. to request access to, or correction of, inquiry information you have provided, or to raise a privacy complaint. Email folenchen0401@outlook.com with enough information for us to identify the relevant inquiry and understand your request. We will consider and respond to it in line with applicable requirements.",
       ],
     },

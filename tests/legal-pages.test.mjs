@@ -13,6 +13,7 @@ const privacyTitles = [
   "Who we are",
   "Information you provide",
   "Browser storage",
+  "Essential security and server logs",
   "Analytics by default",
   "Accepting Analytics cookies",
   "What Analytics receives",
@@ -47,7 +48,7 @@ test("typed legal content contains every reviewed section and required disclosur
     TERMS_CONTENT.sections.map((section) => section.title),
     termsTitles
   );
-  assert.equal(PRIVACY_CONTENT.effectiveDate, "August 3, 2026");
+  assert.equal(PRIVACY_CONTENT.effectiveDate, "August 25, 2026");
   assert.equal(TERMS_CONTENT.effectiveDate, "August 3, 2026");
 
   const privacy = PRIVACY_CONTENT.sections.flatMap((section) => section.paragraphs).join("\n");
@@ -71,6 +72,22 @@ test("typed legal content contains every reviewed section and required disclosur
     "Privacy settings",
     "folenchen0401@outlook.com",
     "We do not describe this processing as anonymous.",
+    "IP address",
+    "request date and time",
+    "User-Agent",
+    "requested path",
+    "response status",
+    "referrer where available",
+    "related security signals",
+    "decline Analytics cookies or have not made a choice",
+    "Vercel",
+    "advertising or cross-site profiling",
+    "We do not add IP addresses to Google Analytics event data.",
+    "uses the source IP at collection time",
+    "discards the IP before Analytics data is logged",
+    "does not create a separate application IP database",
+    "no more than 30 days",
+    "does not stop necessary security logging",
     "request access",
     "correction",
     "privacy complaint",
