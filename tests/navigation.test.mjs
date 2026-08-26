@@ -19,6 +19,10 @@ const navbarUrl = new URL(
   "../components/ui/Navbar.tsx",
   import.meta.url
 );
+const requestQuoteButtonUrl = new URL(
+  "../components/RequestQuoteButton.tsx",
+  import.meta.url
+);
 const bottomNavigationUrl = new URL(
   "../components/ui/BottomNav.tsx",
   import.meta.url
@@ -486,6 +490,10 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
     source,
     /import\s*\{\s*MobileNavigationDrawer\s*\}\s*from\s*["']@\/components\/ui\/MobileNavigationDrawer["']/
   );
+  assert.match(
+    source,
+    /import\s*\{\s*RequestQuoteButton\s*\}\s*from\s*["']@\/components\/RequestQuoteButton["']/
+  );
   assert.match(source, /<DesktopNavigation\s+pathname=\{pathname\}\s*\/>/);
   assert.match(
     source,
@@ -497,8 +505,13 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
   );
   assert.equal(
     [...source.matchAll(/href=\{INQUIRY_HREF\}/g)].length,
-    3,
-    "desktop cart/CTA and mobile Quote must use shared inquiry hrefs"
+    1,
+    "only the cart must retain the shared inquiry navigation href"
+  );
+  assert.equal(
+    [...source.matchAll(/<RequestQuoteButton\b/g)].length,
+    2,
+    "desktop and compact quote CTAs must use the shared button behavior"
   );
   assert.doesNotMatch(source, /["']\/fabrics#inquiry-form["']/);
   assert.doesNotMatch(source, /const\s+navItems\s*=/);
@@ -742,11 +755,26 @@ const assertMobileDrawerStructure = (source, primaryNavigation) => {
   assert.match(source, /\{\s*totalCount\s*\}/);
   assert.match(source, />\s*Request a Quote\s*</);
   assert.match(source, />\s*Inquiry cart\s*</);
-  assert.match(source, /onClick=\{\s*onRouteSelect\s*\}/);
+  assert.match(source, /onBeforeOpen=\{\s*onRouteSelect\s*\}/);
   assert.match(source, /const\s+onRouteSelect\s*=\s*\(\s*\)\s*=>\s*\{\s*onClose\s*\(\s*\)/);
   assert.match(source, /\bborder-l-4\b/);
   assert.match(source, /aria-current=\{/);
 };
+
+test("request quote button routes empty and populated carts without a dead link", async () => {
+  const source = await readFile(requestQuoteButtonUrl, "utf8");
+
+  assert.match(source, /["']use client["']/);
+  assert.match(source, /useInquiryCart\s*\(\s*\)/);
+  assert.match(source, /useInquiry\s*\(\s*\)/);
+  assert.match(source, /OPEN_BATCH_INQUIRY_EVENT/);
+  assert.match(source, /onBeforeOpen\?\.\(\s*\)/);
+  assert.match(source, /if\s*\(\s*totalCount\s*>\s*0\s*\)/);
+  assert.match(source, /window\.dispatchEvent\s*\(\s*new Event\s*\(\s*OPEN_BATCH_INQUIRY_EVENT\s*\)\s*\)/);
+  assert.match(source, /openInquiry\s*\(\s*\)/);
+  assert.match(source, /<button\b[^>]*type=["']button["']/);
+  assert.doesNotMatch(source, /<Link\b|<a\b/);
+});
 
 const assertMobileDrawerFocusContract = (source) => {
   assert.match(source, /closeButtonRef/);

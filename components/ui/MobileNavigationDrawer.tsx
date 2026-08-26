@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { MouseEvent, RefObject } from "react";
 import Link from "next/link";
 import { ChevronDown, ShoppingCart, X } from "lucide-react";
+import { RequestQuoteButton } from "@/components/RequestQuoteButton";
 import {
   PRIMARY_NAVIGATION,
   INQUIRY_HREF,
@@ -313,14 +314,12 @@ export function MobileNavigationDrawer({
                 </span>
               ) : null}
             </Link>
-            <Link
-              href={INQUIRY_HREF}
-              prefetch={false}
-              onClick={onRouteSelect}
+            <RequestQuoteButton
+              onBeforeOpen={onRouteSelect}
               className="flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-orange px-4 py-3 text-center text-base font-bold text-white outline-none transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"
             >
               Request a Quote
-            </Link>
+            </RequestQuoteButton>
           </div>
         </nav>
       </div>

@@ -13,6 +13,7 @@ import { Menu, ShoppingCart } from "lucide-react";
 import { useLocale } from "@/components/LocaleProvider";
 import { useInquiryCart } from "@/components/InquiryCartProvider";
 import { OrangeMark } from "@/components/OrangeMark";
+import { RequestQuoteButton } from "@/components/RequestQuoteButton";
 import { DesktopNavigation } from "@/components/ui/DesktopNavigation";
 import { MobileNavigationDrawer } from "@/components/ui/MobileNavigationDrawer";
 import { INQUIRY_HREF } from "@/lib/navigation";
@@ -101,22 +102,14 @@ function NavbarContent() {
                 ) : null}
               </Link>
 
-              <Link
-                href={INQUIRY_HREF}
-                prefetch={false}
-                className="gn-cta"
-              >
+              <RequestQuoteButton className="gn-cta">
                 {t("navCtaInquiry")}
-              </Link>
+              </RequestQuoteButton>
             </div>
 
-            <Link
-              href={INQUIRY_HREF}
-              prefetch={false}
-              className="gn-quote"
-            >
+            <RequestQuoteButton className="gn-quote">
               Quote
-            </Link>
+            </RequestQuoteButton>
           </div>
         </div>
       </nav>
