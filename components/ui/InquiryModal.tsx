@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { CheckCircle2, X } from "lucide-react";
 import { finishedFabricInquiryOptions } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -30,15 +37,44 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submittingRef = useRef(false);
+  const mountedRef = useRef(false);
+  const openRef = useRef(open);
+  const lifecycleVersionRef = useRef(0);
+  openRef.current = open;
 
   const selectedFabric =
     inquiryOptions.find((option) => option.id === fabricId) ?? inquiryOptions[0];
   const fabricLabel = selectedFabric?.name ?? "";
 
+  const handleClose = useCallback(() => {
+    if (submittingRef.current) return;
+    setSubmitted(false);
+    setName("");
+    setEmail("");
+    setCompany("");
+    setPhone("");
+    setNotes("");
+    setFabricId("finished-range");
+    setQuantity("");
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      lifecycleVersionRef.current += 1;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open) lifecycleVersionRef.current += 1;
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -46,7 +82,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [handleClose, open]);
 
   useEffect(() => {
     if (open) {
@@ -82,6 +118,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
     const formData = new FormData(e.currentTarget);
     const honeypot = String(formData.get("website") ?? "").trim();
+    const lifecycleVersion = lifecycleVersionRef.current;
 
     try {
       submittingRef.current = true;
@@ -111,6 +148,13 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
         inquiryId?: unknown;
       } | null;
       if (
+        !mountedRef.current ||
+        !openRef.current ||
+        lifecycleVersionRef.current !== lifecycleVersion
+      ) {
+        return;
+      }
+      if (
         !response.ok ||
         !result ||
         result.success !== true ||
@@ -124,23 +168,17 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       pushGenerateLead("single_inquiry");
       setSubmitted(true);
     } catch {
-      setError(t("inquirySubmitFailed"));
+      if (
+        mountedRef.current &&
+        openRef.current &&
+        lifecycleVersionRef.current === lifecycleVersion
+      ) {
+        setError(t("inquirySubmitFailed"));
+      }
     } finally {
       submittingRef.current = false;
-      setSubmitting(false);
+      if (mountedRef.current) setSubmitting(false);
     }
-  };
-
-  const handleClose = () => {
-    setSubmitted(false);
-    setName("");
-    setEmail("");
-    setCompany("");
-    setPhone("");
-    setNotes("");
-    setFabricId("finished-range");
-    setQuantity("");
-    onClose();
   };
 
   return (
@@ -155,6 +193,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
         className="absolute inset-0 bg-brand-charcoal/40 backdrop-blur-[2px]"
         aria-label={t("inquiryClose")}
         onClick={handleClose}
+        disabled={submitting}
       />
 
       <div
@@ -175,6 +214,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
             onClick={handleClose}
             className="rounded-full p-2 text-brand-charcoal/60 transition-colors hover:bg-brand-soft hover:text-brand-charcoal"
             aria-label={t("inquiryClose")}
+            disabled={submitting}
           >
             <X className="h-5 w-5" />
           </button>
@@ -186,6 +226,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
             <p className="text-base font-medium text-brand-charcoal">Submitted successfully</p>
+            <p className="mt-2 text-sm text-brand-charcoal/70">{t("inquirySuccess")}</p>
             <Button type="button" className="mt-6 w-full" onClick={handleClose}>
               {t("inquiryOk")}
             </Button>
@@ -347,7 +388,13 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
             </div>
 
             <div className="flex gap-3 pt-2">
-              <Button type="button" variant="secondary" className="flex-1" onClick={handleClose}>
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1"
+                onClick={handleClose}
+                disabled={submitting}
+              >
                 {t("inquiryCancel")}
               </Button>
               <Button type="submit" className="flex-1" disabled={submitting}>

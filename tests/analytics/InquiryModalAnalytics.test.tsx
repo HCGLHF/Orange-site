@@ -1,9 +1,10 @@
 import React from "react";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { InquiryModal } from "@/components/ui/InquiryModal";
 import { LocaleProvider } from "@/components/LocaleProvider";
+import { LOCALE_STORAGE_KEY, messages } from "@/lib/i18n";
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
 
@@ -143,6 +144,101 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(await screen.findByText("Submitted successfully")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(window.alert).not.toHaveBeenCalled();
+  });
+
+  it("blocks every user close path while a submission is pending", async () => {
+    const pendingResponse = deferred<Response>();
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockReturnValue(pendingResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const onClose = renderModal();
+    const user = await completeModalInquiry();
+
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+
+    for (const closeButton of screen.getAllByRole("button", { name: "Close" })) {
+      await user.click(closeButton);
+    }
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      pendingResponse.resolve(
+        jsonResponse({ success: true, inquiryId: "inquiry_123" }),
+      );
+      await pendingResponse.promise;
+    });
+  });
+
+  it("ignores a successful pending response after external unmount", async () => {
+    const pendingResponse = deferred<Response>();
+    vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const onClose = vi.fn();
+    const view = render(
+      <LocaleProvider>
+        <InquiryModal open onClose={onClose} />
+      </LocaleProvider>,
+    );
+    const user = await completeModalInquiry();
+
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
+    view.unmount();
+
+    await act(async () => {
+      pendingResponse.resolve(
+        jsonResponse({ success: true, inquiryId: "inquiry_123" }),
+      );
+      await pendingResponse.promise;
+    });
+
+    expect(window.dataLayer).toEqual([]);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("renders the localized success detail for the active locale", async () => {
+    localStorage.setItem(LOCALE_STORAGE_KEY, "zh");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({ success: true, inquiryId: "inquiry_123" }),
+    );
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    renderModal();
+    const user = await completeModalInquiry();
+
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute("lang", "zh"),
+    );
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(await screen.findByText("Submitted successfully")).toBeInTheDocument();
+    expect(screen.getByText(messages.zh.inquirySuccess)).toBeInTheDocument();
+  });
+
+  it("maps a populated website field to the API honeypot field", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({ success: true, inquiryId: "inquiry_123" }),
+    );
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    renderModal();
+    const user = await completeModalInquiry();
+    const honeypot = document.querySelector<HTMLInputElement>('input[name="website"]');
+
+    expect(honeypot).not.toBeNull();
+    fireEvent.change(honeypot!, { target: { value: "bot.example" } });
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    const request = fetchSpy.mock.calls[0][1];
+    expect(JSON.parse(String(request?.body))).toMatchObject({
+      honeypot: "bot.example",
+    });
   });
 
   it("does not push a lead when validation fails", async () => {
