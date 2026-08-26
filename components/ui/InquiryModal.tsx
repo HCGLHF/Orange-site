@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { CheckCircle2, X } from "lucide-react";
 import { finishedFabricInquiryOptions } from "@/lib/data";
-import {
-  appendInquiryRecord,
-  FORMSPREE_INQUIRY_ENDPOINT,
-  type InquiryRecord,
-} from "@/lib/inquiry-storage";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/LocaleProvider";
 import { pushGenerateLead } from "@/lib/analytics/events";
-
-export type { InquiryRecord };
 
 type InquiryModalProps = {
   open: boolean;
@@ -29,11 +22,14 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
+  const [notes, setNotes] = useState("");
   const [fabricId, setFabricId] = useState("finished-range");
   const [quantity, setQuantity] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const submittingRef = useRef(false);
 
   const selectedFabric =
     inquiryOptions.find((option) => option.id === fabricId) ?? inquiryOptions[0];
@@ -66,8 +62,9 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
   if (!open) return null;
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submittingRef.current) return;
     setError(null);
 
     if (!name.trim() || !email.trim()) {
@@ -83,43 +80,53 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       return;
     }
 
-    const entry = appendInquiryRecord({
-      name: name.trim(),
-      email: email.trim(),
-      company: company.trim(),
-      fabric: fabricLabel,
-      quantity: quantity.trim(),
-    });
+    const formData = new FormData(e.currentTarget);
+    const honeypot = String(formData.get("website") ?? "").trim();
 
     try {
+      submittingRef.current = true;
       setSubmitting(true);
-      const response = await fetch(FORMSPREE_INQUIRY_ENDPOINT, {
+      const response = await fetch("/api/inquiry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
-          name: entry.name,
-          email: entry.email,
-          company: entry.company,
-          fabric: entry.fabric,
-          message: entry.quantity,
-          _subject: `[Website inquiry] ${entry.company || entry.name} - ${entry.fabric}`,
+          type: "single",
+          submissionId: crypto.randomUUID(),
+          customer: name.trim(),
+          email: email.trim(),
+          company: company.trim(),
+          phone: phone.trim(),
+          notes: notes.trim(),
+          sourceUrl: typeof window === "undefined" ? "" : window.location.href,
+          honeypot,
+          items: [{ name: fabricLabel, quantity: quantity.trim() }],
         }),
       });
 
-      if (response.ok) {
-        pushGenerateLead("single_inquiry");
-        alert("Submitted successfully. We will contact you shortly.");
-        handleClose();
-      } else {
-        alert("Submission failed. Please email us directly.");
+      const result = (await response.json()) as {
+        success?: unknown;
+        inquiryId?: unknown;
+      } | null;
+      if (
+        !response.ok ||
+        !result ||
+        result.success !== true ||
+        typeof result.inquiryId !== "string" ||
+        !result.inquiryId.trim()
+      ) {
+        setError(t("inquirySubmitFailed"));
+        return;
       }
-    } catch (submitError) {
-      console.error(submitError);
-      alert("Network error. Please try again later.");
+
+      pushGenerateLead("single_inquiry");
+      setSubmitted(true);
+    } catch {
+      setError(t("inquirySubmitFailed"));
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -129,6 +136,8 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
     setName("");
     setEmail("");
     setCompany("");
+    setPhone("");
+    setNotes("");
     setFabricId("finished-range");
     setQuantity("");
     onClose();
@@ -176,13 +185,27 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
             <div className="mb-3 flex justify-center">
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
-            <p className="text-base font-medium text-brand-charcoal">{t("inquirySuccess")}</p>
+            <p className="text-base font-medium text-brand-charcoal">Submitted successfully</p>
             <Button type="button" className="mt-6 w-full" onClick={handleClose}>
               {t("inquiryOk")}
             </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div
+              className="pointer-events-none absolute -left-[10000px] h-px w-px overflow-hidden"
+              aria-hidden="true"
+            >
+              <label htmlFor="inquiry-website">Website</label>
+              <input
+                id="inquiry-website"
+                name="website"
+                type="text"
+                autoComplete="off"
+                tabIndex={-1}
+              />
+            </div>
+
             {error && (
               <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
             )}
@@ -205,6 +228,42 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                   {t("inquiryName")} <span className="text-brand-orange">*</span>
                 </label>
               </div>
+            </div>
+
+            <div>
+              <div className="relative">
+                <input
+                  id="inquiry-phone"
+                  name="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  autoComplete="tel"
+                  placeholder=" "
+                  className="peer w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 pb-2 pt-5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
+                />
+                <label
+                  htmlFor="inquiry-phone"
+                  className="pointer-events-none absolute left-4 top-2 text-xs text-brand-charcoal/70 transition-all duration-200 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-brand-orange"
+                >
+                  {t("inquiryBatchPhone")}
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="inquiry-notes" className="mb-1 block text-sm text-brand-charcoal">
+                {t("inquiryBatchNotes")}
+              </label>
+              <textarea
+                id="inquiry-notes"
+                name="notes"
+                rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={t("inquiryBatchNotesPlaceholder")}
+                className="w-full rounded-2xl border border-gray-200 bg-brand-cream/50 px-4 py-2.5 text-sm text-brand-charcoal outline-none transition-all duration-200 ease-in-out focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/50"
+              />
             </div>
 
             <div>
