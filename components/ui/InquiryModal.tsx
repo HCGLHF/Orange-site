@@ -40,16 +40,29 @@ type SharedInquiryOperation = {
   promise: Promise<InquirySubmissionOutcome>;
 };
 
+type SharedInquiryDraft = {
+  name: string;
+  email: string;
+  company: string;
+  phone: string;
+  notes: string;
+  fabricId: string;
+  quantity: string;
+  website: string;
+};
+
 type SharedInquirySnapshot = {
   status: "idle" | "pending" | "success" | "error";
   submissionId: string | null;
   operation: SharedInquiryOperation | null;
+  draft: SharedInquiryDraft | null;
 };
 
 const idleInquirySnapshot: SharedInquirySnapshot = {
   status: "idle",
   submissionId: null,
   operation: null,
+  draft: null,
 };
 
 let sharedInquirySnapshot = idleInquirySnapshot;
@@ -124,6 +137,7 @@ async function submitInquiryRequest(
 
 function startSharedInquiryOperation(
   payload: Omit<InquirySubmissionPayload, "submissionId">,
+  draft: SharedInquiryDraft,
 ) {
   if (sharedInquirySnapshot.operation) return sharedInquirySnapshot.operation;
 
@@ -144,19 +158,21 @@ function startSharedInquiryOperation(
           status: "success",
           submissionId: null,
           operation: null,
+          draft: null,
         });
       } else {
         setSharedInquirySnapshot({
           status: "error",
           submissionId,
           operation: null,
+          draft,
         });
       }
 
       return outcome;
     });
   operation = { controller, promise };
-  setSharedInquirySnapshot({ status: "pending", submissionId, operation });
+  setSharedInquirySnapshot({ status: "pending", submissionId, operation, draft });
   return operation;
 }
 
@@ -175,13 +191,23 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
     getSharedInquirySnapshot,
     () => idleInquirySnapshot,
   );
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [company, setCompany] = useState("");
-  const [phone, setPhone] = useState("");
-  const [notes, setNotes] = useState("");
-  const [fabricId, setFabricId] = useState("finished-range");
-  const [quantity, setQuantity] = useState("");
+  const mountedWithSharedDraft = useRef(sharedSubmission.draft !== null).current;
+  const [name, setName] = useState(() => sharedSubmission.draft?.name ?? "");
+  const [email, setEmail] = useState(() => sharedSubmission.draft?.email ?? "");
+  const [company, setCompany] = useState(
+    () => sharedSubmission.draft?.company ?? "",
+  );
+  const [phone, setPhone] = useState(() => sharedSubmission.draft?.phone ?? "");
+  const [notes, setNotes] = useState(() => sharedSubmission.draft?.notes ?? "");
+  const [fabricId, setFabricId] = useState(
+    () => sharedSubmission.draft?.fabricId ?? "finished-range",
+  );
+  const [quantity, setQuantity] = useState(
+    () => sharedSubmission.draft?.quantity ?? "",
+  );
+  const [website, setWebsite] = useState(
+    () => sharedSubmission.draft?.website ?? "",
+  );
   const [error, setError] = useState<string | null>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const submitting = sharedSubmission.status === "pending";
@@ -204,6 +230,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
     setNotes("");
     setFabricId("finished-range");
     setQuantity("");
+    setWebsite("");
     onClose();
   }, [onClose]);
 
@@ -227,13 +254,15 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
   useEffect(() => {
     if (open) {
       setError(null);
-      setFabricId(
-        initialFabricId && inquiryOptions.some((option) => option.id === initialFabricId)
-          ? initialFabricId
-          : "finished-range"
-      );
+      if (!mountedWithSharedDraft) {
+        setFabricId(
+          initialFabricId && inquiryOptions.some((option) => option.id === initialFabricId)
+            ? initialFabricId
+            : "finished-range"
+        );
+      }
     }
-  }, [initialFabricId, inquiryOptions, open]);
+  }, [initialFabricId, inquiryOptions, mountedWithSharedDraft, open]);
 
   if (!open) return null;
 
@@ -255,19 +284,30 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       return;
     }
 
-    const formData = new FormData(e.currentTarget);
-    const honeypot = String(formData.get("website") ?? "").trim();
-    startSharedInquiryOperation({
-      type: "single",
-      customer: name.trim(),
-      email: email.trim(),
-      company: company.trim(),
-      phone: phone.trim(),
-      notes: notes.trim(),
-      sourceUrl: typeof window === "undefined" ? "" : window.location.href,
-      honeypot,
-      items: [{ name: fabricLabel, quantity: quantity.trim() }],
-    });
+    const draft: SharedInquiryDraft = {
+      name,
+      email,
+      company,
+      phone,
+      notes,
+      fabricId,
+      quantity,
+      website,
+    };
+    startSharedInquiryOperation(
+      {
+        type: "single",
+        customer: name.trim(),
+        email: email.trim(),
+        company: company.trim(),
+        phone: phone.trim(),
+        notes: notes.trim(),
+        sourceUrl: typeof window === "undefined" ? "" : window.location.href,
+        honeypot: website.trim(),
+        items: [{ name: fabricLabel, quantity: quantity.trim() }],
+      },
+      draft,
+    );
   };
 
   return (
@@ -338,6 +378,8 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                 id="inquiry-website"
                 name="website"
                 type="text"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
                 autoComplete="off"
                 tabIndex={-1}
               />

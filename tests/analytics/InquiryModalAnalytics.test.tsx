@@ -242,6 +242,109 @@ describe("InquiryModal server submission and conversion analytics", () => {
     await remountedUser.click(screen.getByRole("button", { name: "OK" }));
   });
 
+  it("restores a remounted failed draft and retries its edited values with the same ID", async () => {
+    const originalResponse = deferred<Response>();
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockReturnValueOnce(originalResponse.promise)
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      );
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValue(SUBMISSION_ID);
+    const firstView = render(
+      <LocaleProvider>
+        <InquiryModal open onClose={vi.fn()} />
+      </LocaleProvider>,
+    );
+    const firstUser = await completeModalInquiry();
+    await firstUser.selectOptions(
+      screen.getByLabelText(/^Fabric of interest/),
+      "french-terry",
+    );
+    const firstHoneypot = document.querySelector<HTMLInputElement>(
+      'input[name="website"]',
+    );
+    fireEvent.change(firstHoneypot!, { target: { value: "draft.example" } });
+
+    await firstUser.click(screen.getByRole("button", { name: "Submit" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    firstView.unmount();
+
+    const remountedView = render(
+      <LocaleProvider>
+        <InquiryModal open onClose={vi.fn()} />
+      </LocaleProvider>,
+    );
+    const retryUser = userEvent.setup();
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
+    await retryUser.clear(screen.getByLabelText(/^Notes/));
+    await retryUser.type(
+      screen.getByLabelText(/^Notes/),
+      "Updated after remount",
+    );
+
+    await act(async () => {
+      originalResponse.resolve(
+        jsonResponse({ success: false }, { ok: false }),
+      );
+      await originalResponse.promise;
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
+    expect(screen.getByLabelText(/^Email/)).toHaveValue("buyer@example.com");
+    expect(screen.getByLabelText(/^Company/)).toHaveValue("Private Company");
+    expect(screen.getByLabelText(/^Phone/)).toHaveValue("+61 400 123 456");
+    expect(screen.getByLabelText(/^Notes/)).toHaveValue("Updated after remount");
+    expect(screen.getByLabelText(/^Fabric of interest/)).toHaveValue(
+      "french-terry",
+    );
+    expect(screen.getByLabelText(/^Quantity needed/)).toHaveValue(
+      "500 kg confidential",
+    );
+    expect(
+      document.querySelector<HTMLInputElement>('input[name="website"]'),
+    ).toHaveValue("draft.example");
+
+    await retryUser.click(screen.getByRole("button", { name: "Submit" }));
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(retryBody).toMatchObject({
+      submissionId: firstBody.submissionId,
+      customer: "Buyer Name",
+      email: "buyer@example.com",
+      company: "Private Company",
+      phone: "+61 400 123 456",
+      notes: "Updated after remount",
+      honeypot: "draft.example",
+      items: [{ name: "French terry fabric", quantity: "500 kg confidential" }],
+    });
+    expect(retryBody.submissionId).toBe(SUBMISSION_ID);
+    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "single_inquiry" },
+    ]);
+
+    await retryUser.click(screen.getByRole("button", { name: "OK" }));
+    remountedView.unmount();
+    renderModal();
+    expect(screen.getByLabelText(/^Name/)).toHaveValue("");
+    expect(screen.getByLabelText(/^Email/)).toHaveValue("");
+    expect(screen.getByLabelText(/^Fabric of interest/)).toHaveValue(
+      "finished-range",
+    );
+    expect(
+      document.querySelector<HTMLInputElement>('input[name="website"]'),
+    ).toHaveValue("");
+  });
+
   it("keeps a zero-subscriber success through StrictMode remounts until explicit reset", async () => {
     const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
     const pendingResponse = deferred<Response>();
@@ -354,7 +457,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
 
     renderModal();
     expect(screen.getByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
-    const retryUser = await completeModalInquiry();
+    expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
+    const retryUser = userEvent.setup();
     await retryUser.click(screen.getByRole("button", { name: "Submit" }));
 
     expect(await screen.findByRole("status")).toHaveTextContent(
