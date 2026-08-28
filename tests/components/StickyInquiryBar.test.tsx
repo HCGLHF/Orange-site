@@ -30,6 +30,12 @@ function StickyHarness({ withAnchor }: { withAnchor: boolean }) {
       <button type="button" onClick={() => addItem(testFabric)}>
         Add sticky fabric
       </button>
+      <button
+        type="button"
+        data-inquiry-fallback-opener="compact"
+      >
+        Persistent Navbar fallback
+      </button>
       {withAnchor ? <FabricsInquiryAnchor /> : null}
       <StickyInquiryBar />
       <InquiryBar />
@@ -102,5 +108,48 @@ describe("StickyInquiryBar batch opener", () => {
     fireEvent.click(within(dialog).getAllByRole("button", { name: "Close" })[1]);
     expect(screen.queryByRole("dialog", { name: "Batch inquiry" })).not.toBeInTheDocument();
     expect(stickyTrigger).toHaveFocus();
+  });
+
+  it("rejects a connected sticky trigger hidden by opacity and pointer events", () => {
+    vi.stubGlobal("scrollY", 400);
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
+    render(
+      <LocaleProvider>
+        <InquiryCartProvider>
+          <StickyHarness withAnchor={false} />
+        </InquiryCartProvider>
+      </LocaleProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add sticky fabric" }));
+    fireEvent.scroll(window);
+    const stickyTrigger = screen.getByRole("button", {
+      name: /1 pending inquiry/i,
+    });
+    fireEvent.click(stickyTrigger);
+    fireEvent.click(screen.getByRole("button", { name: "Fill inquiry form" }));
+
+    const stickyContainer = stickyTrigger.parentElement;
+    expect(stickyContainer).not.toBeNull();
+    if (stickyContainer) {
+      stickyContainer.style.opacity = "0";
+      stickyContainer.style.pointerEvents = "none";
+    }
+
+    const dialog = screen.getByRole("dialog", { name: "Batch inquiry" });
+    fireEvent.click(within(dialog).getAllByRole("button", { name: "Close" })[1]);
+
+    expect(stickyTrigger.isConnected).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Persistent Navbar fallback" }),
+    ).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
   });
 });

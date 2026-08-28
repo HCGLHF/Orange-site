@@ -18,6 +18,7 @@ import {
 import {
   getOpenBatchInquiryOpeners,
   OPEN_BATCH_INQUIRY_EVENT,
+  restoreInquiryFocus,
 } from "@/lib/inquiry-events";
 import { pushGenerateLead } from "@/lib/analytics/events";
 
@@ -314,12 +315,7 @@ export function InquiryBar({
     const fallbackOpener = fallbackOpenerRef.current;
     openerRef.current = null;
     fallbackOpenerRef.current = null;
-    const focusTarget = opener?.isConnected
-      ? opener
-      : fallbackOpener?.isConnected
-        ? fallbackOpener
-        : null;
-    focusTarget?.focus();
+    restoreInquiryFocus(opener, fallbackOpener);
   }, []);
 
   const closeForm = useCallback(() => {

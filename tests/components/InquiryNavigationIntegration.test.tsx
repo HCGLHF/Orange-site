@@ -27,6 +27,8 @@ const testFabric: Fabric = {
   stockStatus: "In stock",
 };
 
+let desktopViewport = false;
+
 function RouteWithoutLocalInquiryBar() {
   const { addItem } = useInquiryCart();
 
@@ -78,6 +80,7 @@ function singleDialogControls() {
 
 describe("global inquiry navigation", () => {
   beforeEach(() => {
+    desktopViewport = false;
     vi.stubGlobal("React", React);
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
       callback(0);
@@ -86,11 +89,13 @@ describe("global inquiry navigation", () => {
     vi.stubGlobal("cancelAnimationFrame", vi.fn());
     vi.stubGlobal(
       "matchMedia",
-      vi.fn().mockReturnValue({
-        matches: false,
+      vi.fn().mockImplementation((query: string) => ({
+        get matches() {
+          return query === "(min-width: 1280px)" && desktopViewport;
+        },
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
-      }),
+      })),
     );
   });
 
@@ -245,52 +250,69 @@ describe("global inquiry navigation", () => {
     expect(menuTrigger).toHaveFocus();
   });
 
-  it("restores sticky success focus to a persistent visible Navbar control after the cart clears", async () => {
-    const user = userEvent.setup();
-    vi.stubGlobal("scrollY", 400);
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue(
-        jsonResponse({ success: true, inquiryId: "sticky-success" }),
-      ),
-    );
-    renderGlobalInquiryRoute();
+  it.each([
+    ["desktop to compact", true, false],
+    ["compact to desktop", false, true],
+  ])(
+    "restores sticky success focus to the current Navbar fallback after resizing %s",
+    async (_label, initialDesktop, finalDesktop) => {
+      const user = userEvent.setup();
+      desktopViewport = initialDesktop;
+      vi.stubGlobal("scrollY", 400);
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          jsonResponse({ success: true, inquiryId: "sticky-success" }),
+        ),
+      );
+      renderGlobalInquiryRoute();
 
-    await user.click(screen.getByRole("button", { name: "Add test fabric" }));
-    fireEvent.scroll(window);
-    const stickyTrigger = await screen.findByRole("button", {
-      name: /1 pending inquiry/i,
-    });
-    await user.click(stickyTrigger);
-    await user.click(screen.getByRole("button", { name: "Fill inquiry form" }));
-    await screen.findByRole("dialog", { name: "Batch inquiry" });
+      await user.click(screen.getByRole("button", { name: "Add test fabric" }));
+      fireEvent.scroll(window);
+      const stickyTrigger = await screen.findByRole("button", {
+        name: /1 pending inquiry/i,
+      });
+      await user.click(stickyTrigger);
+      await user.click(
+        screen.getByRole("button", { name: "Fill inquiry form" }),
+      );
+      await screen.findByRole("dialog", { name: "Batch inquiry" });
 
-    await user.type(screen.getByPlaceholderText("Your full name"), "Buyer Name");
-    await user.type(screen.getByPlaceholderText("+1 or +86"), "+61 400 000 000");
-    await user.type(
-      screen.getByPlaceholderText("example@company.com"),
-      "buyer@example.com",
-    );
-    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+      await user.type(
+        screen.getByPlaceholderText("Your full name"),
+        "Buyer Name",
+      );
+      await user.type(
+        screen.getByPlaceholderText("+1 or +86"),
+        "+61 400 000 000",
+      );
+      await user.type(
+        screen.getByPlaceholderText("example@company.com"),
+        "buyer@example.com",
+      );
+      await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
 
-    const success = await screen.findByRole("status");
-    expect(success).toHaveTextContent("Submitted");
-    await waitFor(() => expect(stickyTrigger.isConnected).toBe(false));
+      const success = await screen.findByRole("status");
+      expect(success).toHaveTextContent("Submitted");
+      await waitFor(() => expect(stickyTrigger.isConnected).toBe(false));
 
-    const persistentFallback = screen.getByRole("button", {
-      name: "Open navigation menu",
-    });
-    expect(persistentFallback).toHaveAttribute(
-      "data-inquiry-fallback-opener",
-      "compact",
-    );
-    await user.click(screen.getByRole("button", { name: "OK" }));
-    await waitFor(() => {
-      expect(
-        screen.queryByRole("dialog", { name: "Batch inquiry" }),
-      ).not.toBeInTheDocument();
-    });
-    expect(persistentFallback).toHaveFocus();
-    expect(document.body).not.toHaveFocus();
-  });
+      desktopViewport = finalDesktop;
+      fireEvent.resize(window);
+      const persistentFallback = finalDesktop
+        ? screen.getByRole("link", { name: "Inquiry cart: 0 items" })
+        : screen.getByRole("button", { name: "Open navigation menu" });
+      expect(persistentFallback).toHaveAttribute(
+        "data-inquiry-fallback-opener",
+        finalDesktop ? "desktop" : "compact",
+      );
+      await user.click(screen.getByRole("button", { name: "OK" }));
+      await waitFor(() => {
+        expect(
+          screen.queryByRole("dialog", { name: "Batch inquiry" }),
+        ).not.toBeInTheDocument();
+      });
+      expect(persistentFallback).toHaveFocus();
+      expect(document.body).not.toHaveFocus();
+    },
+  );
 });

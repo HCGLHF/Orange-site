@@ -9,19 +9,10 @@ import {
   X,
 } from "lucide-react";
 import { useInquiryCart } from "@/components/InquiryCartProvider";
-import { dispatchOpenBatchInquiry } from "@/lib/inquiry-events";
-
-function getPersistentFallbackOpener(): HTMLElement | null {
-  const viewport =
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(min-width: 1280px)").matches
-      ? "desktop"
-      : "compact";
-  const candidate = document.querySelector<HTMLElement>(
-    `[data-inquiry-fallback-opener="${viewport}"]`,
-  );
-  return candidate?.isConnected ? candidate : null;
-}
+import {
+  dispatchOpenBatchInquiry,
+  getCurrentInquiryFallbackOpener,
+} from "@/lib/inquiry-events";
 
 export default function StickyInquiryBar() {
   const { items, totalCount, removeItem } = useInquiryCart();
@@ -67,7 +58,7 @@ export default function StickyInquiryBar() {
     const stableOpener = stickyTriggerRef.current?.isConnected
       ? stickyTriggerRef.current
       : null;
-    const stableFallbackOpener = getPersistentFallbackOpener();
+    const stableFallbackOpener = getCurrentInquiryFallbackOpener();
     const dispatchOpen = () => {
       dispatchOpenBatchInquiry(
         stableOpener?.isConnected ? stableOpener : undefined,

@@ -136,17 +136,19 @@ afterEach(async () => {
 });
 
 describe("DeferredInquiryBarHost", () => {
-  it("recovers from failed lazy loads without losing the latest opener or listener handoff", async () => {
+  it("owns focus through cancellation, repeated failures, retries, and a future successful event in StrictMode", async () => {
     const user = userEvent.setup();
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const addListenerSpy = vi.spyOn(window, "addEventListener");
     const removeListenerSpy = vi.spyOn(window, "removeEventListener");
     const view = render(
-      <LocaleProvider>
-        <InquiryCartProvider>
-          <DeferredHostHarness />
-        </InquiryCartProvider>
-      </LocaleProvider>,
+      <React.StrictMode>
+        <LocaleProvider>
+          <InquiryCartProvider>
+            <DeferredHostHarness />
+          </InquiryCartProvider>
+        </LocaleProvider>
+      </React.StrictMode>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Add deferred fabric" }));
     const firstOpener = screen.getByRole("button", { name: "First stable opener" });
@@ -155,20 +157,43 @@ describe("DeferredInquiryBarHost", () => {
     expect(lazyImports.attempts).toHaveLength(1);
     firstOpener.focus();
     act(() => dispatchOpenBatchInquiry(firstOpener));
-    expect(await screen.findByRole("status")).toHaveTextContent("Loading inquiry form");
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Loading inquiry form",
+    );
+    const firstLoadingTarget = screen.getByRole("document");
+    const firstCancel = screen.getByRole("button", { name: "Cancel" });
+    expect(firstLoadingTarget).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
+
+    await user.tab();
+    expect(firstCancel).toHaveFocus();
+    await user.tab();
+    expect(firstCancel).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(firstCancel).toHaveFocus();
+
+    await user.click(firstCancel);
+    await waitFor(() => {
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
+    expect(firstOpener).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
 
     await act(async () => {
-      lazyImports.attempts[0].reject(new Error("first chunk failure"));
-      await Promise.resolve();
+      lazyImports.attempts[0].resolve();
+      await lazyImports.attempts[0].gate;
     });
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "The inquiry form could not load",
-    );
+    expect(
+      screen.queryByRole("dialog", { name: "Batch inquiry" }),
+    ).not.toBeInTheDocument();
 
     secondOpener.focus();
     act(() => dispatchOpenBatchInquiry(secondOpener));
     await waitFor(() => expect(lazyImports.attempts).toHaveLength(2));
-    expect(await screen.findByRole("status")).toHaveTextContent("Loading inquiry form");
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Loading inquiry form",
+    );
+    expect(screen.getByRole("document")).toHaveFocus();
 
     await act(async () => {
       lazyImports.attempts[1].reject(new Error("second chunk failure"));
@@ -177,29 +202,68 @@ describe("DeferredInquiryBarHost", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The inquiry form could not load",
     );
+    let retryButton = screen.getByRole("button", { name: "Retry" });
+    const errorCancel = screen.getByRole("button", { name: "Cancel" });
+    expect(retryButton).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
 
-    await user.click(screen.getByRole("button", { name: "Retry" }));
+    await user.tab();
+    expect(errorCancel).toHaveFocus();
+    await user.tab();
+    expect(retryButton).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(errorCancel).toHaveFocus();
+
+    await user.click(retryButton);
     await waitFor(() => expect(lazyImports.attempts).toHaveLength(3));
-    expect(await screen.findByRole("status")).toHaveTextContent("Loading inquiry form");
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Loading inquiry form",
+    );
+    expect(screen.getByRole("document")).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
 
     await act(async () => {
-      lazyImports.attempts[2].resolve();
-      await lazyImports.attempts[2].gate;
+      lazyImports.attempts[2].reject(new Error("third chunk failure"));
+      await Promise.resolve();
     });
-    expect(await screen.findByRole("dialog", { name: "Batch inquiry" })).toBeInTheDocument();
-    expect(screen.getAllByRole("dialog", { name: "Batch inquiry" })).toHaveLength(1);
+    retryButton = await screen.findByRole("button", { name: "Retry" });
+    expect(retryButton).toHaveFocus();
 
-    closeBatchDialog();
+    await user.click(retryButton);
+    await waitFor(() => expect(lazyImports.attempts).toHaveLength(4));
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Loading inquiry form",
+    );
+    expect(screen.getByRole("document")).toHaveFocus();
+
+    await act(async () => {
+      lazyImports.attempts[3].reject(new Error("fourth chunk failure"));
+      await Promise.resolve();
+    });
+    retryButton = await screen.findByRole("button", { name: "Retry" });
+    expect(retryButton).toHaveFocus();
+
+    await user.keyboard("{Escape}");
     await waitFor(() => {
-      expect(screen.queryByRole("dialog", { name: "Batch inquiry" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
     expect(secondOpener).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
 
     firstOpener.focus();
     act(() => dispatchOpenBatchInquiry(firstOpener));
+    await waitFor(() => expect(lazyImports.attempts).toHaveLength(5));
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Loading inquiry form",
+    );
+    expect(screen.getByRole("document")).toHaveFocus();
+
+    await act(async () => {
+      lazyImports.attempts[4].resolve();
+      await lazyImports.attempts[4].gate;
+    });
     expect(await screen.findByRole("dialog", { name: "Batch inquiry" })).toBeInTheDocument();
     expect(screen.getAllByRole("dialog", { name: "Batch inquiry" })).toHaveLength(1);
-    expect(lazyImports.attempts).toHaveLength(3);
     closeBatchDialog();
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "Batch inquiry" })).not.toBeInTheDocument();
