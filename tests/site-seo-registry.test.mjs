@@ -3,9 +3,14 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const moduleUrl = new URL("../lib/seo/site-seo.ts", import.meta.url);
+const legalContentModuleUrl = new URL("../lib/legal-content.ts", import.meta.url);
 const loadSeo = async () => {
   assert.ok(existsSync(moduleUrl), "lib/seo/site-seo.ts must exist");
   return import(moduleUrl.href);
+};
+const loadLegalContent = async () => {
+  assert.ok(existsSync(legalContentModuleUrl), "lib/legal-content.ts must exist");
+  return import(legalContentModuleUrl.href);
 };
 
 const allowedIntents = new Set([
@@ -41,8 +46,18 @@ test("SEO registry owns exactly 35 normalized public pages", async () => {
 
 test("privacy and terms pages own exact navigational legal records", async () => {
   const { getPublicPageSeo } = await loadSeo();
+  const { PRIVACY_CONTENT, TERMS_CONTENT } = await loadLegalContent();
+  const visibleLegalDate = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
-  assert.deepEqual(getPublicPageSeo("/privacy"), {
+  const privacySeo = getPublicPageSeo("/privacy");
+  const termsSeo = getPublicPageSeo("/terms");
+
+  assert.deepEqual(privacySeo, {
     path: "/privacy",
     primaryKeyword: "O'range Textile privacy policy",
     secondaryKeywords: [
@@ -56,12 +71,12 @@ test("privacy and terms pages own exact navigational legal records", async () =>
     metaDescription:
       "O'range Textile privacy policy explains how Shaoxing Shicheng Textile Products Co., Ltd. handles buyer inquiries, browser storage, GA4 cookieless measurement, optional analytics cookies, service providers, retention, choices and privacy contact requests.",
     h1: "O'range Textile Privacy Policy",
-    updatedAt: "2026-08-03",
+    updatedAt: "2026-08-28",
     changeFrequency: "monthly",
     priority: 0.2,
   });
 
-  assert.deepEqual(getPublicPageSeo("/terms"), {
+  assert.deepEqual(termsSeo, {
     path: "/terms",
     primaryKeyword: "O'range Textile terms of service",
     secondaryKeywords: [
@@ -75,10 +90,19 @@ test("privacy and terms pages own exact navigational legal records", async () =>
     metaDescription:
       "O'range Textile terms of service explain permitted website use, informational fabric content, inquiry status, specification and availability confirmation, intellectual property, external services, disclaimers, liability limits and contact.",
     h1: "O'range Textile Terms of Service",
-    updatedAt: "2026-08-03",
+    updatedAt: "2026-08-28",
     changeFrequency: "monthly",
     priority: 0.2,
   });
+
+  assert.equal(
+    visibleLegalDate.format(new Date(`${privacySeo.updatedAt}T00:00:00Z`)),
+    PRIVACY_CONTENT.effectiveDate
+  );
+  assert.equal(
+    visibleLegalDate.format(new Date(`${termsSeo.updatedAt}T00:00:00Z`)),
+    TERMS_CONTENT.effectiveDate
+  );
 });
 
 test("homepage owns the commercial finished knit fabric supplier query", async () => {

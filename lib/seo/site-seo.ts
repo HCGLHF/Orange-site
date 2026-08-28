@@ -84,7 +84,7 @@ const publicPageSeo = [
     metaDescription:
       "O'range Textile privacy policy explains how Shaoxing Shicheng Textile Products Co., Ltd. handles buyer inquiries, browser storage, GA4 cookieless measurement, optional analytics cookies, service providers, retention, choices and privacy contact requests.",
     h1: "O'range Textile Privacy Policy",
-    updatedAt: "2026-08-03",
+    updatedAt: "2026-08-28",
     changeFrequency: "monthly",
     priority: 0.2,
   },
@@ -102,7 +102,7 @@ const publicPageSeo = [
     metaDescription:
       "O'range Textile terms of service explain permitted website use, informational fabric content, inquiry status, specification and availability confirmation, intellectual property, external services, disclaimers, liability limits and contact.",
     h1: "O'range Textile Terms of Service",
-    updatedAt: "2026-08-03",
+    updatedAt: "2026-08-28",
     changeFrequency: "monthly",
     priority: 0.2,
   },
