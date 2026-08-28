@@ -40,9 +40,10 @@ describe("inquiry email transport", () => {
         replyTo: "buyer@example.com",
         subject: "[Website inquiry] Buyer Co | Cotton Jersey",
       }),
-      {
+      expect.objectContaining({
         idempotencyKey: "inquiry-inq_1234567890abcdef",
-      },
+        signal: expect.any(AbortSignal),
+      }),
     );
   });
 
@@ -105,6 +106,142 @@ describe("inquiry email transport", () => {
       /^Inquiry delivery failed\.$/,
     );
   });
+
+  it("aborts each timed-out attempt and exhausts below the browser deadline", async () => {
+    vi.useFakeTimers();
+    const signals: AbortSignal[] = [];
+    const send = vi.fn(
+      (
+        _message: unknown,
+        options: { idempotencyKey: string; signal: AbortSignal },
+      ) => {
+        if (!options.signal) {
+          return Promise.resolve({
+            data: null,
+            error: {
+              name: "validation_error",
+              statusCode: 400,
+              message: "missing abort signal",
+            },
+          });
+        }
+        signals.push(options.signal);
+        return new Promise<never>(() => {});
+      },
+    );
+    const delivery = expect(
+      sendInquiryEmail(input, { emails: { send } }),
+    ).rejects.toThrowError(/^Inquiry delivery failed\.$/);
+
+    await vi.advanceTimersByTimeAsync(14_999);
+
+    await delivery;
+    expect(send).toHaveBeenCalledTimes(3);
+    expect(signals).toHaveLength(3);
+    expect(signals.every((signal) => signal.aborted)).toBe(true);
+  });
+
+  it.each([
+    ["a rejected network call", new Error("network unavailable")],
+    [
+      "application_error",
+      { name: "application_error", statusCode: null, message: "temporary" },
+    ],
+    [
+      "HTTP 429",
+      { name: "validation_error", statusCode: 429, message: "temporary" },
+    ],
+    [
+      "rate_limit_exceeded",
+      { name: "rate_limit_exceeded", statusCode: 400, message: "temporary" },
+    ],
+    [
+      "HTTP 5xx",
+      { name: "validation_error", statusCode: 503, message: "temporary" },
+    ],
+    [
+      "internal_server_error",
+      { name: "internal_server_error", statusCode: 400, message: "temporary" },
+    ],
+    [
+      "concurrent_idempotent_requests",
+      {
+        name: "concurrent_idempotent_requests",
+        statusCode: 409,
+        message: "temporary",
+      },
+    ],
+  ])("retries %s and returns a later success", async (_label, failure) => {
+    vi.useFakeTimers();
+    const send = vi
+      .fn()
+      .mockImplementationOnce(() =>
+        failure instanceof Error
+          ? Promise.reject(failure)
+          : Promise.resolve({ data: null, error: failure }),
+      )
+      .mockResolvedValueOnce({ data: { id: "email_retry" }, error: null });
+    const delivery = expect(
+      sendInquiryEmail(input, { emails: { send } }),
+    ).resolves.toEqual({ id: "email_retry" });
+
+    await vi.runAllTimersAsync();
+
+    await delivery;
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+
+  it("bounds transient exhaustion and reuses the exact message and key", async () => {
+    vi.useFakeTimers();
+    const send = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        name: "application_error",
+        statusCode: null,
+        message: "temporary provider detail",
+      },
+    });
+    const delivery = expect(
+      sendInquiryEmail(input, { emails: { send } }),
+    ).rejects.toThrowError(/^Inquiry delivery failed\.$/);
+
+    await vi.runAllTimersAsync();
+
+    await delivery;
+    expect(send).toHaveBeenCalledTimes(3);
+    const messages = send.mock.calls.map(([message]) => message);
+    const options = send.mock.calls.map(([, requestOptions]) => requestOptions);
+    expect(messages[1]).toBe(messages[0]);
+    expect(messages[2]).toBe(messages[0]);
+    expect(messages.map((message) => JSON.stringify(message))).toEqual([
+      JSON.stringify(messages[0]),
+      JSON.stringify(messages[0]),
+      JSON.stringify(messages[0]),
+    ]);
+    expect(
+      options.map((requestOptions) => requestOptions.idempotencyKey),
+    ).toEqual([
+      "inquiry-inq_1234567890abcdef",
+      "inquiry-inq_1234567890abcdef",
+      "inquiry-inq_1234567890abcdef",
+    ]);
+    expect(new Set(options.map((requestOptions) => requestOptions.signal)).size).toBe(3);
+  });
+
+  it.each(["validation_error", "invalid_api_key", "invalid_idempotent_request"])(
+    "does not retry permanent %s failures",
+    async (name) => {
+      const send = vi.fn().mockResolvedValue({
+        data: null,
+        error: { name, statusCode: 400, message: "permanent provider detail" },
+      });
+
+      await expect(
+        sendInquiryEmail(input, { emails: { send } }),
+      ).rejects.toThrowError(/^Inquiry delivery failed\.$/);
+      expect(send).toHaveBeenCalledOnce();
+    },
+  );
 
   it("rejects a provider response that has no message ID", async () => {
     const sender = {
