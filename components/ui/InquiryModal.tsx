@@ -483,7 +483,8 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit}>
+            <fieldset disabled={submitting} className="min-w-0 space-y-4 border-0 p-0">
             <div
               className="pointer-events-none absolute -left-[10000px] h-px w-px overflow-hidden"
               aria-hidden="true"
@@ -686,6 +687,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
                 {t("inquirySubmit")}
               </Button>
             </div>
+            </fieldset>
           </form>
         )}
       </div>

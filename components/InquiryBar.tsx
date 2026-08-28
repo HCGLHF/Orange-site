@@ -614,7 +614,11 @@ export function InquiryBar({
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6 p-6">
+              <form onSubmit={handleSubmit}>
+                <fieldset
+                  disabled={submitting}
+                  className="min-w-0 space-y-6 border-0 p-6"
+                >
                 <div
                   className="pointer-events-none absolute -left-[10000px] h-px w-px overflow-hidden"
                   aria-hidden="true"
@@ -821,6 +825,7 @@ export function InquiryBar({
                 <p className="text-center text-xs text-gray-500">
                   {t("inquiryBatchFootnote")}
                 </p>
+                </fieldset>
               </form>
             )}
           </div>

@@ -220,6 +220,16 @@ describe("InquiryBar server submission and conversion analytics", () => {
 
     await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
     expect(submitButton).toBeDisabled();
+    expect(honeypot).toBeDisabled();
+    expect(screen.getByLabelText("Name *")).toBeDisabled();
+    expect(screen.getByLabelText("Company")).toBeDisabled();
+    expect(screen.getByLabelText("Phone *")).toBeDisabled();
+    expect(screen.getByLabelText("Email *")).toBeDisabled();
+    expect(screen.getByLabelText("Notes")).toBeDisabled();
+    quantityInputs.forEach((input) => expect(input).toBeDisabled());
+    screen
+      .getAllByRole("button", { name: "Remove from list" })
+      .forEach((button) => expect(button).toBeDisabled());
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
     expect(window.dataLayer).toEqual([]);
@@ -588,7 +598,7 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
-  it("restores the latest pending draft after a second zero-subscriber failure and rotates the UUID for edits", async () => {
+  it("locks the pending draft, restores it after failure, and rotates the UUID for later edits", async () => {
     const pendingResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
@@ -609,27 +619,19 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
 
     await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
-    const customerInput = screen.getByPlaceholderText("Your full name");
-    const companyInput = screen.getByPlaceholderText("Company name");
-    const phoneInput = screen.getByPlaceholderText("+1 or +86");
-    const emailInput = screen.getByPlaceholderText("example@company.com");
-    const notesInput = screen.getByPlaceholderText(
-      "Special requirements, delivery timeline, target price",
-    );
-    await user.clear(customerInput);
-    await user.type(customerInput, "Latest Buyer");
-    await user.clear(companyInput);
-    await user.type(companyInput, "Latest Company");
-    await user.clear(phoneInput);
-    await user.type(phoneInput, "+61 400 000 001");
-    await user.clear(emailInput);
-    await user.type(emailInput, "latest@example.com");
-    await user.clear(notesInput);
-    await user.type(notesInput, "Latest delivery requirement");
+    expect(screen.getByPlaceholderText("Your full name")).toBeDisabled();
+    expect(screen.getByPlaceholderText("Company name")).toBeDisabled();
+    expect(screen.getByPlaceholderText("+1 or +86")).toBeDisabled();
+    expect(screen.getByPlaceholderText("example@company.com")).toBeDisabled();
+    expect(
+      screen.getByPlaceholderText(
+        "Special requirements, delivery timeline, target price",
+      ),
+    ).toBeDisabled();
     const pendingHoneypot = document.querySelector<HTMLInputElement>(
       'input[name="website"]',
     );
-    fireEvent.change(pendingHoneypot!, { target: { value: "latest-bot.example" } });
+    expect(pendingHoneypot).toBeDisabled();
     await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
 
     await act(async () => {
@@ -642,24 +644,38 @@ describe("InquiryBar server submission and conversion analytics", () => {
 
     await user.click(screen.getByRole("button", { name: "Toggle inquiry bar" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
-    expect(screen.getByPlaceholderText("Your full name")).toHaveValue("Latest Buyer");
-    expect(screen.getByPlaceholderText("Company name")).toHaveValue("Latest Company");
-    expect(screen.getByPlaceholderText("+1 or +86")).toHaveValue(
-      "+61 400 000 001",
+    const restoredCustomerInput = screen.getByPlaceholderText("Your full name");
+    const restoredCompanyInput = screen.getByPlaceholderText("Company name");
+    const restoredPhoneInput = screen.getByPlaceholderText("+1 or +86");
+    const restoredEmailInput = screen.getByPlaceholderText("example@company.com");
+    const restoredNotesInput = screen.getByPlaceholderText(
+      "Special requirements, delivery timeline, target price",
     );
-    expect(screen.getByPlaceholderText("example@company.com")).toHaveValue(
-      "latest@example.com",
+    expect(restoredCustomerInput).toHaveValue("Buyer Name");
+    expect(restoredCompanyInput).toHaveValue("Private Company");
+    expect(restoredPhoneInput).toHaveValue("+86 138 0000 0000");
+    expect(restoredEmailInput).toHaveValue("buyer@example.com");
+    expect(restoredNotesInput).toHaveValue(
+      "Private target price and delivery notes",
     );
-    expect(
-      screen.getByPlaceholderText(
-        "Special requirements, delivery timeline, target price",
-      ),
-    ).toHaveValue("Latest delivery requirement");
     const restoredHoneypot = document.querySelector<HTMLInputElement>(
       'input[name="website"]',
     );
-    expect(restoredHoneypot).toHaveValue("latest-bot.example");
+    expect(restoredHoneypot).toHaveValue("");
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
+
+    await user.clear(restoredCustomerInput);
+    await user.type(restoredCustomerInput, "Latest Buyer");
+    await user.clear(restoredCompanyInput);
+    await user.type(restoredCompanyInput, "Latest Company");
+    await user.clear(restoredPhoneInput);
+    await user.type(restoredPhoneInput, "+61 400 000 001");
+    await user.clear(restoredEmailInput);
+    await user.type(restoredEmailInput, "latest@example.com");
+    await user.clear(restoredNotesInput);
+    await user.type(restoredNotesInput, "Latest delivery requirement");
+    fireEvent.change(restoredHoneypot!, { target: { value: "latest-bot.example" } });
+    expect(restoredHoneypot).toHaveValue("latest-bot.example");
     fireEvent.change(restoredHoneypot!, { target: { value: "" } });
     await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
 

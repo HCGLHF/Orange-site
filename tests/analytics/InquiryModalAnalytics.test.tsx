@@ -82,6 +82,14 @@ describe("InquiryModal server submission and conversion analytics", () => {
 
     await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
     expect(submitButton).toBeDisabled();
+    expect(honeypot).toBeDisabled();
+    expect(screen.getByLabelText("Name *")).toBeDisabled();
+    expect(screen.getByLabelText("Phone")).toBeDisabled();
+    expect(screen.getByLabelText("Notes")).toBeDisabled();
+    expect(screen.getByLabelText("Email *")).toBeDisabled();
+    expect(screen.getByLabelText("Company")).toBeDisabled();
+    expect(screen.getByLabelText("Fabric of interest *")).toBeDisabled();
+    expect(screen.getByLabelText("Quantity needed *")).toBeDisabled();
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
     expect(window.dataLayer).toEqual([]);
     expect(screen.queryByText("Submitted successfully")).not.toBeInTheDocument();
@@ -251,7 +259,7 @@ describe("InquiryModal server submission and conversion analytics", () => {
     await remountedUser.click(screen.getByRole("button", { name: "OK" }));
   });
 
-  it("restores a remounted failed draft and rotates the ID for its edited retry", async () => {
+  it("locks a remounted pending draft and rotates the ID for edits made after failure", async () => {
     const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
     const originalResponse = deferred<Response>();
     const retryResponse = deferred<Response>();
@@ -290,6 +298,25 @@ describe("InquiryModal server submission and conversion analytics", () => {
     const retryUser = userEvent.setup();
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
     expect(screen.getByLabelText(/^Name/)).toHaveValue("Buyer Name");
+    expect(screen.getByLabelText(/^Name/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Email/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Company/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Phone/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Notes/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Fabric of interest/)).toBeDisabled();
+    expect(screen.getByLabelText(/^Quantity needed/)).toBeDisabled();
+    expect(
+      document.querySelector<HTMLInputElement>('input[name="website"]'),
+    ).toBeDisabled();
+
+    await act(async () => {
+      originalResponse.resolve(
+        jsonResponse({ success: false }, { ok: false }),
+      );
+      await originalResponse.promise;
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
     await retryUser.clear(screen.getByLabelText(/^Name/));
     await retryUser.type(screen.getByLabelText(/^Name/), "Remounted Buyer");
     await retryUser.clear(screen.getByLabelText(/^Email/));
@@ -319,15 +346,6 @@ describe("InquiryModal server submission and conversion analytics", () => {
       document.querySelector<HTMLInputElement>('input[name="website"]')!,
       { target: { value: "edited.example" } },
     );
-
-    await act(async () => {
-      originalResponse.resolve(
-        jsonResponse({ success: false }, { ok: false }),
-      );
-      await originalResponse.promise;
-    });
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
     remountedView.unmount();
 
     const failedView = render(
