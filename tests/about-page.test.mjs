@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -156,7 +156,10 @@ test("public machine evidence uses rounded counts", () => {
   )
     .toString("utf8")
     .split("\0")
-    .filter((file) => /\.(?:tsx?|json)$/i.test(file));
+    .filter(
+      (file) =>
+        /\.(?:tsx?|json)$/i.test(file) && existsSync(path.join(root, file)),
+    );
   const publicSources = trackedPublicFiles.map((file) => ({
     file,
     source: readFileSync(path.join(root, file), "utf8"),

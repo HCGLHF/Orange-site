@@ -275,7 +275,7 @@ describe("InquiryBar server submission and conversion analytics", () => {
       { event: "orange_generate_lead", form_name: "batch_inquiry" },
     ]);
     expect(alertSpy).not.toHaveBeenCalled();
-    expect(localStorage.getItem("orange-textile-inquiries")).toBeNull();
+    expect(localStorage).toHaveLength(0);
     expect(sessionStorage).toHaveLength(0);
 
     await user.click(screen.getByRole("button", { name: "OK" }));
@@ -314,7 +314,7 @@ describe("InquiryBar server submission and conversion analytics", () => {
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("2");
     expect(window.dataLayer).toEqual([]);
     expect(alertSpy).not.toHaveBeenCalled();
-    expect(localStorage.getItem("orange-textile-inquiries")).toBeNull();
+    expect(localStorage).toHaveLength(0);
     expect(sessionStorage).toHaveLength(0);
 
     closeBatchInquiry();

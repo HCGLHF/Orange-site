@@ -33,7 +33,7 @@ export const PRIVACY_CONTENT = {
       id: "browser-storage",
       title: "Browser storage",
       paragraphs: [
-        "The website stores your Analytics choice in a dedicated versioned localStorage record. Existing inquiry functionality separately stores a copy of submitted inquiry details in your browser until that browser storage is cleared and sends inquiry details to Formspree and, when configured, Notion and the business email workflow. Analytics code does not read those inquiry records.",
+        "The website stores your Analytics choice in a dedicated versioned localStorage record. Inquiry details are sent to O'range Textile and its email delivery provider so we can respond. They are not retained in browser storage after submission.",
       ],
     },
     {
@@ -68,7 +68,7 @@ export const PRIVACY_CONTENT = {
       id: "providers-and-international-processing",
       title: "Providers and international processing",
       paragraphs: [
-        "Vercel hosts and protects the website and may process the essential security and server-log information described above. Google provides GA4 and Google Tag Manager. Formspree receives website inquiry submissions, and Notion may receive them when that integration is configured. These providers may process information in countries outside your location under their own terms and privacy arrangements.",
+        "Vercel hosts and protects the website and may process the essential security and server-log information described above. Google provides GA4 and Google Tag Manager. Inquiry details are sent to O'range Textile and its email delivery provider so we can respond. These providers may process information in countries outside your location under their own terms and privacy arrangements.",
       ],
     },
     {
@@ -140,7 +140,7 @@ export const TERMS_CONTENT = {
       id: "external-services",
       title: "External services",
       paragraphs: [
-        "The website uses external services including Google Analytics 4, Google Tag Manager, Formspree and, when configured, Notion. Links or integrations supplied by external providers are also subject to the relevant provider's terms and practices.",
+        "The website uses external services including Google Analytics 4, Google Tag Manager, an email delivery provider and Notion for product-data workflows. Links or integrations supplied by external providers are also subject to the relevant provider's terms and practices.",
       ],
     },
     {

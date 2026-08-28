@@ -6,7 +6,8 @@
 - `components/`: UI components and page sections. Components should render data passed from page/data modules and avoid owning persistence or data-fetching policy.
 - `lib/public-catalog.ts`: Local public fabric catalog and category data used by crawlable public pages.
 - `lib/geo-content.ts`: Stable company facts, page copy, structured data inputs, and AI-search FAQ content.
-- `lib/notion-inquiry-api.ts`: Inquiry CRM integration only. Notion may support internal inquiry capture, but public fabric rendering must not depend on it.
+- `lib/inquiry-email.ts`: Server-only inquiry email formatting and delivery boundary.
+- `lib/notion-inquiry-api.ts`: Retained internal Notion integration; it is not part of the active public inquiry route, and public fabric rendering must not depend on it.
 - `lib/inquiry-events.ts`: Inquiry event persistence/telemetry boundary.
 - `public/`: Static assets.
 - `docs/`: Project memory, architecture notes, risk log, next-step log, and ADRs.
@@ -24,7 +25,7 @@
 - Public pages: `app/*` -> `lib/public-catalog.ts` / `lib/geo-content.ts` -> `components/*`.
 - Category pages: static params from public catalog -> category page metadata and body -> structured data.
 - Fabric API: static public catalog -> JSON response.
-- Inquiry API: request payload -> validation -> `lib/notion-inquiry-api.ts` and inquiry event handling.
+- Inquiry API: request payload -> validation -> `lib/inquiry-email.ts` -> email delivery provider.
 
 ## Dependency Direction
 

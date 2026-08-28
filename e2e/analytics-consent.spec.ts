@@ -545,13 +545,21 @@ test("a successful production single-inquiry UI path emits only the controlled l
 }) => {
   await protectAnalyticsRequests(context);
   const failures = captureRuntimeFailures(page);
-  const formspreeRequests: string[] = [];
-  await page.route("https://formspree.io/f/mojpdwdg", async (route) => {
-    formspreeRequests.push(route.request().postData() ?? "");
+  const inquiryRequests: Array<{
+    method: string;
+    url: string;
+    body: Record<string, unknown>;
+  }> = [];
+  await page.route("**/api/inquiry", async (route) => {
+    inquiryRequests.push({
+      method: route.request().method(),
+      url: route.request().url(),
+      body: route.request().postDataJSON() as Record<string, unknown>,
+    });
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: '{"ok":true}',
+      body: JSON.stringify({ success: true, inquiryId: "email_test_123" }),
     });
   });
   await page.addInitScript((key) => {
@@ -569,11 +577,22 @@ test("a successful production single-inquiry UI path emits only the controlled l
   await dialog.locator("#inquiry-email").fill("analytics-test@example.invalid");
   await dialog.locator("#inquiry-company").fill("Analytics Test Company");
   await dialog.locator("#inquiry-qty").fill("123 metres test quantity");
-  page.once("dialog", (browserDialog) => browserDialog.accept());
   await dialog.getByRole("button", { name: "Submit", exact: true }).click();
 
+  await expect(dialog.getByRole("status")).toContainText("Submitted successfully");
   await expect.poll(async () => (await leadEvents(page)).length).toBe(1);
-  expect(formspreeRequests).toHaveLength(1);
+  expect(inquiryRequests).toHaveLength(1);
+  expect(inquiryRequests[0]).toMatchObject({
+    method: "POST",
+    body: {
+      type: "single",
+      customer: "Analytics Test Buyer",
+      email: "analytics-test@example.invalid",
+      company: "Analytics Test Company",
+      items: [{ quantity: "123 metres test quantity" }],
+    },
+  });
+  expect(inquiryRequests[0].url).toMatch(/\/api\/inquiry$/);
   const leads = await leadEvents(page);
   expect(leads).toEqual([
     { event: "orange_generate_lead", form_name: "single_inquiry" },

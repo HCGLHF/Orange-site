@@ -697,12 +697,12 @@ describe("AnalyticsConsentProvider", () => {
     window.gtag = gtag;
     renderProvider();
 
-    localStorage.setItem("orange-textile-inquiries", "not-json");
+    localStorage.setItem("orange-textile-locale", "en");
 
     window.dispatchEvent(
       new StorageEvent("storage", {
-        key: "orange-textile-inquiries",
-        newValue: "not-json",
+        key: "orange-textile-locale",
+        newValue: "en",
         storageArea: window.localStorage,
       }),
     );

@@ -1,12 +1,30 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const readSource = async (relativePath) => {
   const url = new URL(`../${relativePath}`, import.meta.url);
   assert.ok(existsSync(url), `${relativePath} must exist`);
   return readFile(url, "utf8");
+};
+
+const sourceFilesUnder = async (relativeDirectory) => {
+  const files = [];
+
+  const walk = async (directoryUrl) => {
+    for (const entry of await readdir(directoryUrl, { withFileTypes: true })) {
+      const entryUrl = new URL(entry.isDirectory() ? `${entry.name}/` : entry.name, directoryUrl);
+      if (entry.isDirectory()) {
+        await walk(entryUrl);
+      } else if (/\.(?:ts|tsx)$/.test(entry.name)) {
+        files.push(entryUrl);
+      }
+    }
+  };
+
+  await walk(new URL(`../${relativeDirectory}/`, import.meta.url));
+  return files;
 };
 
 const privacyTitles = [
@@ -69,7 +87,16 @@ test("typed legal content contains every reviewed section and required disclosur
   assert.ok(providers, "providers section must exist");
   assert.equal(
     providers.paragraphs[0],
-    "Vercel hosts and protects the website and may process the essential security and server-log information described above. Google provides GA4 and Google Tag Manager. Formspree receives website inquiry submissions, and Notion may receive them when that integration is configured. These providers may process information in countries outside your location under their own terms and privacy arrangements."
+    "Vercel hosts and protects the website and may process the essential security and server-log information described above. Google provides GA4 and Google Tag Manager. Inquiry details are sent to O'range Textile and its email delivery provider so we can respond. These providers may process information in countries outside your location under their own terms and privacy arrangements."
+  );
+
+  const browserStorage = PRIVACY_CONTENT.sections.find(
+    (section) => section.id === "browser-storage"
+  );
+  assert.ok(browserStorage, "browser storage section must exist");
+  assert.equal(
+    browserStorage.paragraphs[0],
+    "The website stores your Analytics choice in a dedicated versioned localStorage record. Inquiry details are sent to O'range Textile and its email delivery provider so we can respond. They are not retained in browser storage after submission."
   );
 
   const retention = PRIVACY_CONTENT.sections.find(
@@ -101,8 +128,8 @@ test("typed legal content contains every reviewed section and required disclosur
     "advertising personalisation",
     "Google Signals",
     "user-provided data collection",
-    "Formspree",
-    "Notion",
+    "email delivery provider",
+    "not retained in browser storage after submission",
     "localStorage",
     "two months",
     "Privacy settings",
@@ -136,11 +163,71 @@ test("typed legal content contains every reviewed section and required disclosur
     "privacy must provide one confirmed contact route for complaints",
   );
   assert.doesNotMatch(privacy, /inquiry information is retained for exactly/i);
+  assert.doesNotMatch(`${privacy}\n${terms}`, /Formspree/i);
 
   assert.ok(
     terms.includes(
       "Submitting an inquiry asks O'range Textile to review a possible sourcing requirement. It does not create an order, reservation, exclusivity arrangement or binding supply contract. Composition, GSM, usable width, colour, finish, sample route, testing, quantity, stock status, price, lead time, capacity, documentation and delivery terms require current written confirmation for the specific inquiry."
     )
+  );
+});
+
+test("active production source has no legacy Formspree or inquiry PII storage API", async () => {
+  const forbiddenLegacyInquiry =
+    /formspree\.io|FORMSPREE_INQUIRY_ENDPOINT|appendInquiryRecord|orange-textile-inquiries/i;
+  const productionSources = (
+    await Promise.all(["app", "components", "lib"].map(sourceFilesUnder))
+  ).flat();
+
+  for (const sourceUrl of productionSources) {
+    const source = await readFile(sourceUrl, "utf8");
+    assert.doesNotMatch(
+      source,
+      forbiddenLegacyInquiry,
+      `${sourceUrl.pathname} must not contain legacy inquiry submission or storage code`,
+    );
+  }
+
+  assert.equal(
+    existsSync(new URL("../lib/inquiry-storage.ts", import.meta.url)),
+    false,
+    "the unused buyer-PII browser storage module must be removed",
+  );
+
+  for (const relativePath of [
+    "components/InquiryBar.tsx",
+    "components/ui/InquiryModal.tsx",
+  ]) {
+    const source = await readSource(relativePath);
+    assert.doesNotMatch(
+      source,
+      /localStorage|sessionStorage/,
+      `${relativePath} must not write inquiry details to browser storage`,
+    );
+  }
+});
+
+test("inquiry UI copy and E2E interception describe the current server path", async () => {
+  const messagesSource = await readSource("lib/i18n.ts");
+  assert.doesNotMatch(messagesSource, /submissions? (?:are )?saved on (?:this |your )?device/i);
+  assert.doesNotMatch(messagesSource, /NEXT_PUBLIC_INQUIRY_EMAIL/);
+
+  const e2eSource = await readSource("e2e/analytics-consent.spec.ts");
+  assert.match(e2eSource, /page\.route\(["']\*\*\/api\/inquiry["']/);
+  assert.match(e2eSource, /inquiryId:\s*["']email_test_123["']/);
+  assert.doesNotMatch(e2eSource, /formspree/i);
+});
+
+test("current inquiry documentation describes the server email route", async () => {
+  const designQa = await readSource("design-qa.md");
+  assert.match(designQa, /intercepts and fulfils the `\/api\/inquiry` request locally/i);
+  assert.doesNotMatch(designQa, /Formspree/i);
+
+  const architecture = await readSource("docs/architecture.md");
+  assert.match(architecture, /Inquiry API:[^\n]*`lib\/inquiry-email\.ts`/);
+  assert.doesNotMatch(
+    architecture,
+    /Inquiry API:[^\n]*`lib\/notion-inquiry-api\.ts`/,
   );
 });
 

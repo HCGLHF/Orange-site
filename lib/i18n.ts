@@ -221,7 +221,7 @@ const englishMessages: Messages = {
   inquiryCancel: "Cancel",
   inquirySubmit: "Submit",
   inquiryFootnote:
-    "Submissions are saved on this device. Set NEXT_PUBLIC_INQUIRY_EMAIL to also open a draft email.",
+    "Inquiry details are sent to O'range Textile and its email delivery provider so we can respond.",
   inquiryErrNameEmail: "Please enter your name and email.",
   inquiryErrFabric: "Please select a fabric.",
   inquiryErrQty: "Please enter the quantity needed.",
