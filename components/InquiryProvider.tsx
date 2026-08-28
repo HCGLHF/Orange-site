@@ -4,6 +4,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -12,6 +13,7 @@ import dynamic, { type DynamicOptionsLoadingProps } from "next/dynamic";
 import { DeferredInquiryBarHost } from "@/components/DeferredInquiryBarHost";
 import { DeferredStickyInquiryBar } from "@/components/DeferredStickyInquiryBar";
 import { InquiryCartProvider } from "@/components/InquiryCartProvider";
+import { clearLegacyInquiryStorage } from "@/lib/inquiry-storage-migration";
 
 type InquiryContextValue = {
   openInquiry: (initialFabricId?: string) => void;
@@ -137,6 +139,11 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [ActiveInquiryModal, setActiveInquiryModal] = useState(() => InquiryModal);
   const [initialFabricId, setInitialFabricId] = useState<string | undefined>();
+
+  useEffect(() => {
+    clearLegacyInquiryStorage(window);
+  }, []);
+
   const openInquiry = useCallback((fabricId?: string) => {
     setInitialFabricId(fabricId);
     setOpen(true);

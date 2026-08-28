@@ -1,13 +1,14 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes } from "react";
 import { useInquiryCart } from "@/components/InquiryCartProvider";
 import { useInquiry } from "@/components/InquiryProvider";
 import { dispatchOpenBatchInquiry } from "@/lib/inquiry-events";
 
-type RequestQuoteButtonProps = {
-  children: ReactNode;
-  className?: string;
+type RequestQuoteButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "onClick" | "type"
+> & {
   onBeforeOpen?: () => void;
 };
 
@@ -15,6 +16,7 @@ export function RequestQuoteButton({
   children,
   className,
   onBeforeOpen,
+  ...buttonProps
 }: RequestQuoteButtonProps) {
   const { totalCount } = useInquiryCart();
   const { openInquiry } = useInquiry();
@@ -34,7 +36,12 @@ export function RequestQuoteButton({
   };
 
   return (
-    <button type="button" className={className} onClick={handleClick}>
+    <button
+      type="button"
+      {...buttonProps}
+      className={className}
+      onClick={handleClick}
+    >
       {children}
     </button>
   );

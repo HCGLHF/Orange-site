@@ -52,11 +52,15 @@ vi.mock("@/components/ui/DesktopNavigation", () => ({
 }));
 
 import { Navbar } from "@/components/ui/Navbar";
+import { OPEN_BATCH_INQUIRY_EVENT } from "@/lib/inquiry-events";
 
 describe("Navbar quote navigation", () => {
+  let listenerController: AbortController;
+
   beforeEach(() => {
     inquiryMocks.openInquiry.mockReset();
     inquiryMocks.totalCount = 0;
+    listenerController = new window.AbortController();
     vi.stubGlobal("React", React);
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
       callback(0);
@@ -71,25 +75,41 @@ describe("Navbar quote navigation", () => {
   });
 
   afterEach(() => {
+    listenerController.abort();
     vi.unstubAllGlobals();
   });
 
-  it("renders desktop and compact quote CTAs as buttons while keeping the cart as a link", () => {
+  it("opens the selected desktop inquiry cart instead of navigating to an empty anchor", async () => {
+    inquiryMocks.totalCount = 2;
+    const onBatchOpen = vi.fn();
+    window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, onBatchOpen, {
+      signal: listenerController.signal,
+    });
+    const user = userEvent.setup();
     render(<Navbar />);
 
     const desktopCta = screen.getByRole("button", { name: "Request a quote" });
     const compactCta = screen.getByRole("button", { name: "Quote" });
-    const cartLink = screen.getByRole("link", { name: "Inquiry cart: 0 items" });
+    const cartButton = screen.getByRole("button", { name: "Inquiry cart: 2 items" });
 
     expect(desktopCta).toHaveClass("gn-cta");
     expect(compactCta).toHaveClass("gn-quote");
     expect(desktopCta.closest("a")).toBeNull();
     expect(compactCta.closest("a")).toBeNull();
-    expect(cartLink).toHaveAttribute("href", "/fabrics#inquiry-form");
-    expect(cartLink).toHaveClass("gn-cart");
+    expect(cartButton).toHaveClass("gn-cart");
+
+    await user.click(cartButton);
+
+    expect(onBatchOpen).toHaveBeenCalledOnce();
+    expect(inquiryMocks.openInquiry).not.toHaveBeenCalled();
   });
 
-  it("renders the drawer quote CTA as a button and keeps its cart navigation link", async () => {
+  it("opens the selected drawer inquiry cart instead of navigating to an empty anchor", async () => {
+    inquiryMocks.totalCount = 2;
+    const onBatchOpen = vi.fn();
+    window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, onBatchOpen, {
+      signal: listenerController.signal,
+    });
     const user = userEvent.setup();
     render(<Navbar />);
 
@@ -97,9 +117,11 @@ describe("Navbar quote navigation", () => {
 
     const drawerCta = screen.getByRole("button", { name: "Request a Quote" });
     expect(drawerCta.closest("a")).toBeNull();
-    expect(screen.getByRole("link", { name: "Inquiry cart" })).toHaveAttribute(
-      "href",
-      "/fabrics#inquiry-form",
-    );
+    const drawerCart = screen.getByRole("button", { name: "Inquiry cart" });
+
+    await user.click(drawerCart);
+
+    expect(onBatchOpen).toHaveBeenCalledOnce();
+    expect(inquiryMocks.openInquiry).not.toHaveBeenCalled();
   });
 });

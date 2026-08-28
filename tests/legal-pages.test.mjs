@@ -181,7 +181,6 @@ test("active production source has no legacy Formspree or inquiry PII storage AP
     { label: "Formspree", pattern: /formspree/i },
     { label: "FORMSPREE_INQUIRY_ENDPOINT", pattern: /FORMSPREE_INQUIRY_ENDPOINT/ },
     { label: "appendInquiryRecord", pattern: /appendInquiryRecord/ },
-    { label: "orange-textile-inquiries", pattern: /orange-textile-inquiries/ },
   ];
   const productionSources = (
     await Promise.all(["app", "components", "lib"].map(sourceFilesUnder))
@@ -213,6 +212,7 @@ test("active production source has no legacy Formspree or inquiry PII storage AP
     "components/LocaleProvider.tsx",
     "components/analytics/AnalyticsConsentProvider.tsx",
     "lib/analytics/bootstrap.ts",
+    "lib/inquiry-storage-migration.ts",
     "lib/legal-content.ts",
   ].sort();
   const browserStorageSources = sourceContents
@@ -236,6 +236,11 @@ test("active production source has no legacy Formspree or inquiry PII storage AP
       `${relativePath} must not write inquiry details to browser storage`,
     );
   }
+
+  const migrationSource = await readSource("lib/inquiry-storage-migration.ts");
+  assert.match(migrationSource, /orange-textile-inquiries/);
+  assert.match(migrationSource, /removeItem/);
+  assert.doesNotMatch(migrationSource, /getItem|setItem/);
 });
 
 test("inquiry UI copy and E2E interception describe the current server path", async () => {

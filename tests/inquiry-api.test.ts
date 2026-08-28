@@ -340,6 +340,20 @@ describe("POST /api/inquiry", () => {
     );
   });
 
+  it.each([
+    "https://attacker.example/fabrics",
+    "https://orangetextiles.com/private/buyer@example.com",
+  ])("omits the unapproved source URL %s", async (sourceUrl) => {
+    mockedSendInquiryEmail.mockResolvedValue({ id: "email_source" });
+
+    const response = await POST(makeRequest({ ...validBody, sourceUrl }));
+
+    expect(response.status).toBe(200);
+    expect(mockedSendInquiryEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceUrl: undefined }),
+    );
+  });
+
   it("normalizes and sends a valid single inquiry", async () => {
     mockedSendInquiryEmail.mockResolvedValue({ id: "email_123" });
 

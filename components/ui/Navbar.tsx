@@ -16,7 +16,6 @@ import { OrangeMark } from "@/components/OrangeMark";
 import { RequestQuoteButton } from "@/components/RequestQuoteButton";
 import { DesktopNavigation } from "@/components/ui/DesktopNavigation";
 import { MobileNavigationDrawer } from "@/components/ui/MobileNavigationDrawer";
-import { INQUIRY_HREF } from "@/lib/navigation";
 
 function NavbarContent() {
   const pathname = usePathname();
@@ -84,9 +83,7 @@ function NavbarContent() {
             <DesktopNavigation pathname={pathname} />
 
             <div className="gn-actions">
-              <Link
-                href={INQUIRY_HREF}
-                prefetch={false}
+              <RequestQuoteButton
                 aria-label={`Inquiry cart: ${totalCount} ${
                   totalCount === 1 ? "item" : "items"
                 }`}
@@ -102,7 +99,7 @@ function NavbarContent() {
                     {totalCount}
                   </span>
                 ) : null}
-              </Link>
+              </RequestQuoteButton>
 
               <RequestQuoteButton className="gn-cta">
                 {t("navCtaInquiry")}

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -20,6 +20,7 @@ vi.mock("@/components/InquiryCartProvider", () => ({
 }));
 
 import {
+  InquiryProvider,
   InquiryModalLoadBoundary,
   InquiryModalLoading,
 } from "@/components/InquiryProvider";
@@ -29,6 +30,25 @@ function BrokenModal(): React.JSX.Element {
 }
 
 describe("InquiryModalLoading", () => {
+  it("removes legacy browser inquiry records without touching unrelated storage", async () => {
+    localStorage.setItem(
+      "orange-textile-inquiries",
+      JSON.stringify([{ email: "legacy-buyer@example.com" }]),
+    );
+    localStorage.setItem("unrelated-key", "keep");
+
+    render(
+      <InquiryProvider>
+        <div>Site content</div>
+      </InquiryProvider>,
+    );
+
+    await waitFor(() => {
+      expect(localStorage.getItem("orange-textile-inquiries")).toBeNull();
+    });
+    expect(localStorage.getItem("unrelated-key")).toBe("keep");
+  });
+
   it("announces that the inquiry form is loading", () => {
     render(<InquiryModalLoading isLoading />);
 

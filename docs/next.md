@@ -16,6 +16,7 @@
 - Added a bounded, abortable Resend retry policy and a 32 KiB raw inquiry request-body limit for declared and streamed bodies.
 - Made populated inquiry honeypots return a generic success without sending, and kept daily or monthly Resend quota exhaustion out of short-lived retry loops.
 - Limited inquiry source attribution to URL origin and pathname, removed client identifiers from delivery-error logs, and made Resend rate-limit retries honor provider reset headers within a 13.5-second total budget.
+- Added one-time cleanup for the legacy browser inquiry key, routed header and drawer cart controls into the live inquiry flow, and restricted source attribution to registered production pages.
 
 ## Learned
 
@@ -29,6 +30,7 @@
 - The installed Resend SDK forwards an abort signal at runtime even though its public email request-options type does not currently declare that extra `RequestInit` field.
 - Resend reports per-second throttling and daily/monthly quota exhaustion as distinct named 429 errors; only the per-second rate limit is useful to retry inside one request.
 - Resend SDK responses include rate-limit headers at runtime; retry code should prefer `retry-after`, then `ratelimit-reset`, while preserving the route's end-to-end deadline.
+- Removing a browser-storage writer does not delete records created by older releases; a narrowly scoped migration is required when historical inquiry PII may remain.
 
 ## Risks
 

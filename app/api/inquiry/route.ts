@@ -4,6 +4,8 @@ import {
   type InquiryEmailInput,
   type InquiryItem,
 } from "@/lib/inquiry-email";
+import { isTrackablePublicPath } from "@/lib/analytics/public-paths";
+import { SEO_SITE_ORIGIN } from "@/lib/seo/site-seo";
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +84,12 @@ function readSourceUrl(value: unknown): ReadStringResult {
   try {
     const parsed = new URL(sourceUrl);
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
+    if (
+      parsed.origin !== SEO_SITE_ORIGIN ||
+      !isTrackablePublicPath(parsed.pathname)
+    ) {
+      return undefined;
+    }
     return `${parsed.origin}${parsed.pathname}`;
   } catch {
     return null;

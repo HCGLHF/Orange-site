@@ -7,7 +7,6 @@ import { ChevronDown, ShoppingCart, X } from "lucide-react";
 import { RequestQuoteButton } from "@/components/RequestQuoteButton";
 import {
   PRIMARY_NAVIGATION,
-  INQUIRY_HREF,
   getActiveNavigationId,
   getCurrentNavigationItemId,
   type NavigationGroupId,
@@ -300,11 +299,10 @@ export function MobileNavigationDrawer({
           </div>
 
           <div className="mt-6 space-y-3 border-t border-brand-charcoal/10 pt-5">
-            <Link
-              href={INQUIRY_HREF}
-              prefetch={false}
-              onClick={onRouteSelect}
-              className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-base font-semibold text-brand-charcoal outline-none transition-colors hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none"
+            <RequestQuoteButton
+              aria-label="Inquiry cart"
+              onBeforeOpen={closeAndRestoreFocus}
+              className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-base font-semibold text-brand-charcoal outline-none transition-colors hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-inset motion-reduce:transition-none"
             >
               <ShoppingCart className="h-5 w-5" aria-hidden="true" />
               <span>Inquiry cart</span>
@@ -313,7 +311,7 @@ export function MobileNavigationDrawer({
                   {totalCount}
                 </span>
               ) : null}
-            </Link>
+            </RequestQuoteButton>
             <RequestQuoteButton
               onBeforeOpen={closeAndRestoreFocus}
               className="flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-orange px-4 py-3 text-center text-base font-bold text-white outline-none transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 motion-reduce:transition-none"

@@ -515,19 +515,11 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
     source,
     /<MobileNavigationDrawer[\s\S]{0,600}?open=\{drawerOpen\}[\s\S]{0,120}?onClose=\{closeDrawer\}[\s\S]{0,120}?pathname=\{pathname\}[\s\S]{0,120}?totalCount=\{totalCount\}[\s\S]{0,120}?triggerRef=\{menuButtonRef\}[\s\S]{0,120}?desktopFallbackRef=\{brandLinkRef\}/
   );
-  assert.match(
-    source,
-    /import\s*\{\s*INQUIRY_HREF\s*\}\s*from\s*["']@\/lib\/navigation["']/
-  );
-  assert.equal(
-    [...source.matchAll(/href=\{INQUIRY_HREF\}/g)].length,
-    1,
-    "only the cart must retain the shared inquiry navigation href"
-  );
+  assert.doesNotMatch(source, /INQUIRY_HREF/);
   assert.equal(
     [...source.matchAll(/<RequestQuoteButton\b/g)].length,
-    2,
-    "desktop and compact quote CTAs must use the shared button behavior"
+    3,
+    "the cart plus desktop and compact quote CTAs must use the shared button behavior"
   );
   assert.doesNotMatch(source, /["']\/fabrics#inquiry-form["']/);
   assert.doesNotMatch(source, /const\s+navItems\s*=/);
@@ -720,7 +712,7 @@ const assertMobileDrawerStructure = (source, primaryNavigation) => {
   );
   assert.match(
     source,
-    /PRIMARY_NAVIGATION[\s\S]*INQUIRY_HREF[\s\S]*getActiveNavigationId/
+    /PRIMARY_NAVIGATION[\s\S]*getActiveNavigationId/
   );
   assert.match(source, /PRIMARY_NAVIGATION\.map\s*\(/);
   assert.match(source, /getActiveNavigationId\s*\(\s*pathname\s*\)/);
@@ -766,7 +758,8 @@ const assertMobileDrawerStructure = (source, primaryNavigation) => {
   assert.match(source, /event\.target\s*===\s*event\.currentTarget/);
   assert.match(source, /event\.stopPropagation\s*\(\s*\)/);
 
-  assert.match(source, /href=\{\s*INQUIRY_HREF\s*\}/);
+  assert.doesNotMatch(source, /INQUIRY_HREF/);
+  assert.match(source, /<RequestQuoteButton[\s\S]*aria-label=["']Inquiry cart["']/);
   assert.match(source, /totalCount\s*>\s*0\s*\?/);
   assert.match(source, /\{\s*totalCount\s*\}/);
   assert.match(source, />\s*Request a Quote\s*</);
