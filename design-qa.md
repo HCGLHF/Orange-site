@@ -36,7 +36,7 @@ Tag Assistant confirmed that the initial denied consent command preceded GTM. It
 
 - `npm run test:browser`: passed, 18/18 Playwright tests across desktop Chromium and Chromium at `320x256`.
 - Browser coverage verifies consent-before-restore-before-privacy-settings-before-GTM ordering, exact IDs with one installation, no standalone GA script, Accept/Decline updates, refresh persistence, cross-tab synchronization, localStorage fail-closed behavior, one route event per allowed navigation, unknown/PII-path suppression after the route tracker has observed the pathname, successful inquiry mapping, no horizontal overflow, a full-width bottom-fixed banner, real Tab-key reachability, and no console or hydration errors.
-- The lead test uses the production homepage single-inquiry UI. It submits clearly synthetic values while Playwright intercepts and fulfils the `/api/inquiry` request locally; it creates no email delivery or Notion record. The resulting `orange_generate_lead` object contains exactly `event` and the controlled `form_name: single_inquiry`, with none of the entered values.
+- The lead test uses the production homepage single-inquiry UI. It submits clearly synthetic values while Playwright intercepts and fulfils the Formspree request locally; it creates no Formspree or Notion record. The resulting `orange_generate_lead` object contains exactly `event` and the controlled `form_name: single_inquiry`, with none of the entered values.
 - Desktop visual review passed: the banner spans the viewport, remains attached to the bottom edge, separates explanation and actions clearly, and preserves the requested button hierarchy.
 - `320x256` visual review passed: the banner uses internal vertical scrolling without horizontal overflow; both 48px-minimum action buttons remain reachable. The captured mobile frame is intentionally scrolled within the banner to show both actions.
 - Visual evidence:
@@ -195,3 +195,24 @@ fidelity target.
   Hero proportions.
 
 final result: passed
+
+---
+
+## Inquiry delivery addendum — August 28, 2026
+
+Verified locally on 2026-08-28 (Australia/Sydney) against branch `codex/resend-inquiry-hotfix`. This addendum records the Resend inquiry hotfix separately and does not alter the August 3 GA4 verification history above.
+
+### Current inquiry behavior
+
+- The browser sends one JSON request to `/api/inquiry`; the changed browser test fulfils it with the confirmed response `inquiryId: "email_test_123"` before the UI reports success.
+- No browser inquiry PII is written to localStorage or sessionStorage, and active source contains no Formspree integration.
+- Inquiry details are sent through the server email-delivery path; the browser does not call Formspree or the retained Notion inquiry library.
+
+### Checks run
+
+- `npm test`: passed, 162/162 Node tests.
+- `npm run test:components`: passed, 222/222 component tests.
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with the existing `components/ui/FabricCard.tsx` `<img>` optimization warning.
+- `npm run build`: passed, generating 44 static pages.
+- Changed inquiry E2E: passed, 2/2 across `desktop-chromium` and `mobile-320`.

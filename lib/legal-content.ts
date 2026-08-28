@@ -11,7 +11,7 @@ export type LegalPageContent = {
 };
 
 export const PRIVACY_CONTENT = {
-  effectiveDate: "August 25, 2026",
+  effectiveDate: "August 28, 2026",
   introduction:
     "This policy explains how O'range Textile handles inquiry information and uses privacy-conscious website measurement.",
   sections: [
@@ -97,7 +97,7 @@ export const PRIVACY_CONTENT = {
 } as const satisfies LegalPageContent;
 
 export const TERMS_CONTENT = {
-  effectiveDate: "August 3, 2026",
+  effectiveDate: "August 28, 2026",
   introduction:
     "These terms govern use of the O'range Textile website and the submission of sourcing inquiries through it.",
   sections: [

@@ -12,19 +12,23 @@ const readSource = async (relativePath) => {
 const sourceFilesUnder = async (relativeDirectory) => {
   const files = [];
 
-  const walk = async (directoryUrl) => {
-    for (const entry of await readdir(directoryUrl, { withFileTypes: true })) {
+  const walk = async (directoryUrl, relativePath) => {
+    const entries = await readdir(directoryUrl, { withFileTypes: true });
+    entries.sort((left, right) => left.name.localeCompare(right.name));
+
+    for (const entry of entries) {
+      const entryPath = `${relativePath}/${entry.name}`;
       const entryUrl = new URL(entry.isDirectory() ? `${entry.name}/` : entry.name, directoryUrl);
       if (entry.isDirectory()) {
-        await walk(entryUrl);
-      } else if (/\.(?:ts|tsx)$/.test(entry.name)) {
-        files.push(entryUrl);
+        await walk(entryUrl, entryPath);
+      } else if (/\.(?:ts|tsx|js|jsx|mjs|cjs)$/.test(entry.name)) {
+        files.push({ relativePath: entryPath, sourceUrl: entryUrl });
       }
     }
   };
 
-  await walk(new URL(`../${relativeDirectory}/`, import.meta.url));
-  return files;
+  await walk(new URL(`../${relativeDirectory}/`, import.meta.url), relativeDirectory);
+  return files.sort((left, right) => left.relativePath.localeCompare(right.relativePath));
 };
 
 const privacyTitles = [
@@ -66,8 +70,8 @@ test("typed legal content contains every reviewed section and required disclosur
     TERMS_CONTENT.sections.map((section) => section.title),
     termsTitles
   );
-  assert.equal(PRIVACY_CONTENT.effectiveDate, "August 25, 2026");
-  assert.equal(TERMS_CONTENT.effectiveDate, "August 3, 2026");
+  assert.equal(PRIVACY_CONTENT.effectiveDate, "August 28, 2026");
+  assert.equal(TERMS_CONTENT.effectiveDate, "August 28, 2026");
 
   const privacy = PRIVACY_CONTENT.sections.flatMap((section) => section.paragraphs).join("\n");
   const terms = TERMS_CONTENT.sections.flatMap((section) => section.paragraphs).join("\n");
@@ -173,25 +177,52 @@ test("typed legal content contains every reviewed section and required disclosur
 });
 
 test("active production source has no legacy Formspree or inquiry PII storage API", async () => {
-  const forbiddenLegacyInquiry =
-    /formspree\.io|FORMSPREE_INQUIRY_ENDPOINT|appendInquiryRecord|orange-textile-inquiries/i;
+  const forbiddenLegacyInquiryPatterns = [
+    { label: "Formspree", pattern: /formspree/i },
+    { label: "FORMSPREE_INQUIRY_ENDPOINT", pattern: /FORMSPREE_INQUIRY_ENDPOINT/ },
+    { label: "appendInquiryRecord", pattern: /appendInquiryRecord/ },
+    { label: "orange-textile-inquiries", pattern: /orange-textile-inquiries/ },
+  ];
   const productionSources = (
     await Promise.all(["app", "components", "lib"].map(sourceFilesUnder))
   ).flat();
+  const sourceContents = await Promise.all(
+    productionSources.map(async ({ relativePath, sourceUrl }) => ({
+      relativePath,
+      source: await readFile(sourceUrl, "utf8"),
+    })),
+  );
 
-  for (const sourceUrl of productionSources) {
-    const source = await readFile(sourceUrl, "utf8");
-    assert.doesNotMatch(
-      source,
-      forbiddenLegacyInquiry,
-      `${sourceUrl.pathname} must not contain legacy inquiry submission or storage code`,
-    );
+  for (const { relativePath, source } of sourceContents) {
+    for (const { label, pattern } of forbiddenLegacyInquiryPatterns) {
+      assert.doesNotMatch(
+        source,
+        pattern,
+        `${relativePath} must not contain legacy inquiry token ${label}`,
+      );
+    }
   }
 
   assert.equal(
     existsSync(new URL("../lib/inquiry-storage.ts", import.meta.url)),
     false,
     "the unused buyer-PII browser storage module must be removed",
+  );
+
+  const allowedBrowserStorageSources = [
+    "components/LocaleProvider.tsx",
+    "components/analytics/AnalyticsConsentProvider.tsx",
+    "lib/analytics/bootstrap.ts",
+    "lib/legal-content.ts",
+  ].sort();
+  const browserStorageSources = sourceContents
+    .filter(({ source }) => /localStorage|sessionStorage/.test(source))
+    .map(({ relativePath }) => relativePath)
+    .sort();
+  assert.deepEqual(
+    browserStorageSources,
+    allowedBrowserStorageSources,
+    "browser storage references must stay limited to locale, analytics consent, and legal disclosure",
   );
 
   for (const relativePath of [
@@ -218,10 +249,33 @@ test("inquiry UI copy and E2E interception describe the current server path", as
   assert.doesNotMatch(e2eSource, /formspree/i);
 });
 
-test("current inquiry documentation describes the server email route", async () => {
+test("current inquiry documentation preserves historical QA and records the server addendum", async () => {
   const designQa = await readSource("design-qa.md");
-  assert.match(designQa, /intercepts and fulfils the `\/api\/inquiry` request locally/i);
-  assert.doesNotMatch(designQa, /Formspree/i);
+  const addendumHeading = "## Inquiry delivery addendum — August 28, 2026";
+  const addendumIndex = designQa.indexOf(addendumHeading);
+  assert.notEqual(addendumIndex, -1, "the August 28 inquiry addendum must exist");
+
+  const historicalQa = designQa.slice(0, addendumIndex);
+  assert.match(
+    historicalQa,
+    /Playwright intercepts and fulfils the Formspree request locally; it creates no Formspree or Notion record\./,
+  );
+
+  const addendum = designQa.slice(addendumIndex);
+  for (const required of [
+    "`codex/resend-inquiry-hotfix`",
+    "`/api/inquiry`",
+    '`inquiryId: "email_test_123"`',
+    "No browser inquiry PII is written to localStorage or sessionStorage, and active source contains no Formspree integration.",
+    "`npm test`: passed, 162/162 Node tests.",
+    "`npm run test:components`: passed, 222/222 component tests.",
+    "`npm run typecheck`: passed.",
+    "`npm run lint`: passed with the existing `components/ui/FabricCard.tsx` `<img>` optimization warning.",
+    "`npm run build`: passed, generating 44 static pages.",
+    "Changed inquiry E2E: passed, 2/2 across `desktop-chromium` and `mobile-320`.",
+  ]) {
+    assert.ok(addendum.includes(required), `inquiry addendum must record ${required}`);
+  }
 
   const architecture = await readSource("docs/architecture.md");
   assert.match(architecture, /Inquiry API:[^\n]*`lib\/inquiry-email\.ts`/);
