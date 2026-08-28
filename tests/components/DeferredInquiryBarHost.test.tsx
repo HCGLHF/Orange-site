@@ -138,6 +138,7 @@ afterEach(async () => {
 describe("DeferredInquiryBarHost", () => {
   it("owns focus through cancellation, repeated failures, retries, and a future successful event in StrictMode", async () => {
     const user = userEvent.setup();
+    document.body.style.overflow = "clip";
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const addListenerSpy = vi.spyOn(window, "addEventListener");
     const removeListenerSpy = vi.spyOn(window, "removeEventListener");
@@ -164,6 +165,7 @@ describe("DeferredInquiryBarHost", () => {
     const firstCancel = screen.getByRole("button", { name: "Cancel" });
     expect(firstLoadingTarget).toHaveFocus();
     expect(document.body).not.toHaveFocus();
+    expect(document.body.style.overflow).toBe("hidden");
 
     await user.tab();
     expect(firstCancel).toHaveFocus();
@@ -178,6 +180,7 @@ describe("DeferredInquiryBarHost", () => {
     });
     expect(firstOpener).toHaveFocus();
     expect(document.body).not.toHaveFocus();
+    expect(document.body.style.overflow).toBe("clip");
 
     await act(async () => {
       lazyImports.attempts[0].resolve();
@@ -187,6 +190,7 @@ describe("DeferredInquiryBarHost", () => {
       screen.queryByRole("dialog", { name: "Batch inquiry" }),
     ).not.toBeInTheDocument();
 
+    document.body.style.overflow = "auto";
     secondOpener.focus();
     act(() => dispatchOpenBatchInquiry(secondOpener));
     await waitFor(() => expect(lazyImports.attempts).toHaveLength(2));
@@ -194,6 +198,7 @@ describe("DeferredInquiryBarHost", () => {
       "Loading inquiry form",
     );
     expect(screen.getByRole("document")).toHaveFocus();
+    expect(document.body.style.overflow).toBe("hidden");
 
     await act(async () => {
       lazyImports.attempts[1].reject(new Error("second chunk failure"));
@@ -202,6 +207,7 @@ describe("DeferredInquiryBarHost", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The inquiry form could not load",
     );
+    expect(document.body.style.overflow).toBe("hidden");
     let retryButton = screen.getByRole("button", { name: "Retry" });
     const errorCancel = screen.getByRole("button", { name: "Cancel" });
     expect(retryButton).toHaveFocus();
@@ -249,7 +255,9 @@ describe("DeferredInquiryBarHost", () => {
     });
     expect(secondOpener).toHaveFocus();
     expect(document.body).not.toHaveFocus();
+    expect(document.body.style.overflow).toBe("auto");
 
+    document.body.style.overflow = "";
     firstOpener.focus();
     act(() => dispatchOpenBatchInquiry(firstOpener));
     await waitFor(() => expect(lazyImports.attempts).toHaveLength(5));
@@ -257,6 +265,7 @@ describe("DeferredInquiryBarHost", () => {
       "Loading inquiry form",
     );
     expect(screen.getByRole("document")).toHaveFocus();
+    expect(document.body.style.overflow).toBe("hidden");
 
     await act(async () => {
       lazyImports.attempts[4].resolve();
@@ -264,11 +273,13 @@ describe("DeferredInquiryBarHost", () => {
     });
     expect(await screen.findByRole("dialog", { name: "Batch inquiry" })).toBeInTheDocument();
     expect(screen.getAllByRole("dialog", { name: "Batch inquiry" })).toHaveLength(1);
+    expect(document.body.style.overflow).toBe("hidden");
     closeBatchDialog();
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "Batch inquiry" })).not.toBeInTheDocument();
     });
     expect(firstOpener).toHaveFocus();
+    expect(document.body.style.overflow).toBe("");
 
     const openHandlers = addListenerSpy.mock.calls
       .filter(([eventName]) => eventName === OPEN_BATCH_INQUIRY_EVENT)

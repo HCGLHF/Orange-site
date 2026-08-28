@@ -207,7 +207,9 @@ export function DeferredInquiryBarHost() {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
+      if (!inquiryBarListeningRef.current) {
+        document.body.style.overflow = previousOverflow;
+      }
     };
   }, [cancelLoad, inquiryBarListening, loadGeneration, shouldLoad]);
 
