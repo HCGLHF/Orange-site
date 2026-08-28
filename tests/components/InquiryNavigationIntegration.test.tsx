@@ -299,7 +299,7 @@ describe("global inquiry navigation", () => {
       desktopViewport = finalDesktop;
       fireEvent.resize(window);
       const persistentFallback = finalDesktop
-        ? screen.getByRole("link", { name: "Inquiry cart: 0 items" })
+        ? screen.getByRole("button", { name: "Inquiry cart: 0 items" })
         : screen.getByRole("button", { name: "Open navigation menu" });
       expect(persistentFallback).toHaveAttribute(
         "data-inquiry-fallback-opener",
