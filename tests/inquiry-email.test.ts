@@ -191,6 +191,51 @@ describe("inquiry email transport", () => {
     expect(send).toHaveBeenCalledTimes(2);
   });
 
+  it("waits for the provider retry-after window before retrying a rate limit", async () => {
+    vi.useFakeTimers();
+    const send = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: null,
+        error: {
+          name: "rate_limit_exceeded",
+          statusCode: 429,
+          message: "slow down",
+        },
+        headers: { "retry-after": "2", "ratelimit-reset": "1" },
+      })
+      .mockResolvedValueOnce({
+        data: { id: "email_after_rate_limit" },
+        error: null,
+        headers: {},
+      });
+    const delivery = sendInquiryEmail(input, { emails: { send } });
+
+    await vi.advanceTimersByTimeAsync(1_999);
+    expect(send).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(1);
+
+    await expect(delivery).resolves.toEqual({ id: "email_after_rate_limit" });
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not retry when retry-after exceeds the total delivery budget", async () => {
+    const send = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        name: "rate_limit_exceeded",
+        statusCode: 429,
+        message: "slow down",
+      },
+      headers: { "retry-after": "30" },
+    });
+
+    await expect(
+      sendInquiryEmail(input, { emails: { send } }),
+    ).rejects.toThrowError(/^Inquiry delivery failed\.$/);
+    expect(send).toHaveBeenCalledOnce();
+  });
+
   it("bounds transient exhaustion and reuses the exact message and key", async () => {
     vi.useFakeTimers();
     const send = vi.fn().mockResolvedValue({

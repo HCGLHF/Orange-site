@@ -520,7 +520,10 @@ export function InquiryBar({
         company: company.trim(),
         phone: phone.trim(),
         notes: notes.trim(),
-        sourceUrl: typeof window === "undefined" ? "" : window.location.href,
+        sourceUrl:
+          typeof window === "undefined"
+            ? ""
+            : `${window.location.origin}${window.location.pathname}`,
         honeypot: website.trim(),
         items: items.map((item) => ({
           name: item.name,

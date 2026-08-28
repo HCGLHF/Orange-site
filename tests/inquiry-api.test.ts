@@ -321,6 +321,25 @@ describe("POST /api/inquiry", () => {
     });
   });
 
+  it("strips query parameters and fragments from a client source URL", async () => {
+    mockedSendInquiryEmail.mockResolvedValue({ id: "email_source" });
+
+    const response = await POST(
+      makeRequest({
+        ...validBody,
+        sourceUrl:
+          "https://orangetextiles.com/fabrics?email=buyer%40example.com#private-token",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockedSendInquiryEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sourceUrl: "https://orangetextiles.com/fabrics",
+      }),
+    );
+  });
+
   it("normalizes and sends a valid single inquiry", async () => {
     mockedSendInquiryEmail.mockResolvedValue({ id: "email_123" });
 
@@ -439,7 +458,6 @@ describe("POST /api/inquiry", () => {
       error: "Submission failed. Please try again or email us directly.",
     });
     expect(errorSpy).toHaveBeenCalledWith("Inquiry email delivery failed.", {
-      submissionId: "inq_1234567890abcdef",
       errorType: "Error",
     });
 
@@ -449,5 +467,6 @@ describe("POST /api/inquiry", () => {
     expect(logged).not.toContain("Buyer Co");
     expect(logged).not.toContain("re_secret");
     expect(logged).not.toContain("provider token");
+    expect(logged).not.toContain("inq_1234567890abcdef");
   });
 });

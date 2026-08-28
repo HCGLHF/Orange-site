@@ -1,7 +1,7 @@
 import React from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { InquiryModal } from "@/components/ui/InquiryModal";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { LOCALE_STORAGE_KEY, messages } from "@/lib/i18n";
@@ -10,6 +10,10 @@ import { LOCALE_STORAGE_KEY, messages } from "@/lib/i18n";
 
 const SUBMISSION_ID = "123e4567-e89b-42d3-a456-426614174000";
 const SUBMIT_ERROR = "Submission failed. Please try again or email us directly.";
+
+afterEach(() => {
+  window.history.replaceState({}, "", "/");
+});
 
 function jsonResponse(
   body: unknown,
@@ -51,6 +55,11 @@ function renderModal() {
 
 describe("InquiryModal server submission and conversion analytics", () => {
   it("posts one complete single inquiry and records one lead only after confirmed success", async () => {
+    window.history.pushState(
+      {},
+      "",
+      "/fabrics?email=private%40example.com#access-token",
+    );
     const pendingResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
@@ -95,7 +104,7 @@ describe("InquiryModal server submission and conversion analytics", () => {
       company: "Private Company",
       phone: "+61 400 123 456",
       notes: "Need lab dips before approval",
-      sourceUrl: window.location.href,
+      sourceUrl: `${window.location.origin}/fabrics`,
       honeypot: "",
       items: [
         {
@@ -553,13 +562,21 @@ describe("InquiryModal server submission and conversion analytics", () => {
       .spyOn(globalThis.crypto, "randomUUID")
       .mockReturnValueOnce(SUBMISSION_ID)
       .mockReturnValueOnce(nextSubmissionId);
-    window.history.pushState({}, "", "/inquiry-source-one");
+    window.history.pushState(
+      {},
+      "",
+      "/inquiry-source-one?email=buyer%40example.com#private-token",
+    );
     renderModal();
     const user = await completeModalInquiry();
 
     await user.click(screen.getByRole("button", { name: "Submit" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
-    window.history.pushState({}, "", "/inquiry-source-two");
+    window.history.pushState(
+      {},
+      "",
+      "/inquiry-source-two?lead=confidential#second-token",
+    );
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
     expect(await screen.findByRole("status")).toHaveTextContent(
@@ -567,14 +584,17 @@ describe("InquiryModal server submission and conversion analytics", () => {
     );
     const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
     const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
-    expect(firstBody.sourceUrl).toContain("/inquiry-source-one");
-    expect(retryBody.sourceUrl).toContain("/inquiry-source-two");
+    expect(firstBody.sourceUrl).toBe(
+      `${window.location.origin}/inquiry-source-one`,
+    );
+    expect(retryBody.sourceUrl).toBe(
+      `${window.location.origin}/inquiry-source-two`,
+    );
     expect(retryBody.submissionId).toBe(nextSubmissionId);
     expect(retryBody.submissionId).not.toBe(firstBody.submissionId);
     expect(uuidSpy).toHaveBeenCalledTimes(2);
 
     await user.click(screen.getByRole("button", { name: "OK" }));
-    window.history.replaceState({}, "", "/");
   });
 
   it("times out hung response parsing and retries with the same submission ID", async () => {

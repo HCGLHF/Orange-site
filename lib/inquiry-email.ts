@@ -6,7 +6,9 @@ export const INQUIRY_TO = "folenchen0401@outlook.com";
 
 const INQUIRY_SEND_MAX_ATTEMPTS = 3;
 const INQUIRY_SEND_ATTEMPT_TIMEOUT_MS = 4_000;
+const INQUIRY_SEND_TOTAL_TIMEOUT_MS = 13_500;
 const INQUIRY_SEND_RETRY_DELAY_MS = 200;
+const INQUIRY_SEND_RATE_LIMIT_DELAY_MS = 1_000;
 
 export type InquiryItem = {
   name: string;
@@ -41,13 +43,18 @@ type Sender = {
     send: (
       message: InquiryMessage,
       options: { idempotencyKey: string; signal: AbortSignal },
-    ) => Promise<{ data: { id: string } | null; error: unknown }>;
+    ) => Promise<{
+      data: { id: string } | null;
+      error: unknown;
+      headers?: Record<string, string> | null;
+    }>;
   };
 };
 
 type AttemptResult =
   | { status: "success"; id: string }
-  | { status: "transient" | "permanent" };
+  | { status: "transient"; retryDelayMs?: number }
+  | { status: "permanent" };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -74,9 +81,46 @@ function isTransientProviderError(error: unknown): boolean {
   );
 }
 
-function waitForRetry(attempt: number) {
+function readProviderHeader(
+  headers: Record<string, string> | null | undefined,
+  name: string,
+) {
+  if (!headers) return undefined;
+  const target = name.toLowerCase();
+  const entry = Object.entries(headers).find(
+    ([headerName]) => headerName.toLowerCase() === target,
+  );
+  return entry?.[1];
+}
+
+function rateLimitRetryDelayMs(
+  error: unknown,
+  headers: Record<string, string> | null | undefined,
+) {
+  if (!isRecord(error)) return undefined;
+  const name = typeof error.name === "string" ? error.name : "";
+  const statusCode =
+    typeof error.statusCode === "number" ? error.statusCode : null;
+  if (name !== "rate_limit_exceeded" && statusCode !== 429) return undefined;
+
+  for (const headerName of ["retry-after", "ratelimit-reset"]) {
+    const value = readProviderHeader(headers, headerName);
+    if (value === undefined) continue;
+    const seconds = Number(value);
+    if (Number.isFinite(seconds) && seconds >= 0) {
+      return Math.max(
+        INQUIRY_SEND_RATE_LIMIT_DELAY_MS,
+        Math.ceil(seconds * 1_000),
+      );
+    }
+  }
+
+  return INQUIRY_SEND_RATE_LIMIT_DELAY_MS;
+}
+
+function waitForRetry(delayMs: number) {
   return new Promise<void>((resolve) => {
-    setTimeout(resolve, INQUIRY_SEND_RETRY_DELAY_MS * attempt);
+    setTimeout(resolve, delayMs);
   });
 }
 
@@ -84,6 +128,7 @@ async function sendInquiryAttempt(
   sender: Sender,
   message: InquiryMessage,
   idempotencyKey: string,
+  timeoutMs: number,
 ): Promise<AttemptResult> {
   const controller = new AbortController();
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -103,7 +148,7 @@ async function sendInquiryAttempt(
     timeoutId = setTimeout(() => {
       controller.abort();
       resolve({ status: "timeout" });
-    }, INQUIRY_SEND_ATTEMPT_TIMEOUT_MS);
+    }, timeoutMs);
   });
 
   try {
@@ -112,11 +157,13 @@ async function sendInquiryAttempt(
       return { status: "transient" };
     }
 
-    const { data, error } = outcome.result;
+    const { data, error, headers } = outcome.result;
     if (!error && data?.id) return { status: "success", id: data.id };
 
+    if (!isTransientProviderError(error)) return { status: "permanent" };
     return {
-      status: isTransientProviderError(error) ? "transient" : "permanent",
+      status: "transient",
+      retryDelayMs: rateLimitRetryDelayMs(error, headers),
     };
   } finally {
     if (timeoutId !== undefined) clearTimeout(timeoutId);
@@ -183,14 +230,25 @@ export async function sendInquiryEmail(
     text: rendered.text,
   };
   const idempotencyKey = `inquiry-${input.submissionId}`;
+  const deadline = Date.now() + INQUIRY_SEND_TOTAL_TIMEOUT_MS;
 
   for (let attempt = 1; attempt <= INQUIRY_SEND_MAX_ATTEMPTS; attempt += 1) {
-    const result = await sendInquiryAttempt(sender, message, idempotencyKey);
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) break;
+    const result = await sendInquiryAttempt(
+      sender,
+      message,
+      idempotencyKey,
+      Math.min(INQUIRY_SEND_ATTEMPT_TIMEOUT_MS, remainingMs),
+    );
     if (result.status === "success") return { id: result.id };
     if (result.status === "permanent" || attempt === INQUIRY_SEND_MAX_ATTEMPTS) {
       break;
     }
-    await waitForRetry(attempt);
+    const retryDelayMs =
+      result.retryDelayMs ?? INQUIRY_SEND_RETRY_DELAY_MS * attempt;
+    if (retryDelayMs >= deadline - Date.now()) break;
+    await waitForRetry(retryDelayMs);
   }
 
   throw new Error("Inquiry delivery failed.");

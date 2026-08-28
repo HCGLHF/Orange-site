@@ -75,6 +75,19 @@ function isReasonableEmail(value: string): boolean {
   );
 }
 
+function readSourceUrl(value: unknown): ReadStringResult {
+  const sourceUrl = readString(value, 500);
+  if (!sourceUrl) return sourceUrl;
+
+  try {
+    const parsed = new URL(sourceUrl);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeItem(value: unknown): InquiryItem | null {
   if (!isRecord(value)) return null;
 
@@ -122,7 +135,7 @@ function normalizeInput(value: unknown): InquiryEmailInput | null {
   const company = readString(value.company, 160);
   const phone = readString(value.phone, 60);
   const notes = readString(value.notes, 4000);
-  const sourceUrl = readString(value.sourceUrl, 500);
+  const sourceUrl = readSourceUrl(value.sourceUrl);
   const items = normalizeItems(value.items);
 
   if (
@@ -259,7 +272,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, inquiryId: result.id });
   } catch (error) {
     console.error("Inquiry email delivery failed.", {
-      submissionId: input.submissionId,
       errorType: error instanceof Error ? "Error" : "Unknown",
     });
     return NextResponse.json(

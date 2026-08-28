@@ -410,7 +410,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
         company: company.trim(),
         phone: phone.trim(),
         notes: notes.trim(),
-        sourceUrl: typeof window === "undefined" ? "" : window.location.href,
+        sourceUrl:
+          typeof window === "undefined"
+            ? ""
+            : `${window.location.origin}${window.location.pathname}`,
         honeypot: website.trim(),
         items: [{ name: fabricLabel, quantity: quantity.trim() }],
       },

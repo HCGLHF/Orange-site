@@ -189,11 +189,17 @@ afterEach(async () => {
     });
   } finally {
     vi.useRealTimers();
+    window.history.replaceState({}, "", "/");
   }
 });
 
 describe("InquiryBar server submission and conversion analytics", () => {
   it("posts exactly one complete batch inquiry and clears the cart only after confirmed success", async () => {
+    window.history.pushState(
+      {},
+      "",
+      "/fabrics?email=private%40example.com#access-token",
+    );
     const pendingResponse = deferred<Response>();
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
     const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
@@ -233,7 +239,7 @@ describe("InquiryBar server submission and conversion analytics", () => {
       company: "Private Company",
       phone: "+86 138 0000 0000",
       notes: "Private target price and delivery notes",
-      sourceUrl: window.location.href,
+      sourceUrl: `${window.location.origin}/fabrics`,
       honeypot: "",
       items: [
         {
