@@ -7,6 +7,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
+const REQUEST_BODY_LIMIT_BYTES = 32 * 1024;
 const SUBMISSION_ID_PATTERN = /^[A-Za-z0-9_-]{16,100}$/;
 const EMAIL_LOCAL_PART_PATTERN = /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$/;
 const EMAIL_DOMAIN_LABEL_PATTERN =
@@ -20,6 +21,10 @@ const ITEM_METADATA_FIELDS = [
 
 type JsonRecord = Record<string, unknown>;
 type ReadStringResult = string | undefined | null;
+type ReadBodyResult =
+  | { status: "ok"; body: unknown }
+  | { status: "invalid" }
+  | { status: "too-large" };
 
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -157,6 +162,66 @@ function invalidRequest() {
   );
 }
 
+function requestTooLarge() {
+  return NextResponse.json(
+    { success: false, error: "Request too large." },
+    { status: 413 },
+  );
+}
+
+function hasOversizedDeclaredLength(request: Request): boolean {
+  const value = request.headers.get("content-length")?.trim();
+  if (!value || !/^\d+$/.test(value)) return false;
+
+  return BigInt(value) > BigInt(REQUEST_BODY_LIMIT_BYTES);
+}
+
+async function readJsonBody(request: Request): Promise<ReadBodyResult> {
+  if (hasOversizedDeclaredLength(request)) return { status: "too-large" };
+  if (!request.body) return { status: "invalid" };
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let byteLength = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      if (value.byteLength > REQUEST_BODY_LIMIT_BYTES - byteLength) {
+        try {
+          await reader.cancel();
+        } catch {
+          // The request is already rejected; cancellation is best effort.
+        }
+        return { status: "too-large" };
+      }
+
+      byteLength += value.byteLength;
+      chunks.push(value);
+    }
+  } catch {
+    return { status: "invalid" };
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(byteLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return { status: "ok", body: JSON.parse(text) };
+  } catch {
+    return { status: "invalid" };
+  }
+}
+
 export async function POST(request: Request) {
   const mediaType = request.headers
     .get("content-type")
@@ -170,14 +235,11 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return invalidRequest();
-  }
+  const parsedBody = await readJsonBody(request);
+  if (parsedBody.status === "too-large") return requestTooLarge();
+  if (parsedBody.status === "invalid") return invalidRequest();
 
-  const input = normalizeInput(body);
+  const input = normalizeInput(parsedBody.body);
   if (!input) return invalidRequest();
 
   try {

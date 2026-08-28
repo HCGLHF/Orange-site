@@ -7,6 +7,7 @@ vi.mock("@/lib/inquiry-email", () => ({
 }));
 
 const mockedSendInquiryEmail = vi.mocked(sendInquiryEmail);
+const REQUEST_BODY_LIMIT_BYTES = 32 * 1024;
 
 const validBody = {
   type: "single",
@@ -30,6 +31,23 @@ function makeRequest(
     headers: { "content-type": contentType },
     body: typeof body === "string" ? body : JSON.stringify(body),
   });
+}
+
+function makeStreamRequest(chunks: string[]): Request {
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (const chunk of chunks) controller.enqueue(encoder.encode(chunk));
+      controller.close();
+    },
+  });
+
+  return new Request("http://localhost/api/inquiry", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body,
+    duplex: "half",
+  } as RequestInit);
 }
 
 async function expectInvalid(body: unknown) {
@@ -76,6 +94,72 @@ describe("POST /api/inquiry", () => {
 
   it("rejects malformed JSON with the stable public error", async () => {
     await expectInvalid("{not-json");
+  });
+
+  it("fast-rejects a declared oversized body without sending", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/inquiry", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "content-length": String(REQUEST_BODY_LIMIT_BYTES + 1),
+        },
+        body: JSON.stringify(validBody),
+      }),
+    );
+
+    expect(response.status).toBe(413);
+    await expect(response.json()).resolves.toEqual({
+      success: false,
+      error: "Request too large.",
+    });
+    expect(mockedSendInquiryEmail).not.toHaveBeenCalled();
+  });
+
+  it("rejects an oversized streamed body before JSON parsing or sending", async () => {
+    const oversizedBody = JSON.stringify({
+      ...validBody,
+      notes: "x".repeat(REQUEST_BODY_LIMIT_BYTES),
+    });
+    const response = await POST(
+      makeStreamRequest([
+        oversizedBody.slice(0, 16_384),
+        oversizedBody.slice(16_384),
+      ]),
+    );
+
+    expect(response.status).toBe(413);
+    await expect(response.json()).resolves.toEqual({
+      success: false,
+      error: "Request too large.",
+    });
+    expect(mockedSendInquiryEmail).not.toHaveBeenCalled();
+  });
+
+  it("accepts and sends a normal streamed JSON payload", async () => {
+    mockedSendInquiryEmail.mockResolvedValue({ id: "email_streamed" });
+    const body = JSON.stringify(validBody);
+    const response = await POST(
+      makeStreamRequest([body.slice(0, 37), body.slice(37)]),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      success: true,
+      inquiryId: "email_streamed",
+    });
+    expect(mockedSendInquiryEmail).toHaveBeenCalledOnce();
+    expect(mockedSendInquiryEmail).toHaveBeenCalledWith({
+      type: "single",
+      submissionId: "inq_1234567890abcdef",
+      customer: "Buyer Name",
+      email: "buyer@example.com",
+      company: "Buyer Co",
+      phone: "+86 13800000000",
+      notes: "Need lab dips",
+      sourceUrl: "https://orangetextiles.com/fabrics",
+      items: [{ name: "Cotton Jersey", quantity: "500 m" }],
+    });
   });
 
   it.each([
