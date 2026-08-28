@@ -243,6 +243,21 @@ describe("inquiry email transport", () => {
     },
   );
 
+  it.each(["daily_quota_exceeded", "monthly_quota_exceeded"])(
+    "does not retry permanent 429 %s failures",
+    async (name) => {
+      const send = vi.fn().mockResolvedValue({
+        data: null,
+        error: { name, statusCode: 429, message: "quota exhausted" },
+      });
+
+      await expect(
+        sendInquiryEmail(input, { emails: { send } }),
+      ).rejects.toThrowError(/^Inquiry delivery failed\.$/);
+      expect(send).toHaveBeenCalledOnce();
+    },
+  );
+
   it("rejects a provider response that has no message ID", async () => {
     const sender = {
       emails: {

@@ -60,6 +60,10 @@ function isTransientProviderError(error: unknown): boolean {
   const statusCode =
     typeof error.statusCode === "number" ? error.statusCode : null;
 
+  if (name === "daily_quota_exceeded" || name === "monthly_quota_exceeded") {
+    return false;
+  }
+
   return (
     name === "application_error" ||
     name === "rate_limit_exceeded" ||

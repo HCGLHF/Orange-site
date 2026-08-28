@@ -272,8 +272,17 @@ describe("POST /api/inquiry", () => {
     );
   });
 
-  it("rejects a populated honeypot without sending", async () => {
-    await expectInvalid({ ...validBody, honeypot: "spam" });
+  it("silently accepts a populated honeypot without sending", async () => {
+    const response = await POST(
+      makeRequest({ ...validBody, honeypot: "spam" }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      success: true,
+      inquiryId: "accepted",
+    });
+    expect(mockedSendInquiryEmail).not.toHaveBeenCalled();
   });
 
   it("requires at least one item for a batch inquiry", async () => {

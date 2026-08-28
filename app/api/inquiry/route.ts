@@ -112,7 +112,7 @@ function normalizeInput(value: unknown): InquiryEmailInput | null {
   if (!isRecord(value)) return null;
 
   if (value.honeypot !== undefined) {
-    if (typeof value.honeypot !== "string" || value.honeypot.trim()) return null;
+    if (typeof value.honeypot !== "string") return null;
   }
 
   const type = readString(value.type, 6, true);
@@ -167,6 +167,10 @@ function requestTooLarge() {
     { success: false, error: "Request too large." },
     { status: 413 },
   );
+}
+
+function acceptedHoneypot() {
+  return NextResponse.json({ success: true, inquiryId: "accepted" });
 }
 
 function hasOversizedDeclaredLength(request: Request): boolean {
@@ -238,6 +242,14 @@ export async function POST(request: Request) {
   const parsedBody = await readJsonBody(request);
   if (parsedBody.status === "too-large") return requestTooLarge();
   if (parsedBody.status === "invalid") return invalidRequest();
+
+  if (
+    isRecord(parsedBody.body) &&
+    typeof parsedBody.body.honeypot === "string" &&
+    parsedBody.body.honeypot.trim()
+  ) {
+    return acceptedHoneypot();
+  }
 
   const input = normalizeInput(parsedBody.body);
   if (!input) return invalidRequest();

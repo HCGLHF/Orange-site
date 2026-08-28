@@ -14,6 +14,7 @@
 - Verified the local production build on 2026-07-23: 28 checked, 28 passed, 0 failed, 0 unchecked, and 0 inaccessible.
 - Hardened inquiry delivery so identical retries keep byte-identical Resend payloads and idempotency keys, while edited single or batch payloads rotate their submission IDs.
 - Added a bounded, abortable Resend retry policy and a 32 KiB raw inquiry request-body limit for declared and streamed bodies.
+- Made populated inquiry honeypots return a generic success without sending, and kept daily or monthly Resend quota exhaustion out of short-lived retry loops.
 
 ## Learned
 
@@ -25,6 +26,7 @@
 - A nested Git worktree needs `"root": true` in `.eslintrc.json` to prevent Next.js ESLint from loading the parent checkout's duplicate plugin configuration.
 - Resend requires byte-identical request payloads when an idempotency key is reused; client retry identity must therefore follow the complete normalized payload rather than only the form lifecycle.
 - The installed Resend SDK forwards an abort signal at runtime even though its public email request-options type does not currently declare that extra `RequestInit` field.
+- Resend reports per-second throttling and daily/monthly quota exhaustion as distinct named 429 errors; only the per-second rate limit is useful to retry inside one request.
 
 ## Risks
 
