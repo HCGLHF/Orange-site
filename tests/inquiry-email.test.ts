@@ -41,10 +41,41 @@ describe("inquiry email transport", () => {
         subject: "[Website inquiry] Buyer Co | Cotton Jersey",
       }),
       {
-        headers: {
-          "Idempotency-Key": "inquiry-inq_1234567890abcdef",
-        },
+        idempotencyKey: "inquiry-inq_1234567890abcdef",
       },
+    );
+  });
+
+  it("keeps real SDK request bytes and idempotency headers stable for identical input", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () =>
+        new Response(JSON.stringify({ id: "email_123" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+
+    await sendInquiryEmail(input);
+    await sendInquiryEmail({ ...input });
+    await sendInquiryEmail({
+      ...input,
+      submissionId: "inq_1234567890abcdeg",
+      notes: "Edited lab-dip request",
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    const requests = fetchSpy.mock.calls.map(([, options]) => ({
+      body: options?.body,
+      idempotencyKey: new Headers(options?.headers).get("Idempotency-Key"),
+    }));
+    expect(requests[0]).toEqual(requests[1]);
+    expect(requests[0]?.idempotencyKey).toBe(
+      "inquiry-inq_1234567890abcdef",
+    );
+    expect(requests[2]?.body).not.toBe(requests[0]?.body);
+    expect(requests[2]?.idempotencyKey).toBe(
+      "inquiry-inq_1234567890abcdeg",
     );
   });
 
@@ -104,10 +135,7 @@ describe("inquiry email transport", () => {
     );
   });
 
-  it("renders contact details, every fabric, notes, source, ID, and timestamp", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-08-26T10:15:30.000Z"));
-
+  it("renders contact details, every fabric, notes, source, and ID deterministically", () => {
     const rendered = renderInquiryEmail({
       ...input,
       type: "batch",
@@ -146,6 +174,6 @@ describe("inquiry email transport", () => {
     expect(rendered.text).toContain(
       "Source: https://orangetextiles.com/fabrics",
     );
-    expect(rendered.text).toContain("Submitted: 2026-08-26T10:15:30.000Z");
+    expect(rendered.text).not.toContain("Submitted:");
   });
 });

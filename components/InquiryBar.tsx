@@ -72,6 +72,7 @@ type SubmittedCartEntry = {
 type SharedBatchSnapshot = {
   status: "idle" | "pending" | "success" | "error";
   submissionId: string | null;
+  payloadKey: string | null;
   operation: SharedBatchOperation | null;
   draft: SharedBatchDraft | null;
   submittedCart: SubmittedCartEntry[] | null;
@@ -80,6 +81,7 @@ type SharedBatchSnapshot = {
 const idleBatchSnapshot: SharedBatchSnapshot = {
   status: "idle",
   submissionId: null,
+  payloadKey: null,
   operation: null,
   draft: null,
   submittedCart: null,
@@ -209,7 +211,12 @@ function startSharedBatchOperation(
 ) {
   if (sharedBatchSnapshot.operation) return sharedBatchSnapshot.operation;
 
-  const submissionId = sharedBatchSnapshot.submissionId ?? crypto.randomUUID();
+  const payloadKey = JSON.stringify(payload);
+  const submissionId =
+    sharedBatchSnapshot.submissionId !== null &&
+    sharedBatchSnapshot.payloadKey === payloadKey
+      ? sharedBatchSnapshot.submissionId
+      : crypto.randomUUID();
   const controller = new AbortController();
   const promise: Promise<BatchInquiryOutcome> = submitBatchInquiryRequest(
     { ...payload, submissionId },
@@ -225,6 +232,7 @@ function startSharedBatchOperation(
         setSharedBatchSnapshot({
           status: "success",
           submissionId: null,
+          payloadKey: null,
           operation: null,
           draft: null,
           submittedCart: currentSnapshot.submittedCart,
@@ -243,6 +251,7 @@ function startSharedBatchOperation(
   setSharedBatchSnapshot({
     status: "pending",
     submissionId,
+    payloadKey,
     operation,
     draft,
     submittedCart,

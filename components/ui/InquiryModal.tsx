@@ -54,6 +54,7 @@ type SharedInquiryDraft = {
 type SharedInquirySnapshot = {
   status: "idle" | "pending" | "success" | "error";
   submissionId: string | null;
+  payloadKey: string | null;
   operation: SharedInquiryOperation | null;
   draft: SharedInquiryDraft | null;
 };
@@ -61,6 +62,7 @@ type SharedInquirySnapshot = {
 const idleInquirySnapshot: SharedInquirySnapshot = {
   status: "idle",
   submissionId: null,
+  payloadKey: null,
   operation: null,
   draft: null,
 };
@@ -161,7 +163,12 @@ function startSharedInquiryOperation(
 ) {
   if (sharedInquirySnapshot.operation) return sharedInquirySnapshot.operation;
 
-  const submissionId = sharedInquirySnapshot.submissionId ?? crypto.randomUUID();
+  const payloadKey = JSON.stringify(payload);
+  const submissionId =
+    sharedInquirySnapshot.submissionId !== null &&
+    sharedInquirySnapshot.payloadKey === payloadKey
+      ? sharedInquirySnapshot.submissionId
+      : crypto.randomUUID();
   const controller = new AbortController();
   const promise: Promise<InquirySubmissionOutcome> = submitInquiryRequest(
     { ...payload, submissionId },
@@ -177,6 +184,7 @@ function startSharedInquiryOperation(
         setSharedInquirySnapshot({
           status: "success",
           submissionId: null,
+          payloadKey: null,
           operation: null,
           draft: null,
         });
@@ -191,7 +199,13 @@ function startSharedInquiryOperation(
       return outcome;
     });
   const operation = { controller, promise };
-  setSharedInquirySnapshot({ status: "pending", submissionId, operation, draft });
+  setSharedInquirySnapshot({
+    status: "pending",
+    submissionId,
+    payloadKey,
+    operation,
+    draft,
+  });
   return operation;
 }
 

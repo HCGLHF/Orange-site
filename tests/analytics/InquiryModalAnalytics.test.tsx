@@ -242,7 +242,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
     await remountedUser.click(screen.getByRole("button", { name: "OK" }));
   });
 
-  it("restores a remounted failed draft and retries its edited values with the same ID", async () => {
+  it("restores a remounted failed draft and rotates the ID for its edited retry", async () => {
+    const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
     const originalResponse = deferred<Response>();
     const retryResponse = deferred<Response>();
     const fetchSpy = vi
@@ -251,7 +252,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
       .mockReturnValueOnce(retryResponse.promise);
     const uuidSpy = vi
       .spyOn(globalThis.crypto, "randomUUID")
-      .mockReturnValue(SUBMISSION_ID);
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(nextSubmissionId);
     const firstView = render(
       <LocaleProvider>
         <InquiryModal open onClose={vi.fn()} />
@@ -372,7 +374,7 @@ describe("InquiryModal server submission and conversion analytics", () => {
       items: [{ name: "French terry fabric", quantity: "500 kg confidential" }],
     });
     expect(retryBody).toMatchObject({
-      submissionId: firstBody.submissionId,
+      submissionId: nextSubmissionId,
       customer: "Remounted Buyer",
       email: "remounted@example.com",
       company: "Remounted Company",
@@ -381,8 +383,8 @@ describe("InquiryModal server submission and conversion analytics", () => {
       honeypot: "",
       items: [{ name: "Cotton jersey fabric", quantity: "750 kg updated" }],
     });
-    expect(retryBody.submissionId).toBe(SUBMISSION_ID);
-    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(retryBody.submissionId).not.toBe(firstBody.submissionId);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
     expect(window.dataLayer).toEqual([
       { event: "orange_generate_lead", form_name: "single_inquiry" },
     ]);
@@ -537,6 +539,42 @@ describe("InquiryModal server submission and conversion analytics", () => {
     expect(uuidSpy).toHaveBeenCalledTimes(2);
 
     await newDraftUser.click(screen.getByRole("button", { name: "OK" }));
+  });
+
+  it("rotates a failed draft submission ID when only the source URL changes", async () => {
+    const nextSubmissionId = "123e4567-e89b-42d3-a456-426614174001";
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(jsonResponse({ success: false }, { ok: false }))
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      );
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(nextSubmissionId);
+    window.history.pushState({}, "", "/inquiry-source-one");
+    renderModal();
+    const user = await completeModalInquiry();
+
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    window.history.pushState({}, "", "/inquiry-source-two");
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Submitted successfully",
+    );
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(firstBody.sourceUrl).toContain("/inquiry-source-one");
+    expect(retryBody.sourceUrl).toContain("/inquiry-source-two");
+    expect(retryBody.submissionId).toBe(nextSubmissionId);
+    expect(retryBody.submissionId).not.toBe(firstBody.submissionId);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+    window.history.replaceState({}, "", "/");
   });
 
   it("times out hung response parsing and retries with the same submission ID", async () => {

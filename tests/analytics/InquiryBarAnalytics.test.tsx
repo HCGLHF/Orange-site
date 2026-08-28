@@ -374,6 +374,40 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
+  it("rotates a failed draft submission ID when the cart payload changes", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(jsonResponse({ success: false }, { ok: false }))
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      );
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(NEXT_SUBMISSION_ID);
+    const { user } = await renderOpenBatchInquiry({ allowRemount: true });
+    await completeBatchInquiry(user);
+
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
+    await user.click(screen.getByRole("button", { name: "Add later fabric" }));
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
+    const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+    const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+    expect(firstBody.items).toHaveLength(2);
+    expect(retryBody.items).toHaveLength(3);
+    expect(retryBody.submissionId).toBe(NEXT_SUBMISSION_ID);
+    expect(retryBody.submissionId).not.toBe(firstBody.submissionId);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
+    expect(window.dataLayer).toEqual([
+      { event: "orange_generate_lead", form_name: "batch_inquiry" },
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "OK" }));
+  });
+
   it("blocks duplicate pending sends and close paths across an InquiryBar remount", async () => {
     const pendingResponse = deferred<Response>();
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockReturnValue(pendingResponse.promise);
@@ -548,13 +582,16 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "OK" }));
   });
 
-  it("restores the latest pending draft after a second zero-subscriber failure and retries the same UUID", async () => {
+  it("restores the latest pending draft after a second zero-subscriber failure and rotates the UUID for edits", async () => {
     const pendingResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockReturnValueOnce(pendingResponse.promise)
       .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_retry" }));
-    const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(NEXT_SUBMISSION_ID);
     const { user } = await renderOpenBatchInquiry({
       allowRemount: true,
       strictMode: true,
@@ -623,8 +660,8 @@ describe("InquiryBar server submission and conversion analytics", () => {
     expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
     const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
     const retryBody = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
-    expect(retryBody.submissionId).toBe(firstBody.submissionId);
-    expect(retryBody.submissionId).toBe(SUBMISSION_ID);
+    expect(retryBody.submissionId).not.toBe(firstBody.submissionId);
+    expect(retryBody.submissionId).toBe(NEXT_SUBMISSION_ID);
     expect(retryBody).toMatchObject({
       customer: "Latest Buyer",
       company: "Latest Company",
@@ -633,7 +670,7 @@ describe("InquiryBar server submission and conversion analytics", () => {
       notes: "Latest delivery requirement",
       honeypot: "",
     });
-    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
     expect(window.dataLayer).toEqual([
       { event: "orange_generate_lead", form_name: "batch_inquiry" },
@@ -802,7 +839,10 @@ describe("InquiryBar server submission and conversion analytics", () => {
       .spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(jsonResponse({ success: false }, { ok: false }))
       .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_retry" }));
-    const uuidSpy = vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue(SUBMISSION_ID);
+    const uuidSpy = vi
+      .spyOn(globalThis.crypto, "randomUUID")
+      .mockReturnValueOnce(SUBMISSION_ID)
+      .mockReturnValueOnce(NEXT_SUBMISSION_ID);
     const { user } = await renderOpenBatchInquiry();
     await completeBatchInquiry(user);
     const honeypot = document.querySelector<HTMLInputElement>('input[name="website"]');
@@ -825,10 +865,10 @@ describe("InquiryBar server submission and conversion analytics", () => {
 
     expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
     expect(JSON.parse(String(fetchSpy.mock.calls[1][1]?.body))).toMatchObject({
-      submissionId: SUBMISSION_ID,
+      submissionId: NEXT_SUBMISSION_ID,
       honeypot: "",
     });
-    expect(uuidSpy).toHaveBeenCalledTimes(1);
+    expect(uuidSpy).toHaveBeenCalledTimes(2);
     expect(screen.getByLabelText("Cart item count")).toHaveTextContent("0");
     expect(window.dataLayer).toEqual([
       { event: "orange_generate_lead", form_name: "batch_inquiry" },

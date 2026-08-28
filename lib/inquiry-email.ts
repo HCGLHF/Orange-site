@@ -36,7 +36,7 @@ type Sender = {
   emails: {
     send: (
       message: InquiryMessage,
-      options: { headers: Record<string, string> },
+      options: { idempotencyKey: string },
     ) => Promise<{ data: { id: string } | null; error: unknown }>;
   };
 };
@@ -74,7 +74,6 @@ export function renderInquiryEmail(input: InquiryEmailInput) {
       "",
       `Notes: ${input.notes?.trim() || "None"}`,
       `Source: ${input.sourceUrl?.trim() || "Not provided"}`,
-      `Submitted: ${new Date().toISOString()}`,
     ].join("\n"),
   };
 }
@@ -104,9 +103,7 @@ export async function sendInquiryEmail(
         text: rendered.text,
       },
       {
-        headers: {
-          "Idempotency-Key": `inquiry-${input.submissionId}`,
-        },
+        idempotencyKey: `inquiry-${input.submissionId}`,
       },
     );
 
