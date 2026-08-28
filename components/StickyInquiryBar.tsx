@@ -11,6 +11,18 @@ import {
 import { useInquiryCart } from "@/components/InquiryCartProvider";
 import { dispatchOpenBatchInquiry } from "@/lib/inquiry-events";
 
+function getPersistentFallbackOpener(): HTMLElement | null {
+  const viewport =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(min-width: 1280px)").matches
+      ? "desktop"
+      : "compact";
+  const candidate = document.querySelector<HTMLElement>(
+    `[data-inquiry-fallback-opener="${viewport}"]`,
+  );
+  return candidate?.isConnected ? candidate : null;
+}
+
 export default function StickyInquiryBar() {
   const { items, totalCount, removeItem } = useInquiryCart();
   const [isVisible, setIsVisible] = useState(false);
@@ -55,6 +67,13 @@ export default function StickyInquiryBar() {
     const stableOpener = stickyTriggerRef.current?.isConnected
       ? stickyTriggerRef.current
       : null;
+    const stableFallbackOpener = getPersistentFallbackOpener();
+    const dispatchOpen = () => {
+      dispatchOpenBatchInquiry(
+        stableOpener?.isConnected ? stableOpener : undefined,
+        stableFallbackOpener?.isConnected ? stableFallbackOpener : undefined,
+      );
+    };
     stableOpener?.focus();
     const anchor = document.getElementById("inquiry-form");
     if (anchor) {
@@ -64,12 +83,10 @@ export default function StickyInquiryBar() {
       }
       pendingDispatchTimerRef.current = window.setTimeout(() => {
         pendingDispatchTimerRef.current = null;
-        dispatchOpenBatchInquiry(
-          stableOpener?.isConnected ? stableOpener : undefined,
-        );
+        dispatchOpen();
       }, 380);
     } else {
-      dispatchOpenBatchInquiry(stableOpener ?? undefined);
+      dispatchOpen();
     }
     closePanel();
   };

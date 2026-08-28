@@ -61,6 +61,7 @@ function NavbarContent() {
               }
               onClick={() => setDrawerOpen(true)}
               className="gn-menu"
+              data-inquiry-fallback-opener="compact"
             >
               <Menu className="gn-icon" aria-hidden="true" />
             </button>
@@ -90,6 +91,7 @@ function NavbarContent() {
                   totalCount === 1 ? "item" : "items"
                 }`}
                 className="gn-cart"
+                data-inquiry-fallback-opener="desktop"
               >
                 <ShoppingCart
                   className="gn-cart-icon"

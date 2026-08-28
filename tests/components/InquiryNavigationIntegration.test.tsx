@@ -1,5 +1,5 @@
 import React from "react";
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetBatchInquiryStateForTests } from "@/components/InquiryBar";
@@ -49,6 +49,13 @@ function renderGlobalInquiryRoute() {
       </InquiryProvider>
     </LocaleProvider>,
   );
+}
+
+function jsonResponse(body: unknown): Response {
+  return {
+    ok: true,
+    json: vi.fn().mockResolvedValue(body),
+  } as unknown as Response;
 }
 
 function batchDialogControls() {
@@ -236,5 +243,54 @@ describe("global inquiry navigation", () => {
       ).not.toBeInTheDocument();
     });
     expect(menuTrigger).toHaveFocus();
+  });
+
+  it("restores sticky success focus to a persistent visible Navbar control after the cart clears", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("scrollY", 400);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        jsonResponse({ success: true, inquiryId: "sticky-success" }),
+      ),
+    );
+    renderGlobalInquiryRoute();
+
+    await user.click(screen.getByRole("button", { name: "Add test fabric" }));
+    fireEvent.scroll(window);
+    const stickyTrigger = await screen.findByRole("button", {
+      name: /1 pending inquiry/i,
+    });
+    await user.click(stickyTrigger);
+    await user.click(screen.getByRole("button", { name: "Fill inquiry form" }));
+    await screen.findByRole("dialog", { name: "Batch inquiry" });
+
+    await user.type(screen.getByPlaceholderText("Your full name"), "Buyer Name");
+    await user.type(screen.getByPlaceholderText("+1 or +86"), "+61 400 000 000");
+    await user.type(
+      screen.getByPlaceholderText("example@company.com"),
+      "buyer@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+
+    const success = await screen.findByRole("status");
+    expect(success).toHaveTextContent("Submitted");
+    await waitFor(() => expect(stickyTrigger.isConnected).toBe(false));
+
+    const persistentFallback = screen.getByRole("button", {
+      name: "Open navigation menu",
+    });
+    expect(persistentFallback).toHaveAttribute(
+      "data-inquiry-fallback-opener",
+      "compact",
+    );
+    await user.click(screen.getByRole("button", { name: "OK" }));
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("dialog", { name: "Batch inquiry" }),
+      ).not.toBeInTheDocument();
+    });
+    expect(persistentFallback).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
   });
 });

@@ -335,6 +335,86 @@ function assertActiveModalStartsWithLazyBinding(sourceFile) {
   assert.ok(found, "ActiveInquiryModal must start from the lazy InquiryModal binding");
 }
 
+function assertRetryableInquiryBarFactory(sourceFile) {
+  const dynamicBinding = defaultImportBinding(sourceFile, "next/dynamic");
+  const factory = sourceFile.statements.find(
+    (statement) =>
+      ts.isFunctionDeclaration(statement) &&
+      statement.name?.text === "createRetryableInquiryBar"
+  );
+  assert.ok(factory?.body, "a module-level retryable InquiryBar factory is required");
+  assert.equal(factory.body.statements.length, 1, "retryable InquiryBar factory must have one return");
+  const [statement] = factory.body.statements;
+  assert.ok(
+    ts.isReturnStatement(statement) && statement.expression,
+    "retryable InquiryBar factory must return dynamic(...)"
+  );
+  const initializer = unwrappedExpression(statement.expression);
+  assert.ok(
+    ts.isCallExpression(initializer) &&
+      ts.isIdentifier(initializer.expression) &&
+      initializer.expression.text === dynamicBinding,
+    "retryable InquiryBar factory must call the imported dynamic binding"
+  );
+  const returnedExpression = loaderReturnExpression(initializer.arguments[0]);
+  assert.ok(
+    returnedExpression &&
+      isExactModalImportChain(
+        returnedExpression,
+        "@/components/InquiryBar",
+        "InquiryBar"
+      ),
+    "retryable InquiryBar factory must use the exact InquiryBar dynamic loader"
+  );
+  const config = unwrappedExpression(initializer.arguments[1]);
+  assert.ok(config && ts.isObjectLiteralExpression(config));
+  const propertyByName = (name) =>
+    config.properties.find(
+      (property) =>
+        ts.isPropertyAssignment(property) &&
+        ((ts.isIdentifier(property.name) && property.name.text === name) ||
+          (ts.isStringLiteralLike(property.name) && property.name.text === name))
+    );
+  const ssr = propertyByName("ssr");
+  const loading = propertyByName("loading");
+  assert.ok(ssr?.initializer.kind === ts.SyntaxKind.FalseKeyword);
+  assert.ok(
+    loading &&
+      ts.isIdentifier(unwrappedExpression(loading.initializer)) &&
+      unwrappedExpression(loading.initializer).text === "InquiryBarLoading",
+    "retryable InquiryBar factory must set loading: InquiryBarLoading"
+  );
+}
+
+function assertActiveInquiryBarStartsWithLazyBinding(sourceFile) {
+  let found = false;
+  const visit = (node) => {
+    if (ts.isVariableDeclaration(node) && ts.isArrayBindingPattern(node.name)) {
+      const [activeBinding] = node.name.elements;
+      const initializer = node.initializer && unwrappedExpression(node.initializer);
+      if (
+        activeBinding &&
+        ts.isBindingElement(activeBinding) &&
+        ts.isIdentifier(activeBinding.name) &&
+        activeBinding.name.text === "ActiveInquiryBar" &&
+        initializer &&
+        ts.isCallExpression(initializer) &&
+        initializer.arguments.length === 1
+      ) {
+        const initialComponent = loaderReturnExpression(initializer.arguments[0]);
+        found = Boolean(
+          initialComponent &&
+            ts.isIdentifier(initialComponent) &&
+            initialComponent.text === "InquiryBar"
+        );
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  assert.ok(found, "ActiveInquiryBar must start from the lazy InquiryBar binding");
+}
+
 function hasDirectivePrologue(sourceFile, directive) {
   for (const statement of sourceFile.statements) {
     if (!ts.isExpressionStatement(statement) || !ts.isStringLiteral(statement.expression)) {
@@ -471,11 +551,14 @@ function assertBatchInquiryBarStaysLazy(inquiryProvider, deferredHost) {
     hostSource,
     "InquiryBar",
     "@/components/InquiryBar",
-    "InquiryBar"
+    "InquiryBar",
+    "InquiryBarLoading"
   );
+  assertRetryableInquiryBarFactory(hostSource);
+  assertActiveInquiryBarStartsWithLazyBinding(hostSource);
   assertUniqueConditionalRender(
     hostSource,
-    "InquiryBar",
+    "ActiveInquiryBar",
     isShouldLoadTrueNullGate
   );
 }

@@ -16,7 +16,7 @@ import {
   type CartItem,
 } from "@/components/InquiryCartProvider";
 import {
-  getOpenBatchInquiryOpener,
+  getOpenBatchInquiryOpeners,
   OPEN_BATCH_INQUIRY_EVENT,
 } from "@/lib/inquiry-events";
 import { pushGenerateLead } from "@/lib/analytics/events";
@@ -252,12 +252,14 @@ function startSharedBatchOperation(
 type InquiryBarProps = {
   initiallyOpen?: boolean;
   initialOpener?: HTMLElement | null;
+  initialFallbackOpener?: HTMLElement | null;
   onOpenListenerReady?: () => void;
 };
 
 export function InquiryBar({
   initiallyOpen = false,
   initialOpener = null,
+  initialFallbackOpener = null,
   onOpenListenerReady,
 }: InquiryBarProps = {}) {
   const { t } = useLocale();
@@ -295,6 +297,9 @@ export function InquiryBar({
   const openerRef = useRef<HTMLElement | null>(
     initialOpener?.isConnected ? initialOpener : null,
   );
+  const fallbackOpenerRef = useRef<HTMLElement | null>(
+    initialFallbackOpener?.isConnected ? initialFallbackOpener : null,
+  );
   const wasOpenRef = useRef(showForm);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
@@ -303,6 +308,19 @@ export function InquiryBar({
   const visibleError =
     error ??
     (sharedSubmission.status === "error" ? t("inquirySubmitFailed") : null);
+
+  const restoreOpenerFocus = useCallback(() => {
+    const opener = openerRef.current;
+    const fallbackOpener = fallbackOpenerRef.current;
+    openerRef.current = null;
+    fallbackOpenerRef.current = null;
+    const focusTarget = opener?.isConnected
+      ? opener
+      : fallbackOpener?.isConnected
+        ? fallbackOpener
+        : null;
+    focusTarget?.focus();
+  }, []);
 
   const closeForm = useCallback(() => {
     if (sharedBatchSnapshot.status === "pending") return;
@@ -380,10 +398,14 @@ export function InquiryBar({
       const activeElement = document.activeElement;
       if (
         activeElement instanceof HTMLElement &&
+        activeElement !== document.body &&
         !panelRef.current?.contains(activeElement)
       ) {
         openerRef.current = activeElement;
       }
+    }
+    if (!fallbackOpenerRef.current?.isConnected) {
+      fallbackOpenerRef.current = null;
     }
 
     if (submitting || submitted || visibleError) return;
@@ -398,10 +420,8 @@ export function InquiryBar({
 
     if (!wasOpenRef.current) return;
     wasOpenRef.current = false;
-    const opener = openerRef.current;
-    openerRef.current = null;
-    if (opener?.isConnected) opener.focus();
-  }, [showForm]);
+    restoreOpenerFocus();
+  }, [restoreOpenerFocus, showForm]);
 
   useEffect(() => {
     if (showForm) setError(null);
@@ -436,7 +456,9 @@ export function InquiryBar({
 
   useEffect(() => {
     const open = (event: Event) => {
-      openerRef.current = getOpenBatchInquiryOpener(event);
+      const { opener, fallbackOpener } = getOpenBatchInquiryOpeners(event);
+      openerRef.current = opener;
+      fallbackOpenerRef.current = fallbackOpener;
       setShowForm(true);
     };
     window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
@@ -447,12 +469,8 @@ export function InquiryBar({
   }, [onOpenListenerReady]);
 
   useEffect(() => {
-    return () => {
-      const opener = openerRef.current;
-      openerRef.current = null;
-      if (opener?.isConnected) opener.focus();
-    };
-  }, []);
+    return restoreOpenerFocus;
+  }, [restoreOpenerFocus]);
 
   if (totalCount === 0 && !showForm && sharedSubmission.status === "idle") {
     return null;
