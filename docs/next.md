@@ -12,6 +12,8 @@
 - Added six catalogue-backed sourcing guides covering air-layer, wool-blend, jacquard specifications, brushed finishes, RFQ preparation, and sourcing questions, supported by five dedicated WebP visuals.
 - Added an automated production-HTML audit for HTTP status, robots, sitemap membership, title, description, Open Graph, Twitter, H1, image ALT, canonical, and noindex state.
 - Verified the local production build on 2026-07-23: 28 checked, 28 passed, 0 failed, 0 unchecked, and 0 inaccessible.
+- Hardened inquiry delivery so identical retries keep byte-identical Resend payloads and idempotency keys, while edited single or batch payloads rotate their submission IDs.
+- Added a bounded, abortable Resend retry policy and a 32 KiB raw inquiry request-body limit for declared and streamed bodies.
 
 ## Learned
 
@@ -21,6 +23,8 @@
 - The checked-in lockfile was out of sync with its optional `@emnapi` dependency graph; regenerating it was required before `npm ci` could be reliable.
 - Next.js normalizes the homepage canonical to the origin without a trailing slash, so the registry and sitemap now use the same exact homepage URL.
 - A nested Git worktree needs `"root": true` in `.eslintrc.json` to prevent Next.js ESLint from loading the parent checkout's duplicate plugin configuration.
+- Resend requires byte-identical request payloads when an idempotency key is reused; client retry identity must therefore follow the complete normalized payload rather than only the form lifecycle.
+- The installed Resend SDK forwards an abort signal at runtime even though its public email request-options type does not currently declare that extra `RequestInit` field.
 
 ## Risks
 
@@ -29,6 +33,7 @@
 - The existing `components/ui/FabricCard.tsx` still raises a non-blocking Next.js `<img>` lint warning.
 - A clean install reports 39 dependency vulnerabilities and flags Next.js 14.2.33 for a published security update; handle the framework/dependency upgrade in a separate tested change.
 - Article-level composition, GSM, usable width, finish, MOQ, lead time, tests, and availability must continue to be confirmed in quotations and labeled samples.
+- Keep the server-side inquiry send budget below the browser's 15-second deadline if retry counts, backoff, or per-attempt timeouts change.
 
 ## Next
 
@@ -36,3 +41,4 @@
 - Request GSC reindexing for the homepage, commercial hubs, and early-opportunity Interlock, Ponte Roma, and Jacquard pages; allow the remaining pages to be rediscovered through the updated sitemap.
 - Run Semrush Site Audit and keyword/content checks against the deployed Orange Textiles domain, then compare results with the low-difficulty finished-fabric keyword cluster.
 - Review whether inquiry CRM failures need clearer user-facing fallback behavior.
+- Monitor production inquiry delivery for timeout, rate-limit, and idempotency failures after deployment without logging buyer PII or provider details.
