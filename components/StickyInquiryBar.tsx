@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ChevronRight,
@@ -16,6 +16,8 @@ export default function StickyInquiryBar() {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const stickyTriggerRef = useRef<HTMLButtonElement>(null);
+  const pendingDispatchTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +32,15 @@ export default function StickyInquiryBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [totalCount]);
 
+  useEffect(() => {
+    return () => {
+      if (pendingDispatchTimerRef.current !== null) {
+        window.clearTimeout(pendingDispatchTimerRef.current);
+        pendingDispatchTimerRef.current = null;
+      }
+    };
+  }, []);
+
   const openPanel = () => {
     setIsAnimating(true);
     setIsExpanded(true);
@@ -41,12 +52,24 @@ export default function StickyInquiryBar() {
   };
 
   const goToInquiryForm = () => {
+    const stableOpener = stickyTriggerRef.current?.isConnected
+      ? stickyTriggerRef.current
+      : null;
+    stableOpener?.focus();
     const anchor = document.getElementById("inquiry-form");
     if (anchor) {
       anchor.scrollIntoView({ behavior: "smooth", block: "start" });
-      window.setTimeout(() => dispatchOpenBatchInquiry(), 380);
+      if (pendingDispatchTimerRef.current !== null) {
+        window.clearTimeout(pendingDispatchTimerRef.current);
+      }
+      pendingDispatchTimerRef.current = window.setTimeout(() => {
+        pendingDispatchTimerRef.current = null;
+        dispatchOpenBatchInquiry(
+          stableOpener?.isConnected ? stableOpener : undefined,
+        );
+      }, 380);
     } else {
-      dispatchOpenBatchInquiry();
+      dispatchOpenBatchInquiry(stableOpener ?? undefined);
     }
     closePanel();
   };
@@ -63,6 +86,7 @@ export default function StickyInquiryBar() {
         }`}
       >
         <button
+          ref={stickyTriggerRef}
           type="button"
           onClick={openPanel}
           className="group flex items-center gap-3 rounded-full bg-brand-charcoal py-3 pl-5 pr-4 text-white shadow-2xl shadow-brand-charcoal/30 transition-all duration-300 hover:scale-105 hover:shadow-brand-charcoal/50"

@@ -15,7 +15,10 @@ import {
   useInquiryCart,
   type CartItem,
 } from "@/components/InquiryCartProvider";
-import { OPEN_BATCH_INQUIRY_EVENT } from "@/lib/inquiry-events";
+import {
+  getOpenBatchInquiryOpener,
+  OPEN_BATCH_INQUIRY_EVENT,
+} from "@/lib/inquiry-events";
 import { pushGenerateLead } from "@/lib/analytics/events";
 
 const BATCH_INQUIRY_TIMEOUT_MS = 15_000;
@@ -246,7 +249,17 @@ function startSharedBatchOperation(
   return operation;
 }
 
-export function InquiryBar() {
+type InquiryBarProps = {
+  initiallyOpen?: boolean;
+  initialOpener?: HTMLElement | null;
+  onOpenListenerReady?: () => void;
+};
+
+export function InquiryBar({
+  initiallyOpen = false,
+  initialOpener = null,
+  onOpenListenerReady,
+}: InquiryBarProps = {}) {
   const { t } = useLocale();
   const { items, totalCount, removeItem, updateQuantity } = useInquiryCart();
   const sharedSubmission = useSyncExternalStore(
@@ -255,7 +268,7 @@ export function InquiryBar() {
     () => idleBatchSnapshot,
   );
   const [showForm, setShowForm] = useState(
-    () => sharedSubmission.status !== "idle",
+    () => initiallyOpen || sharedSubmission.status !== "idle",
   );
   const [customer, setCustomer] = useState(
     () => sharedSubmission.draft?.customer ?? "",
@@ -279,7 +292,9 @@ export function InquiryBar() {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
+  const openerRef = useRef<HTMLElement | null>(
+    initialOpener?.isConnected ? initialOpener : null,
+  );
   const wasOpenRef = useRef(showForm);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
@@ -330,7 +345,9 @@ export function InquiryBar() {
 
       if (
         event.shiftKey &&
-        (activeElement === firstFocusable || !panel.contains(activeElement))
+        (activeElement === firstFocusable ||
+          activeElement === panel ||
+          !panel.contains(activeElement))
       ) {
         event.preventDefault();
         lastFocusable.focus();
@@ -339,7 +356,9 @@ export function InquiryBar() {
 
       if (
         !event.shiftKey &&
-        (activeElement === lastFocusable || !panel.contains(activeElement))
+        (activeElement === lastFocusable ||
+          activeElement === panel ||
+          !panel.contains(activeElement))
       ) {
         event.preventDefault();
         firstFocusable.focus();
@@ -356,7 +375,8 @@ export function InquiryBar() {
   useEffect(() => {
     if (!showForm) return;
 
-    if (!openerRef.current) {
+    if (!openerRef.current?.isConnected) {
+      openerRef.current = null;
       const activeElement = document.activeElement;
       if (
         activeElement instanceof HTMLElement &&
@@ -366,9 +386,9 @@ export function InquiryBar() {
       }
     }
 
-    if (submitted || visibleError) return;
+    if (submitting || submitted || visibleError) return;
     closeButtonRef.current?.focus();
-  }, [showForm, submitted, visibleError]);
+  }, [showForm, submitting, submitted, visibleError]);
 
   useEffect(() => {
     if (showForm) {
@@ -396,6 +416,10 @@ export function InquiryBar() {
   }, [visibleError]);
 
   useEffect(() => {
+    if (showForm && submitting) panelRef.current?.focus();
+  }, [showForm, submitting]);
+
+  useEffect(() => {
     const submittedCart = claimSubmittedCartReconciliation(sharedSubmission);
     if (!submittedCart) return;
 
@@ -411,18 +435,23 @@ export function InquiryBar() {
   }, [items, removeItem, sharedSubmission]);
 
   useEffect(() => {
-    const open = () => {
-      const activeElement = document.activeElement;
-      if (
-        activeElement instanceof HTMLElement &&
-        !panelRef.current?.contains(activeElement)
-      ) {
-        openerRef.current = activeElement;
-      }
+    const open = (event: Event) => {
+      openerRef.current = getOpenBatchInquiryOpener(event);
       setShowForm(true);
     };
     window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
-    return () => window.removeEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
+    onOpenListenerReady?.();
+    return () => {
+      window.removeEventListener(OPEN_BATCH_INQUIRY_EVENT, open);
+    };
+  }, [onOpenListenerReady]);
+
+  useEffect(() => {
+    return () => {
+      const opener = openerRef.current;
+      openerRef.current = null;
+      if (opener?.isConnected) opener.focus();
+    };
   }, []);
 
   if (totalCount === 0 && !showForm && sharedSubmission.status === "idle") {
@@ -512,6 +541,8 @@ export function InquiryBar() {
           />
           <div
             ref={panelRef}
+            role="document"
+            tabIndex={-1}
             className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl"
           >
             <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-gray-200 bg-white p-6">

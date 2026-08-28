@@ -33,6 +33,7 @@ describe("RequestQuoteButton", () => {
     try {
       listenerController.abort();
     } finally {
+      document.querySelector('[data-testid="persistent-opener"]')?.remove();
       vi.unstubAllGlobals();
     }
   });
@@ -54,7 +55,7 @@ describe("RequestQuoteButton", () => {
 
   it("dispatches one batch inquiry event and skips the general inquiry for a populated cart", async () => {
     inquiryMocks.totalCount = 2;
-    const onBatchOpen = vi.fn();
+    const onBatchOpen = vi.fn((_event: Event) => undefined);
     window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, onBatchOpen, {
       signal: listenerController.signal,
     });
@@ -64,14 +65,26 @@ describe("RequestQuoteButton", () => {
     await user.click(screen.getByRole("button", { name: "Request a Quote" }));
 
     expect(onBatchOpen).toHaveBeenCalledTimes(1);
+    const event = onBatchOpen.mock.calls[0][0] as CustomEvent<{ opener?: HTMLElement }>;
+    expect(event).toBeInstanceOf(CustomEvent);
+    expect(event.detail.opener).toBe(
+      screen.getByRole("button", { name: "Request a Quote" }),
+    );
     expect(inquiryMocks.openInquiry).not.toHaveBeenCalled();
   });
 
   it("runs onBeforeOpen before routing to the inquiry form", async () => {
     inquiryMocks.totalCount = 1;
     const callOrder: string[] = [];
-    const onBeforeOpen = vi.fn(() => callOrder.push("before"));
-    const onBatchOpen = () => callOrder.push("route");
+    const persistentOpener = document.createElement("button");
+    persistentOpener.textContent = "Persistent opener";
+    persistentOpener.dataset.testid = "persistent-opener";
+    document.body.append(persistentOpener);
+    const onBeforeOpen = vi.fn(() => {
+      callOrder.push("before");
+      persistentOpener.focus();
+    });
+    const onBatchOpen = vi.fn((_event: Event) => callOrder.push("route"));
     window.addEventListener(OPEN_BATCH_INQUIRY_EVENT, onBatchOpen, {
       signal: listenerController.signal,
     });
@@ -87,7 +100,11 @@ describe("RequestQuoteButton", () => {
 
     expect(callOrder).toEqual(["before", "route"]);
     expect(onBeforeOpen).toHaveBeenCalledTimes(1);
+    const event = onBatchOpen.mock.calls[0][0] as CustomEvent<{ opener?: HTMLElement }>;
+    expect(event.detail.opener).toBe(persistentOpener);
     expect(button).toHaveAttribute("type", "button");
     expect(button).toHaveClass("quote-style");
+
+    persistentOpener.remove();
   });
 });

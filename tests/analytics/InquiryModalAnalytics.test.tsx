@@ -244,12 +244,11 @@ describe("InquiryModal server submission and conversion analytics", () => {
 
   it("restores a remounted failed draft and retries its edited values with the same ID", async () => {
     const originalResponse = deferred<Response>();
+    const retryResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockReturnValueOnce(originalResponse.promise)
-      .mockResolvedValueOnce(
-        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
-      );
+      .mockReturnValueOnce(retryResponse.promise);
     const uuidSpy = vi
       .spyOn(globalThis.crypto, "randomUUID")
       .mockReturnValue(SUBMISSION_ID);
@@ -348,6 +347,15 @@ describe("InquiryModal server submission and conversion analytics", () => {
 
     const failedRetryUser = userEvent.setup();
     await failedRetryUser.click(screen.getByRole("button", { name: "Submit" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
+    expect.soft(screen.queryByRole("document")).toHaveFocus();
+
+    await act(async () => {
+      retryResponse.resolve(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      );
+      await retryResponse.promise;
+    });
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Submitted successfully",
     );

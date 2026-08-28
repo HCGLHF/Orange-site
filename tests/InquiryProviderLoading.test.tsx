@@ -11,8 +11,8 @@ vi.mock("@/components/DeferredStickyInquiryBar", () => ({
   DeferredStickyInquiryBar: () => null,
 }));
 
-vi.mock("@/components/InquiryBar", () => ({
-  InquiryBar: () => null,
+vi.mock("@/components/DeferredInquiryBarHost", () => ({
+  DeferredInquiryBarHost: () => null,
 }));
 
 vi.mock("@/components/InquiryCartProvider", () => ({

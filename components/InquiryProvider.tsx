@@ -9,8 +9,8 @@ import React, {
   type ReactNode,
 } from "react";
 import dynamic, { type DynamicOptionsLoadingProps } from "next/dynamic";
+import { DeferredInquiryBarHost } from "@/components/DeferredInquiryBarHost";
 import { DeferredStickyInquiryBar } from "@/components/DeferredStickyInquiryBar";
-import { InquiryBar } from "@/components/InquiryBar";
 import { InquiryCartProvider } from "@/components/InquiryCartProvider";
 
 type InquiryContextValue = {
@@ -158,7 +158,7 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
     <InquiryContext.Provider value={value}>
       <InquiryCartProvider>
         {children}
-        <InquiryBar />
+        <DeferredInquiryBarHost />
         <DeferredStickyInquiryBar />
         {open ? (
           <InquiryModalLoadBoundary

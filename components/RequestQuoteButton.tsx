@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useInquiryCart } from "@/components/InquiryCartProvider";
 import { useInquiry } from "@/components/InquiryProvider";
-import { OPEN_BATCH_INQUIRY_EVENT } from "@/lib/inquiry-events";
+import { dispatchOpenBatchInquiry } from "@/lib/inquiry-events";
 
 type RequestQuoteButtonProps = {
   children: ReactNode;
@@ -23,7 +23,10 @@ export function RequestQuoteButton({
     onBeforeOpen?.();
 
     if (totalCount > 0) {
-      window.dispatchEvent(new Event(OPEN_BATCH_INQUIRY_EVENT));
+      const activeElement = document.activeElement;
+      dispatchOpenBatchInquiry(
+        activeElement instanceof HTMLElement ? activeElement : undefined,
+      );
       return;
     }
 

@@ -228,6 +228,10 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
     () => sharedSubmission.draft?.website ?? "",
   );
   const [error, setError] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const submitting = sharedSubmission.status === "pending";
   const submitted = sharedSubmission.status === "success";
@@ -237,6 +241,12 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
   const selectedFabric =
     inquiryOptions.find((option) => option.id === fabricId) ?? inquiryOptions[0];
   const fabricLabel = selectedFabric?.name ?? "";
+
+  const restoreOpenerFocus = useCallback(() => {
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (opener?.isConnected) opener.focus();
+  }, []);
 
   const handleClose = useCallback(() => {
     if (sharedInquirySnapshot.status === "pending") return;
@@ -251,16 +261,81 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
     setQuantity("");
     setWebsite("");
     onClose();
-  }, [onClose]);
+    restoreOpenerFocus();
+  }, [onClose, restoreOpenerFocus]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLElement &&
+      !panelRef.current?.contains(activeElement)
+    ) {
+      openerRef.current = activeElement;
+    }
+    closeButtonRef.current?.focus();
+
+    return restoreOpenerFocus;
+  }, [open, restoreOpenerFocus]);
 
   useEffect(() => {
     if (open && submitted) successRef.current?.focus();
   }, [open, submitted]);
 
   useEffect(() => {
+    if (open && visibleError) errorRef.current?.focus();
+  }, [open, visibleError]);
+
+  useEffect(() => {
+    if (open && submitting) panelRef.current?.focus();
+  }, [open, submitting]);
+
+  useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        handleClose();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const panel = panelRef.current;
+      const focusableElements = Array.from(
+        panel?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter(
+        (element) => !element.closest('[hidden], [aria-hidden="true"]'),
+      );
+
+      if (!panel || focusableElements.length === 0) return;
+
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (
+        event.shiftKey &&
+        (activeElement === firstFocusable ||
+          activeElement === panel ||
+          !panel.contains(activeElement))
+      ) {
+        event.preventDefault();
+        lastFocusable.focus();
+        return;
+      }
+
+      if (
+        !event.shiftKey &&
+        (activeElement === lastFocusable ||
+          activeElement === panel ||
+          !panel.contains(activeElement))
+      ) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -346,6 +421,9 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
       />
 
       <div
+        ref={panelRef}
+        role="document"
+        tabIndex={-1}
         className={cn(
           "relative z-10 w-full max-w-md rounded-3xl bg-white p-6 shadow-xl",
           "max-h-[90vh] overflow-y-auto"
@@ -359,6 +437,7 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
             <p className="mt-1 text-sm text-brand-charcoal/70">{t("inquirySubtitle")}</p>
           </div>
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={handleClose}
             className="rounded-full p-2 text-brand-charcoal/60 transition-colors hover:bg-brand-soft hover:text-brand-charcoal"
@@ -409,9 +488,11 @@ export function InquiryModal({ open, onClose, initialFabricId }: InquiryModalPro
 
             {visibleError && (
               <p
+                ref={errorRef}
                 role="alert"
                 aria-live="assertive"
-                className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"
+                tabIndex={-1}
+                className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 outline-none"
               >
                 {visibleError}
               </p>

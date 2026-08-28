@@ -403,6 +403,16 @@ function isStickyTrueNullGate(context) {
   );
 }
 
+function isShouldLoadTrueNullGate(context) {
+  const condition = unwrappedExpression(context.conditional.condition);
+  return (
+    context.branch === "true" &&
+    ts.isIdentifier(condition) &&
+    condition.text === "shouldLoad" &&
+    isNullExpression(context.conditional.whenFalse)
+  );
+}
+
 function assertUniqueConditionalRender(sourceFile, binding, isRequiredGate) {
   const references = jsxReferences(sourceFile, binding);
   assert.equal(references.length, 1, `${binding} must have exactly one JSX render`);
@@ -449,6 +459,24 @@ function assertStickyInquiryBarStaysLazy(stickyGate) {
     sourceFile,
     "StickyInquiryBar",
     isStickyTrueNullGate
+  );
+}
+
+function assertBatchInquiryBarStaysLazy(inquiryProvider, deferredHost) {
+  const providerSource = parseTsx(inquiryProvider);
+  const hostSource = parseTsx(deferredHost);
+  assertNoStaticValueImport(providerSource, "@/components/InquiryBar");
+  assertNoStaticValueImport(hostSource, "@/components/InquiryBar");
+  assertLazyDynamicComponent(
+    hostSource,
+    "InquiryBar",
+    "@/components/InquiryBar",
+    "InquiryBar"
+  );
+  assertUniqueConditionalRender(
+    hostSource,
+    "InquiryBar",
+    isShouldLoadTrueNullGate
   );
 }
 
@@ -577,14 +605,25 @@ test("deferred sticky inquiry bar loads from a lazy client-only chunk", async ()
   assertStickyInquiryBarStaysLazy(stickyGate);
 });
 
+test("global batch inquiry overlay loads from a deferred lazy client-only chunk", async () => {
+  const [inquiryProvider, deferredHost] = await Promise.all([
+    source("components/InquiryProvider.tsx"),
+    source("components/DeferredInquiryBarHost.tsx"),
+  ]);
+
+  assertBatchInquiryBarStaysLazy(inquiryProvider, deferredHost);
+});
+
 test("below-the-fold contact and inquiry overlays stay out of initial client JS", async () => {
-  const [contactCard, inquiryProvider, stickyGate] = await Promise.all([
+  const [contactCard, inquiryProvider, deferredHost, stickyGate] = await Promise.all([
     source("components/ContactCard.tsx"),
     source("components/InquiryProvider.tsx"),
+    source("components/DeferredInquiryBarHost.tsx"),
     source("components/DeferredStickyInquiryBar.tsx"),
   ]);
 
   assertContactCardStaysServerRendered(contactCard);
   assertInquiryModalStaysLazy(inquiryProvider);
+  assertBatchInquiryBarStaysLazy(inquiryProvider, deferredHost);
   assertStickyInquiryBarStaysLazy(stickyGate);
 });

@@ -27,6 +27,10 @@ const inquiryProviderUrl = new URL(
   "../components/InquiryProvider.tsx",
   import.meta.url
 );
+const deferredInquiryBarHostUrl = new URL(
+  "../components/DeferredInquiryBarHost.tsx",
+  import.meta.url
+);
 const fabricsInquiryAnchorUrl = new URL(
   "../components/FabricsInquiryAnchor.tsx",
   import.meta.url
@@ -779,27 +783,32 @@ test("request quote button routes empty and populated carts without a dead link"
   assert.match(source, /["']use client["']/);
   assert.match(source, /useInquiryCart\s*\(\s*\)/);
   assert.match(source, /useInquiry\s*\(\s*\)/);
-  assert.match(source, /OPEN_BATCH_INQUIRY_EVENT/);
+  assert.match(source, /dispatchOpenBatchInquiry/);
   assert.match(source, /onBeforeOpen\?\.\(\s*\)/);
   assert.match(source, /if\s*\(\s*totalCount\s*>\s*0\s*\)/);
-  assert.match(source, /window\.dispatchEvent\s*\(\s*new Event\s*\(\s*OPEN_BATCH_INQUIRY_EVENT\s*\)\s*\)/);
+  assert.match(source, /dispatchOpenBatchInquiry\s*\(/);
+  assert.doesNotMatch(source, /window\.dispatchEvent\s*\(/);
   assert.match(source, /openInquiry\s*\(\s*\)/);
   assert.match(source, /<button\b[^>]*type=["']button["']/);
   assert.doesNotMatch(source, /<Link\b|<a\b/);
 });
 
-test("the inquiry provider owns the only global batch inquiry host", async () => {
-  const [provider, anchor, home] = await Promise.all([
+test("the inquiry provider owns one lightweight deferred global batch inquiry host", async () => {
+  const [provider, deferredHost, anchor, home] = await Promise.all([
     readFile(inquiryProviderUrl, "utf8"),
+    readFile(deferredInquiryBarHostUrl, "utf8"),
     readFile(fabricsInquiryAnchorUrl, "utf8"),
     readFile(geoHomePageUrl, "utf8"),
   ]);
 
   assert.match(
     provider,
-    /import\s*\{\s*InquiryBar\s*\}\s*from\s*["']@\/components\/InquiryBar["']/,
+    /import\s*\{\s*DeferredInquiryBarHost\s*\}\s*from\s*["']@\/components\/DeferredInquiryBarHost["']/,
   );
-  assert.equal([...provider.matchAll(/<InquiryBar\s*\/>/g)].length, 1);
+  assert.equal([...provider.matchAll(/<DeferredInquiryBarHost\s*\/>/g)].length, 1);
+  assert.doesNotMatch(provider, /from\s*["']@\/components\/InquiryBar["']/);
+  assert.match(deferredHost, /OPEN_BATCH_INQUIRY_EVENT/);
+  assert.match(deferredHost, /removeEventListener/);
   assert.match(anchor, /id=["']inquiry-form["']/);
   assert.doesNotMatch(anchor, /InquiryBar/);
   assert.doesNotMatch(home, /InquiryBar/);

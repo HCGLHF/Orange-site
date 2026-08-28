@@ -61,6 +61,14 @@ function batchDialogControls() {
   return { dialog, closeButton, submitButton };
 }
 
+function singleDialogControls() {
+  const dialog = screen.getByRole("dialog", { name: "Request free samples" });
+  const closeButtons = within(dialog).getAllByRole("button", { name: "Close" });
+  const closeButton = closeButtons[1];
+  const submitButton = within(dialog).getByRole("button", { name: "Submit" });
+  return { dialog, closeButton, submitButton };
+}
+
 describe("global inquiry navigation", () => {
   beforeEach(() => {
     vi.stubGlobal("React", React);
@@ -116,6 +124,31 @@ describe("global inquiry navigation", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("moves desktop focus into the empty-cart dialog, traps it, and restores the quote button", async () => {
+    const user = userEvent.setup();
+    renderGlobalInquiryRoute();
+    const quoteButton = screen.getByRole("button", { name: "Request a quote" });
+
+    await user.click(quoteButton);
+    await screen.findByRole("dialog", { name: "Request free samples" });
+    const { closeButton, submitButton } = singleDialogControls();
+
+    expect(closeButton).toHaveFocus();
+    submitButton.focus();
+    await user.tab();
+    expect(closeButton).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(submitButton).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("dialog", { name: "Request free samples" }),
+      ).not.toBeInTheDocument();
+    });
+    expect(quoteButton).toHaveFocus();
+  });
+
   it("moves desktop focus into the batch dialog, traps it, and restores the opener", async () => {
     const user = userEvent.setup();
     renderGlobalInquiryRoute();
@@ -166,6 +199,40 @@ describe("global inquiry navigation", () => {
     await waitFor(() => {
       expect(
         screen.queryByRole("dialog", { name: "Batch inquiry" }),
+      ).not.toBeInTheDocument();
+    });
+    expect(menuTrigger).toHaveFocus();
+  });
+
+  it("hands mobile drawer focus to the empty-cart dialog, traps it, and restores the menu trigger", async () => {
+    const user = userEvent.setup();
+    renderGlobalInquiryRoute();
+    const menuTrigger = screen.getByRole("button", {
+      name: "Open navigation menu",
+    });
+
+    await user.click(menuTrigger);
+    await user.click(screen.getByRole("button", { name: "Request a Quote" }));
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("dialog", { name: "O'range Textile" }),
+      ).not.toBeInTheDocument();
+    });
+    await screen.findByRole("dialog", { name: "Request free samples" });
+    const { closeButton, submitButton } = singleDialogControls();
+    expect(closeButton).toHaveFocus();
+
+    submitButton.focus();
+    await user.tab();
+    expect(closeButton).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(submitButton).toHaveFocus();
+
+    await user.click(closeButton);
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("dialog", { name: "Request free samples" }),
       ).not.toBeInTheDocument();
     });
     expect(menuTrigger).toHaveFocus();

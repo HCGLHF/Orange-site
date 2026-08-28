@@ -322,10 +322,11 @@ describe("InquiryBar server submission and conversion analytics", () => {
   });
 
   it("reuses a failed draft submission ID and rotates it only after success", async () => {
+    const retryResponse = deferred<Response>();
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(jsonResponse({ success: false }, { ok: false }))
-      .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_retry" }))
+      .mockReturnValueOnce(retryResponse.promise)
       .mockResolvedValueOnce(jsonResponse({ success: true, inquiryId: "inquiry_new" }));
     const uuidSpy = vi
       .spyOn(globalThis.crypto, "randomUUID")
@@ -337,6 +338,15 @@ describe("InquiryBar server submission and conversion analytics", () => {
     await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(SUBMIT_ERROR);
     await user.click(screen.getByRole("button", { name: "Submit inquiry" }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
+    expect.soft(screen.queryByRole("document")).toHaveFocus();
+
+    await act(async () => {
+      retryResponse.resolve(
+        jsonResponse({ success: true, inquiryId: "inquiry_retry" }),
+      );
+      await retryResponse.promise;
+    });
     expect(await screen.findByRole("status")).toHaveTextContent("Submitted");
 
     const firstBody = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
