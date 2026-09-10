@@ -36,34 +36,19 @@ export const PRIMARY_NAVIGATION = [
     label: "Products",
     items: [
       {
-        id: "ready-stock",
-        label: "Ready Stock",
-        href: "/ready-stock-knit-fabrics",
+        id: "structured",
+        label: "Air-Layer & Structured Knits",
+        href: "/fabrics?collection=structured",
       },
       {
-        id: "finished-knit-fabrics",
-        label: "Finished Knit Fabrics",
-        href: "/fabrics",
+        id: "soft-touch",
+        label: "Soft-Touch & Wool-Blend Knits",
+        href: "/fabrics?collection=soft-touch",
       },
       {
-        id: "double-knit-manufacturing",
-        label: "Double-Knit Manufacturing",
-        href: "/finished-double-knit-fabrics",
-      },
-      {
-        id: "interlock-fabric",
-        label: "Interlock Fabric",
-        href: "/fabrics/interlock-fabric",
-      },
-      {
-        id: "ponte-roma-fabric",
-        label: "Ponte Roma Fabric",
-        href: "/fabrics/ponte-roma-fabric",
-      },
-      {
-        id: "rib-knit-fabric",
-        label: "Rib Knit Fabric",
-        href: "/fabrics/rib-knit-fabric",
+        id: "textured",
+        label: "Textured & Brushed Knits",
+        href: "/fabrics?collection=textured",
       },
       {
         id: "view-all-fabrics",
@@ -128,12 +113,7 @@ const CURRENT_ITEM_BY_PATHNAME: Readonly<
   Record<string, CurrentNavigationItemId>
 > = Object.freeze({
   "/": "home",
-  "/ready-stock-knit-fabrics": "ready-stock",
-  "/fabrics": "finished-knit-fabrics",
-  "/finished-double-knit-fabrics": "double-knit-manufacturing",
-  "/fabrics/interlock-fabric": "interlock-fabric",
-  "/fabrics/ponte-roma-fabric": "ponte-roma-fabric",
-  "/fabrics/rib-knit-fabric": "rib-knit-fabric",
+  "/fabrics": "view-all-fabrics",
   "/custom-knit-fabric-development": "custom-development",
   "/blog/what-is-double-knit-fabric": "double-knit-guide",
   "/blog/what-is-interlock-fabric": "interlock-guide",
@@ -143,8 +123,15 @@ const CURRENT_ITEM_BY_PATHNAME: Readonly<
 });
 
 export function getCurrentNavigationItemId(
-  pathname: string
+  pathname: string,
+  search: string = ""
 ): CurrentNavigationItemId | null {
+  if (pathname === "/fabrics") {
+    const collection = new URLSearchParams(search).get("collection");
+    if (collection === "structured" || collection === "soft-touch" || collection === "textured") {
+      return collection;
+    }
+  }
   return CURRENT_ITEM_BY_PATHNAME[pathname] ?? null;
 }
 
@@ -155,7 +142,8 @@ const configuredHrefs = PRIMARY_NAVIGATION.flatMap((section) =>
 );
 
 export const NAVIGATION_DISCOVERY_HREFS: readonly string[] = Object.freeze(
-  Array.from(new Set([...configuredHrefs, INQUIRY_HREF]))
+  // Inquiry is a dialog action. Discovery contains actual crawlable route links.
+  Array.from(new Set(configuredHrefs))
 );
 
 export function getActiveNavigationId(

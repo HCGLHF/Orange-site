@@ -122,7 +122,7 @@ const publicPageSeo = [
       "Finished Knit Fabrics for B2B Sourcing | O'range Textile",
     metaDescription:
       "Finished knit fabrics for global B2B apparel sourcing teams. Review 104 documented articles across 11 series, compare composition, GSM and usable width, then request samples and confirm colour, finish, quantity and commercial terms.",
-    h1: "Finished Knit Fabrics for Apparel Buyers",
+    h1: "Finished knit fabrics. A considered collection.",
     updatedAt: "2026-07-28",
     changeFrequency: "weekly",
     priority: 0.9,

@@ -11,6 +11,7 @@ import type { Fabric } from "@/lib/data";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/route-without-local-inquiry-bar",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const testFabric: Fabric = {

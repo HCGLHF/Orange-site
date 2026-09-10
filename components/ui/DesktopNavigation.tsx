@@ -13,6 +13,7 @@ import {
 
 type DesktopNavigationProps = {
   pathname: string;
+  search?: string;
 };
 
 type PendingMenuFocus = {
@@ -22,6 +23,7 @@ type PendingMenuFocus = {
 
 export function DesktopNavigation({
   pathname,
+  search = "",
 }: DesktopNavigationProps) {
   const [openGroup, setOpenGroup] = useState<NavigationGroupId | null>(
     null
@@ -39,7 +41,7 @@ export function DesktopNavigation({
   const pendingFocusRef = useRef<PendingMenuFocus | null>(null);
   const activeNavigationId = getActiveNavigationId(pathname);
   const currentNavigationItemId =
-    getCurrentNavigationItemId(pathname);
+    getCurrentNavigationItemId(pathname, search);
 
   const openMenu = (
     groupId: NavigationGroupId,
@@ -133,7 +135,7 @@ export function DesktopNavigation({
 
   useEffect(() => {
     setOpenGroup(null);
-  }, [pathname]);
+  }, [pathname, search]);
 
   useEffect(() => {
     const pendingFocus = pendingFocusRef.current;

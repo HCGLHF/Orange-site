@@ -1,0 +1,1507 @@
+/* Scoped styling adapted from the user-approved collection preview. */
+
+.fabric-collections{
+  --paper:oklch(97.2% .008 85);
+  --surface:oklch(99% .004 85);
+  --ink:oklch(27% .012 55);
+  --muted:oklch(49% .014 65);
+  --line:oklch(85.5% .015 75);
+  --accent:oklch(51% .125 38);
+  --accent-soft:oklch(94% .029 50);
+  --soft:oklch(93.8% .012 75);
+  --ease:cubic-bezier(.22,1,.36,1)
+}
+.fabric-collections *{
+  box-sizing:border-box
+}
+.fabric-collections{
+  margin:0;
+  color:var(--ink);
+  background:var(--paper);
+  font-family:var(--font-catalogue-geist), sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased
+}
+.fabric-collections button,.fabric-collections input,.fabric-collections select,.fabric-collections textarea{
+  font:inherit
+}
+.fabric-collections button,.fabric-collections a,.fabric-collections input,.fabric-collections select,.fabric-collections textarea{
+  -webkit-tap-highlight-color:transparent
+}
+.fabric-collections a{
+  color:inherit;
+  text-decoration:none
+}
+.fabric-collections button{
+  color:inherit;
+  cursor:pointer
+}
+.fabric-collections button:disabled{
+  cursor:default;
+  opacity:.35
+}
+.fabric-collections button{
+  border:0;
+  background:none
+}
+.fabric-collections a:focus-visible,.fabric-collections button:focus-visible,.fabric-collections input:focus-visible,.fabric-collections select:focus-visible,.fabric-collections textarea:focus-visible,.fabric-collections summary:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:5px
+}
+.fabric-collections button,.fabric-collections input,.fabric-collections select,.fabric-collections textarea{
+  border-radius:0
+}
+.fabric-collections img{
+  display:block;
+  max-width:100%
+}
+.fabric-collections p,.fabric-collections h1,.fabric-collections h2,.fabric-collections h3{
+  margin:0
+}
+.fabric-collections p{
+  max-width:70ch
+}
+.fabric-collections [hidden]{
+  display:none!important
+}
+.fabric-collections .sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0
+}
+.fabric-collections .page-width{
+  width:calc(100% - 112px);
+  max-width:1320px;
+  margin-inline:auto
+}
+.fabric-collections summary::-webkit-details-marker{
+  display:none
+}
+.fabric-collections .collection-intro{
+  padding-top:46px;
+  padding-bottom:38px;
+  display:grid;
+  grid-template-columns:1.6fr 1fr;
+  gap:64px;
+  align-items:end
+}
+.fabric-collections .eyebrow{
+  font-size:11px;
+  font-weight:550;
+  letter-spacing:.12em;
+  color:var(--accent);
+  margin-bottom:20px
+}
+.fabric-collections h1{
+  font-size:clamp(40px,4.6vw,66px);
+  font-weight:460;
+  line-height:1.1;
+  letter-spacing:-.052em
+}
+.fabric-collections h1 span{
+  color:var(--muted)
+}
+.fabric-collections .intro-aside{
+  padding-left:34px;
+  padding-bottom:3px;
+  max-width:370px;
+  justify-self:end
+}
+.fabric-collections .intro-aside>p:first-child{
+  font-size:17px;
+  line-height:1.55;
+  letter-spacing:-.025em
+}
+.fabric-collections .intro-description{
+  font-size:14px;
+  color:var(--muted);
+  margin-top:13px;
+  line-height:1.6
+}
+.fabric-collections .text-link{
+  font-size:13px;
+  font-weight:520;
+  display:inline-flex;
+  align-items:center;
+  gap:25px;
+  min-height:44px;
+  border-bottom:1px solid var(--ink);
+  margin-top:15px
+}
+.fabric-collections .text-link span{
+  font-size:20px
+}
+.fabric-collections .text-link:hover{
+  color:var(--accent);
+  border-color:var(--accent)
+}
+.fabric-collections .collection-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:24px
+}
+.fabric-collections .collection-entry{
+  display:block;
+  min-width:0
+}
+.fabric-collections .collection-image{
+  overflow:hidden;
+  position:relative;
+  background:var(--soft);
+  aspect-ratio:1.55
+}
+.fabric-collections .collection-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform 600ms var(--ease)
+}
+.fabric-collections .collection-entry:hover img{
+  transform:scale(1.035)
+}
+.fabric-collections .collection-number{
+  position:absolute;
+  top:15px;
+  left:16px;
+  background:var(--paper);
+  width:31px;
+  height:31px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px
+}
+.fabric-collections .collection-title-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:18px;
+  margin-top:20px
+}
+.fabric-collections .collection-title-line h2{
+  font-size:clamp(21px,1.85vw,27px);
+  line-height:1.2;
+  letter-spacing:-.035em;
+  font-weight:480
+}
+.fabric-collections .collection-arrow{
+  flex-shrink:0;
+  border:1px solid var(--line);
+  border-radius:50%;
+  width:35px;
+  height:35px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:19px;
+  transition:background 200ms,color 200ms
+}
+.fabric-collections .collection-entry:hover .collection-arrow,.fabric-collections .collection-entry[aria-current="true"] .collection-arrow{
+  background:var(--accent);
+  color:var(--surface);
+  border-color:var(--accent)
+}
+.fabric-collections .collection-meta{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:12px;
+  display:flex;
+  align-items:center;
+  gap:8px
+}
+.fabric-collections .collection-meta .dot{
+  width:3px;
+  height:3px;
+  background:var(--muted);
+  border-radius:50%
+}
+.fabric-collections .collection-footnote{
+  border-bottom:1px solid var(--line);
+  padding:32px 0 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  font-size:11px;
+  color:var(--muted)
+}
+.fabric-collections .collection-footnote span:last-child{
+  font-size:10px
+}
+.fabric-collections .catalogue-section{
+  padding-top:76px;
+  padding-bottom:72px;
+  background:var(--surface);
+  margin-top:0;
+  scroll-margin-top:30px
+}
+.fabric-collections .catalogue-heading{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:32px;
+  margin-bottom:32px
+}
+.fabric-collections .section-label{
+  color:var(--accent);
+  font-size:12px;
+  font-weight:500;
+  margin-bottom:10px
+}
+.fabric-collections h2{
+  font-size:clamp(29px,3vw,43px);
+  line-height:1.16;
+  font-weight:450;
+  letter-spacing:-.045em
+}
+.fabric-collections .catalogue-heading>p{
+  max-width:310px;
+  font-size:14px;
+  color:var(--muted);
+  line-height:1.7
+}
+.fabric-collections .collection-tabs{
+  display:flex;
+  border-bottom:1px solid var(--line);
+  gap:30px
+}
+.fabric-collections .collection-tab{
+  font-size:13px;
+  padding:15px 0;
+  min-height:48px;
+  position:relative;
+  white-space:nowrap;
+  color:var(--muted)
+}
+.fabric-collections .collection-tab span{
+  font-size:11px;
+  margin-left:7px;
+  color:var(--muted)
+}
+.fabric-collections .collection-tab[aria-pressed="true"]{
+  color:var(--ink);
+  font-weight:560
+}
+.fabric-collections .collection-tab[aria-pressed="true"]:after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-1px;
+  height:2px;
+  background:var(--accent)
+}
+.fabric-collections .catalogue-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:18px 0
+}
+.fabric-collections .search-field{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-width:240px;
+  flex:1;
+  max-width:410px
+}
+.fabric-collections .search-field input{
+  width:100%;
+  background:none;
+  border:none;
+  min-height:44px;
+  font-size:14px;
+  color:var(--ink);
+  padding:8px 3px
+}
+.fabric-collections .search-field input::placeholder{
+  color:var(--muted)
+}
+.fabric-collections .search-icon{
+  display:block;
+  width:14px;
+  height:14px;
+  border:1px solid var(--muted);
+  border-radius:50%;
+  position:relative;
+  margin:0 2px 2px
+}
+.fabric-collections .search-icon:after{
+  content:"";
+  height:5px;
+  width:1px;
+  position:absolute;
+  right:-3px;
+  bottom:-4px;
+  background:var(--muted);
+  transform:rotate(-45deg)
+}
+.fabric-collections .toolbar-end{
+  display:flex;
+  gap:22px;
+  align-items:center;
+  font-size:12px;
+  color:var(--muted)
+}
+.fabric-collections .filter-toggle{
+  border:1px solid var(--line);
+  padding:9px 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:42px;
+  font-size:13px;
+  color:var(--ink)
+}
+.fabric-collections .filter-toggle[aria-expanded="true"]{
+  background:var(--soft)
+}
+.fabric-collections .filter-icon{
+  font-size:19px;
+  line-height:1;
+  transform:rotate(180deg)
+}
+.fabric-collections #filter-count{
+  font-size:10px;
+  color:var(--accent)
+}
+.fabric-collections .filter-panel{
+  padding:20px;
+  margin-bottom:20px;
+  background:var(--paper);
+  display:grid;
+  grid-template-columns:1.3fr 1fr 1fr auto;
+  gap:20px;
+  align-items:end
+}
+.fabric-collections .filter-panel label{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  font-size:12px;
+  color:var(--muted)
+}
+.fabric-collections select{
+  width:100%;
+  min-height:44px;
+  border:1px solid var(--line);
+  padding:10px;
+  background:var(--surface);
+  color:var(--ink);
+  font-size:14px
+}
+.fabric-collections .reset-filters{
+  font-size:12px;
+  min-height:44px;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  padding-inline:10px
+}
+.fabric-collections .article-table-head,.fabric-collections .article-row{
+  display:grid;
+  grid-template-columns:2fr 2.15fr .65fr .65fr 86px;
+  gap:24px;
+  align-items:center
+}
+.fabric-collections .article-table-head{
+  border-top:1px solid var(--ink);
+  padding:13px 0;
+  font-size:12px;
+  color:var(--muted)
+}
+.fabric-collections .article-row{
+  border-top:1px solid var(--line);
+  padding:23px 0;
+  min-height:108px
+}
+.fabric-collections .article-identity{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  min-width:0
+}
+.fabric-collections .article-mark{
+  width:27px;
+  height:27px;
+  margin-top:2px;
+  background:var(--soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  color:var(--muted);
+  flex-shrink:0
+}
+.fabric-collections .article-code{
+  font-size:16px;
+  font-weight:530;
+  letter-spacing:-.02em;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:27px
+}
+.fabric-collections .article-code:hover{
+  color:var(--accent)
+}
+.fabric-collections .article-code .detail-arrow{
+  font-size:13px;
+  opacity:0;
+  transition:opacity 150ms
+}
+.fabric-collections .article-code:hover .detail-arrow,.fabric-collections .article-code:focus-visible .detail-arrow{
+  opacity:1
+}
+.fabric-collections .article-series{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+  line-height:1.55
+}
+.fabric-collections .article-composition{
+  font-size:14px;
+  line-height:1.7;
+  color:var(--muted);
+  max-width:300px
+}
+.fabric-collections .article-weight,.fabric-collections .article-width{
+  font-size:14px
+}
+.fabric-collections .article-weight small,.fabric-collections .article-width small{
+  font-size:12px;
+  color:var(--muted);
+  display:block;
+  margin-top:3px
+}
+.fabric-collections .mobile-spec-label{
+  display:none
+}
+.fabric-collections .add-sample{
+  font-size:12px;
+  padding:10px 6px;
+  min-height:44px;
+  display:flex;
+  gap:7px;
+  justify-content:center;
+  align-items:center;
+  border:1px solid var(--line);
+  white-space:nowrap
+}
+.fabric-collections .add-sample:hover{
+  border-color:var(--accent);
+  color:var(--accent)
+}
+.fabric-collections .add-sample[aria-pressed="true"]{
+  background:var(--accent-soft);
+  border-color:var(--accent-soft);
+  color:var(--accent)
+}
+.fabric-collections .list-footer{
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding-top:22px;
+  font-size:12px;
+  color:var(--muted)
+}
+.fabric-collections .pagination{
+  display:flex;
+  align-items:center;
+  gap:17px
+}
+.fabric-collections .pagination button{
+  min-width:40px;
+  min-height:44px;
+  font-size:17px;
+  border:1px solid var(--line)
+}
+.fabric-collections .pagination button:hover:not(:disabled){
+  border-color:var(--ink)
+}
+.fabric-collections .specification-note{
+  font-size:12px;
+  line-height:1.6;
+  color:var(--muted);
+  margin-top:22px;
+  max-width:none
+}
+.fabric-collections .empty-state{
+  text-align:center;
+  padding:64px 20px
+}
+.fabric-collections .empty-state h3{
+  font-size:22px;
+  font-weight:450;
+  letter-spacing:-.03em
+}
+.fabric-collections .empty-state p{
+  margin:12px auto 23px;
+  color:var(--muted);
+  font-size:13px
+}
+.fabric-collections .button-secondary{
+  border:1px solid var(--line);
+  padding:13px 20px;
+  min-height:46px;
+  font-size:13px
+}
+.fabric-collections .button-primary{
+  background:var(--accent);
+  color:var(--surface);
+  min-height:49px;
+  padding:14px 22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:35px;
+  font-size:13px;
+  transition:background 200ms
+}
+.fabric-collections .button-primary:hover{
+  background:var(--ink)
+}
+.fabric-collections .button-primary span{
+  font-size:18px
+}
+.fabric-collections .development-section{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:80px;
+  padding-top:76px;
+  padding-bottom:78px;
+  align-items:center
+}
+.fabric-collections .development-content>p{
+  font-size:15px;
+  color:var(--muted);
+  line-height:1.8;
+  max-width:420px
+}
+.fabric-collections .development-content .button-primary{
+  margin-top:25px
+}
+.fabric-collections .sourcing-section{
+  padding-top:40px;
+  padding-bottom:55px;
+  border-top:1px solid var(--line)
+}
+.fabric-collections .sourcing-section>h2{
+  font-size:22px;
+  letter-spacing:-.025em
+}
+.fabric-collections .sourcing-steps{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:48px;
+  margin-top:28px
+}
+.fabric-collections .sourcing-steps>div{
+  display:grid;
+  grid-template-columns:24px 1fr;
+  column-gap:12px
+}
+.fabric-collections .sourcing-steps span{
+  grid-row:1/3;
+  font-size:11px;
+  color:var(--accent);
+  padding-top:4px
+}
+.fabric-collections .sourcing-steps h3{
+  font-size:14px;
+  font-weight:510
+}
+.fabric-collections .sourcing-steps p{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:8px;
+  max-width:290px
+}
+.fabric-collections dialog{
+  border:1px solid var(--line);
+  padding:32px;
+  background:var(--surface);
+  color:var(--ink);
+  max-height:calc(100dvh - 40px);
+  overscroll-behavior:contain
+}
+.fabric-collections dialog::backdrop{
+  background:oklch(20% .012 55/.45)
+}
+.fabric-collections dialog h2{
+  font-size:31px
+}
+.fabric-collections .article-dialog{
+  width:min(580px,calc(100% - 32px))
+}
+.fabric-collections .dialog-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:12px
+}
+.fabric-collections .dialog-top .section-label{
+  margin:0
+}
+.fabric-collections .close-button{
+  font-size:27px;
+  font-weight:250;
+  min-width:44px;
+  min-height:44px;
+  margin:-10px -10px -10px 0
+}
+.fabric-collections .detail-series{
+  font-size:14px;
+  color:var(--muted);
+  margin-top:9px
+}
+.fabric-collections .detail-specs{
+  margin:30px 0
+}
+.fabric-collections .detail-specs>div{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:15px;
+  padding:15px 0;
+  border-top:1px solid var(--line);
+  font-size:13px
+}
+.fabric-collections .detail-specs dt{
+  color:var(--muted);
+  font-size:12px
+}
+.fabric-collections .detail-specs dd{
+  margin:0
+}
+.fabric-collections .detail-note{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.75;
+  margin-bottom:24px
+}
+.fabric-collections .detail-action{
+  width:100%
+}
+.fabric-collections #selection-title{
+  display:flex;
+  gap:12px;
+  align-items:center
+}
+.fabric-collections #dialog-count{
+  font-size:13px;
+  color:var(--muted);
+  font-weight:400;
+  letter-spacing:0
+}
+.fabric-collections .selection-empty{
+  padding:30px 0;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  margin:25px 0;
+  color:var(--muted);
+  font-size:13px
+}
+.fabric-collections .remove-sample{
+  min-width:44px;
+  min-height:44px;
+  font-size:23px;
+  color:var(--muted)
+}
+.fabric-collections textarea{
+  width:100%;
+  min-height:115px;
+  resize:vertical;
+  padding:14px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  font-size:14px;
+  color:var(--ink);
+  line-height:1.7
+}
+.fabric-collections body:has(dialog[open]){
+  overflow:hidden
+}
+@media(min-width:1600px){
+.fabric-collections .collection-intro{
+  padding-top:80px;
+  padding-bottom:65px
+}
+.fabric-collections .collection-image{
+  aspect-ratio:1.4
+}
+.fabric-collections .collection-grid{
+  gap:30px
+}
+}
+@media(max-width:1100px){
+.fabric-collections .page-width{
+  width:calc(100% - 64px)
+}
+.fabric-collections .collection-intro{
+  gap:32px;
+  grid-template-columns:1.6fr 1fr
+}
+.fabric-collections .intro-aside{
+  padding-left:0
+}
+.fabric-collections .collection-grid{
+  gap:20px
+}
+.fabric-collections .collection-title-line{
+  gap:10px
+}
+.fabric-collections .collection-arrow{
+  width:29px;
+  height:29px;
+  font-size:17px
+}
+.fabric-collections .collection-tabs{
+  gap:24px
+}
+.fabric-collections .article-table-head,.fabric-collections .article-row{
+  grid-template-columns:1.8fr 1.8fr .65fr .65fr 75px;
+  gap:18px
+}
+.fabric-collections .article-identity{
+  gap:10px
+}
+.fabric-collections .article-mark{
+  display:none
+}
+.fabric-collections .collection-tab{
+  font-size:13px
+}
+.fabric-collections .filter-panel{
+  gap:12px;
+  padding:16px
+}
+}
+@media(max-width:800px){
+.fabric-collections .page-width{
+  width:calc(100% - 48px)
+}
+.fabric-collections .collection-intro{
+  padding-top:43px;
+  padding-bottom:34px;
+  gap:28px;
+  grid-template-columns:1fr
+}
+.fabric-collections h1{
+  font-size:50px
+}
+.fabric-collections .intro-aside{
+  max-width:100%;
+  justify-self:start;
+  display:grid;
+  grid-template-columns:1fr auto;
+  column-gap:30px;
+  align-items:center
+}
+.fabric-collections .intro-aside>p:first-child{
+  display:none
+}
+.fabric-collections .intro-description{
+  margin:0;
+  font-size:14px;
+  max-width:360px
+}
+.fabric-collections .intro-aside .text-link{
+  margin:0
+}
+.fabric-collections .collection-grid{
+  gap:17px
+}
+.fabric-collections .collection-title-line h2{
+  font-size:20px
+}
+.fabric-collections .collection-title-line{
+  margin-top:16px
+}
+.fabric-collections .collection-arrow{
+  display:none
+}
+.fabric-collections .collection-image{
+  aspect-ratio:1.1
+}
+.fabric-collections .collection-meta{
+  font-size:12px;
+  gap:6px
+}
+.fabric-collections .collection-number{
+  top:12px;
+  left:12px;
+  width:27px;
+  height:27px
+}
+.fabric-collections .collection-footnote{
+  padding-top:26px;
+  padding-bottom:24px;
+  font-size:10px
+}
+.fabric-collections .collection-footnote span:last-child{
+  font-size:9px
+}
+.fabric-collections .catalogue-section{
+  padding-top:47px;
+  padding-bottom:46px
+}
+.fabric-collections .catalogue-heading{
+  gap:24px
+}
+.fabric-collections .catalogue-heading>p{
+  max-width:235px;
+  font-size:14px
+}
+.fabric-collections .collection-tabs{
+  gap:18px;
+  flex-wrap:wrap
+}
+.fabric-collections .collection-tab{
+  padding:12px 0;
+  min-height:44px
+}
+.fabric-collections .collection-tab span{
+  margin-left:5px
+}
+.fabric-collections .article-table-head,.fabric-collections .article-row{
+  grid-template-columns:1.6fr 1.7fr .65fr .65fr 70px;
+  gap:13px
+}
+.fabric-collections .article-composition{
+  font-size:14px
+}
+.fabric-collections .article-code{
+  font-size:16px
+}
+.fabric-collections .article-series{
+  font-size:12px
+}
+.fabric-collections .article-weight,.fabric-collections .article-width{
+  font-size:14px
+}
+.fabric-collections .add-sample{
+  font-size:12px
+}
+.fabric-collections .development-section{
+  gap:40px;
+  padding-block:55px
+}
+.fabric-collections .development-content>p{
+  font-size:13px
+}
+.fabric-collections .sourcing-steps{
+  gap:20px
+}
+.fabric-collections .filter-panel{
+  grid-template-columns:1fr 1fr
+}
+.fabric-collections .reset-filters{
+  justify-self:start
+}
+.fabric-collections .sourcing-steps>div{
+  grid-template-columns:1fr
+}
+.fabric-collections .sourcing-steps span{
+  grid-row:auto;
+  margin-bottom:10px
+}
+.fabric-collections .collection-title-line h2 br{
+  display:none
+}
+}
+@media(max-width:560px){
+.fabric-collections .page-width{
+  width:calc(100% - 40px)
+}
+.fabric-collections .collection-intro{
+  padding-top:37px;
+  padding-bottom:30px;
+  gap:22px
+}
+.fabric-collections .eyebrow{
+  font-size:9px;
+  letter-spacing:.1em;
+  margin-bottom:17px
+}
+.fabric-collections h1{
+  font-size:clamp(34px,8.6vw,47px);
+  line-height:1.12;
+  letter-spacing:-.05em
+}
+.fabric-collections .intro-aside{
+  display:block
+}
+.fabric-collections .intro-description{
+  font-size:14px;
+  max-width:300px
+}
+.fabric-collections .intro-aside .text-link{
+  margin-top:12px;
+  font-size:11px;
+  gap:24px;
+  min-height:44px
+}
+.fabric-collections .collection-grid{
+  grid-template-columns:1fr;
+  gap:30px
+}
+.fabric-collections .collection-image{
+  aspect-ratio:1.65
+}
+.fabric-collections .collection-title-line{
+  margin-top:14px;
+  align-items:center
+}
+.fabric-collections .collection-title-line h2{
+  font-size:23px
+}
+.fabric-collections .collection-title-line h2 br{
+  display:none
+}
+.fabric-collections .collection-arrow{
+  display:flex;
+  width:33px;
+  height:33px
+}
+.fabric-collections .collection-meta{
+  font-size:12px;
+  margin-top:7px
+}
+.fabric-collections .collection-number{
+  width:30px;
+  height:30px;
+  top:14px;
+  left:14px
+}
+.fabric-collections .collection-footnote{
+  align-items:flex-start;
+  flex-direction:column;
+  gap:5px;
+  padding-top:26px;
+  padding-bottom:25px
+}
+.fabric-collections .catalogue-heading{
+  display:block;
+  margin-bottom:22px
+}
+.fabric-collections .catalogue-heading>p{
+  max-width:310px;
+  margin-top:14px;
+  font-size:14px
+}
+.fabric-collections .section-label{
+  font-size:11px
+}
+.fabric-collections h2{
+  font-size:31px
+}
+.fabric-collections .collection-tabs{
+  gap:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-bottom:0;
+  margin-bottom:8px
+}
+.fabric-collections .collection-tab{
+  font-size:13px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+  padding:12px 0;
+  white-space:normal
+}
+.fabric-collections .collection-tab[aria-pressed="true"]:after{
+  right:20px
+}
+.fabric-collections .collection-tab span{
+  font-size:11px;
+  white-space:nowrap
+}
+.fabric-collections .catalogue-toolbar{
+  flex-wrap:wrap;
+  gap:4px;
+  padding:10px 0 17px
+}
+.fabric-collections .search-field{
+  max-width:none;
+  min-width:0;
+  flex-basis:100%
+}
+.fabric-collections .search-field input{
+  font-size:14px
+}
+.fabric-collections .toolbar-end{
+  justify-content:space-between;
+  width:100%;
+  font-size:12px
+}
+.fabric-collections .filter-toggle{
+  min-height:44px;
+  font-size:13px;
+  padding:7px 13px
+}
+.fabric-collections .filter-panel{
+  grid-template-columns:1fr;
+  gap:14px;
+  padding:16px
+}
+.fabric-collections .filter-panel label{
+  font-size:12px
+}
+.fabric-collections select{
+  font-size:14px
+}
+.fabric-collections .reset-filters{
+  font-size:12px
+}
+.fabric-collections .article-table-head{
+  display:none
+}
+.fabric-collections .article-row{
+  grid-template-columns:1fr 1fr auto;
+  gap:14px 20px;
+  padding:22px 0;
+  min-height:0
+}
+.fabric-collections .article-identity{
+  grid-column:1/3
+}
+.fabric-collections .article-mark{
+  display:flex
+}
+.fabric-collections .article-code{
+  font-size:16px
+}
+.fabric-collections .article-code .detail-arrow{
+  opacity:1
+}
+.fabric-collections .article-series{
+  font-size:12px
+}
+.fabric-collections .article-composition{
+  grid-column:1/4;
+  grid-row:2;
+  max-width:none;
+  font-size:14px
+}
+.fabric-collections .article-weight{
+  grid-column:1;
+  grid-row:3;
+  display:flex;
+  gap:5px;
+  align-items:baseline
+}
+.fabric-collections .article-width{
+  grid-column:2/4;
+  grid-row:3;
+  display:flex;
+  gap:5px;
+  align-items:baseline
+}
+.fabric-collections .article-weight small,.fabric-collections .article-width small{
+  display:inline;
+  margin:0
+}
+.fabric-collections .mobile-spec-label{
+  display:inline;
+  color:var(--muted);
+  font-size:10px;
+  margin-right:2px
+}
+.fabric-collections .add-sample{
+  grid-column:3;
+  grid-row:1;
+  align-self:center;
+  min-width:67px;
+  font-size:12px;
+  min-height:44px
+}
+.fabric-collections .list-footer{
+  font-size:12px;
+  gap:8px;
+  padding-top:18px
+}
+.fabric-collections .pagination{
+  gap:12px
+}
+.fabric-collections .pagination button{
+  width:44px;
+  min-width:44px;
+  min-height:44px
+}
+.fabric-collections .specification-note{
+  font-size:12px;
+  margin-top:20px
+}
+.fabric-collections .development-section{
+  grid-template-columns:1fr;
+  gap:25px;
+  padding-block:44px
+}
+.fabric-collections .development-content>p{
+  font-size:14px
+}
+.fabric-collections .development-content .button-primary{
+  margin-top:22px
+}
+.fabric-collections .sourcing-section{
+  padding-top:30px;
+  padding-bottom:35px
+}
+.fabric-collections .sourcing-section>h2{
+  font-size:22px;
+  max-width:280px
+}
+.fabric-collections .sourcing-steps{
+  grid-template-columns:1fr;
+  gap:24px;
+  margin-top:25px
+}
+.fabric-collections .sourcing-steps>div{
+  grid-template-columns:24px 1fr;
+  gap:3px 13px
+}
+.fabric-collections .sourcing-steps span{
+  grid-row:1/3;
+  margin:0
+}
+.fabric-collections .sourcing-steps h3{
+  font-size:14px
+}
+.fabric-collections .sourcing-steps p{
+  font-size:12px;
+  max-width:290px;
+  margin-top:5px
+}
+.fabric-collections dialog{
+  padding:24px
+}
+.fabric-collections .article-dialog{
+  width:calc(100% - 24px);
+  max-height:calc(100dvh - 24px)
+}
+.fabric-collections dialog h2{
+  font-size:29px
+}
+.fabric-collections .detail-specs>div{
+  grid-template-columns:90px 1fr;
+  gap:12px
+}
+.fabric-collections .detail-specs dd{
+  font-size:12px
+}
+}
+@media(prefers-reduced-motion:reduce){
+.fabric-collections *,.fabric-collections *:before,.fabric-collections *:after{
+  transition:none!important;
+  animation:none!important
+}
+}
+@media (max-width:560px){
+.fabric-collections .search-field input, .fabric-collections select, .fabric-collections textarea {
+  font-size: 16px;
+}
+.fabric-collections .collection-tab {
+  font-size: 12px;
+}
+.fabric-collections .collection-tab span {
+  font-size: 11px;
+}
+.fabric-collections .article-series, .fabric-collections .mobile-spec-label, .fabric-collections .article-weight small, .fabric-collections .article-width small {
+  font-size: 12px;
+}
+.fabric-collections .article-row {
+  column-gap: 14px;
+}
+.fabric-collections .add-sample {
+  min-width: 78px;
+}
+.fabric-collections .filter-panel label {
+  font-size: 13px;
+}
+}
+.fabric-collections .article-weight, .fabric-collections .article-width, .fabric-collections .article-code, .fabric-collections #result-count, .fabric-collections #page-indicator, .fabric-collections .collection-meta, .fabric-collections .collection-tab span {
+  font-variant-numeric: tabular-nums;
+}
+.fabric-collections .catalogue-heading > div {
+  min-width: 0;
+}
+.fabric-collections .catalogue-heading > p {
+  flex-shrink: 0;
+}
+.fabric-collections #catalogue-title {
+  text-wrap: balance;
+}
+/* Motion and interaction states share the catalogue's restrained color system. */
+.fabric-collections {
+  --motion-fast: 140ms;
+  --motion-state: 240ms;
+  --motion-enter: 320ms;
+}
+.fabric-collections .icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.fabric-collections .icon * {
+  vector-effect: non-scaling-stroke;
+}
+.fabric-collections .collection-arrow .icon {
+  width: 19px;
+  height: 19px;
+}
+.fabric-collections .collection-image img {
+  transition: transform 700ms var(--ease);
+}
+.fabric-collections .collection-arrow, .fabric-collections .collection-number, .fabric-collections .collection-title-line h2 {
+  transition: color var(--motion-state), background-color var(--motion-state), border-color var(--motion-state), transform var(--motion-enter) var(--ease);
+}
+.fabric-collections .collection-entry[aria-current="true"] .collection-number {
+  color: var(--surface);
+  background: var(--accent);
+}
+.fabric-collections .collection-entry[aria-current="true"] .collection-title-line h2 {
+  color: var(--accent);
+}
+.fabric-collections .collection-entry:active .collection-arrow {
+  transform: scale(.94);
+}
+.fabric-collections .collection-entry:focus-visible {
+  outline-offset: 8px;
+}
+.fabric-collections .text-link .icon, .fabric-collections .button-primary .icon {
+  transition: transform var(--motion-state) var(--ease);
+}
+.fabric-collections .collection-tabs {
+  position: relative;
+}
+.fabric-collections .collection-tabs.has-indicator .collection-tab::after {
+  display: none;
+}
+.fabric-collections .tab-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 2px;
+  transform-origin: 0 0;
+  background: var(--accent);
+  pointer-events: none;
+}
+.fabric-collections .collection-tab {
+  transition: color var(--motion-fast);
+}
+.fabric-collections .article-row {
+  transition: background-color var(--motion-state);
+}
+.fabric-collections .article-row[data-selected="true"] {
+  background: var(--accent-soft);
+}
+.fabric-collections .article-row[data-selected="true"] .article-mark {
+  background: transparent;
+  color: var(--accent);
+}
+.fabric-collections .article-row[data-selected="true"] .article-code {
+  color: var(--accent);
+}
+.fabric-collections .article-code .detail-arrow {
+  display: inline-flex;
+}
+.fabric-collections .article-code .icon {
+  width: 14px;
+  height: 14px;
+}
+.fabric-collections .add-sample, .fabric-collections .filter-toggle, .fabric-collections .button-primary, .fabric-collections .button-secondary, .fabric-collections .pagination button, .fabric-collections .close-button, .fabric-collections .remove-sample {
+  transition: color var(--motion-fast), background-color var(--motion-state), border-color var(--motion-state), opacity var(--motion-fast), transform var(--motion-fast) var(--ease);
+}
+.fabric-collections .add-sample .icon {
+  width: 14px;
+  height: 14px;
+}
+.fabric-collections .add-sample:active, .fabric-collections .filter-toggle:active, .fabric-collections .button-primary:active, .fabric-collections .button-secondary:active {
+  transform: translateY(1px);
+}
+.fabric-collections .close-button, .fabric-collections .remove-sample {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.fabric-collections .close-button .icon, .fabric-collections .remove-sample .icon {
+  width: 20px;
+  height: 20px;
+}
+.fabric-collections .search-field {
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--motion-state);
+}
+.fabric-collections .search-field:focus-within {
+  border-bottom-color: var(--accent);
+}
+.fabric-collections .search-field > .icon {
+  color: var(--muted);
+}
+.fabric-collections .search-field input:focus-visible {
+  outline: none;
+}
+.fabric-collections select, .fabric-collections textarea {
+  transition: border-color var(--motion-state), background-color var(--motion-state);
+}
+.fabric-collections select:focus, .fabric-collections textarea:focus {
+  border-color: var(--accent);
+}
+.fabric-collections .dialog-feedback {
+  min-height: 20px;
+  margin-top: 14px;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.fabric-collections .dialog-feedback:empty {
+  visibility: hidden;
+}
+.fabric-collections .dialog-top {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+  padding-block: 8px;
+}
+.fabric-collections dialog[open]::backdrop {
+  animation: backdrop-in 240ms var(--ease);
+}
+.fabric-collections dialog.is-closing::backdrop {
+  animation: backdrop-out 170ms var(--ease) forwards;
+}
+@media (min-width: 561px) and (max-width: 800px) {
+.fabric-collections .collection-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 0;
+}
+.fabric-collections .collection-tab {
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+}
+@keyframes backdrop-in {
+from {
+  opacity: 0;
+}
+to {
+  opacity: 1;
+}
+}
+@keyframes backdrop-out {
+from {
+  opacity: 1;
+}
+to {
+  opacity: 0;
+}
+}
+@media (hover: hover) and (pointer: fine) {
+.fabric-collections .collection-entry:hover img {
+  transform: scale(1.045);
+}
+.fabric-collections .collection-entry:hover .collection-arrow {
+  transform: translate(2px, -2px);
+}
+.fabric-collections .text-link:hover .icon, .fabric-collections .button-primary:hover .icon {
+  transform: translate(2px, -2px);
+}
+.fabric-collections .article-row:hover {
+  background: var(--paper);
+}
+.fabric-collections .article-row[data-selected="true"]:hover {
+  background: var(--accent-soft);
+}
+.fabric-collections .article-row:hover .detail-arrow {
+  opacity: 1;
+}
+.fabric-collections .close-button:hover, .fabric-collections .remove-sample:hover {
+  background: var(--soft);
+  color: var(--accent);
+}
+.fabric-collections .collection-tab:hover {
+  color: var(--accent);
+}
+}
+@media (hover: none) {
+.fabric-collections .collection-entry:hover img {
+  transform: none;
+}
+}
+@media (prefers-reduced-motion: reduce) {
+.fabric-collections *, .fabric-collections *::before, .fabric-collections *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.fabric-collections .collection-entry:hover img, .fabric-collections .collection-entry:hover .collection-arrow {
+  transform: none;
+}
+}
+
+.fabric-collections { font-family: var(--font-catalogue-geist), sans-serif; }
+.fabric-collections .catalogue-section { scroll-margin-top: 80px; }
+.fabric-collections .collection-title-line h2 { max-width: 230px; }
+.fabric-collections .article-code { display: inline-flex; align-items: center; gap: 8px; text-align: left; min-height: 30px; }
+.fabric-collections .article-dialog { margin: auto; }
+.fabric-collections .detail-series { color: var(--muted); margin-top: 14px; }
+.fabric-collections .dialog-feedback .icon { width: 14px; height: 14px; }
+.fabric-collections .selection-summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+.fabric-collections .selection-summary > span { color: var(--accent); font-size: 13px; }
+.fabric-collections .selection-summary .button-secondary { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; white-space: nowrap; }
+.fabric-collections .development-link { display: flex; align-items: center; gap: 12px; width: fit-content; font-size: 12px; margin-top: 18px; color: var(--muted); }
+.fabric-collections .sourcing-references { margin-top: 44px; padding-block: 24px; border-top: 1px solid var(--line); }
+.fabric-collections .sourcing-references summary { cursor: pointer; font-size: 14px; min-height: 44px; }
+.fabric-collections .sourcing-references > p { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 22px; }
+.fabric-collections .sourcing-references > div { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0 32px; }
+.fabric-collections .sourcing-references a { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 56px; padding-block: 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.fabric-collections .sourcing-references a:hover { color: var(--accent); }
+@media (max-width:800px) { .fabric-collections .sourcing-references > div { grid-template-columns: 1fr 1fr; } }
+@media (max-width:560px) {
+  .fabric-collections .selection-summary { flex-direction: column; align-items: stretch; gap: 16px; }
+  .fabric-collections .sourcing-references > div { grid-template-columns: 1fr; }
+  .fabric-collections .collection-title-line h2 { max-width: none; }
+  .fabric-collections .article-dialog { padding: 24px; }
+}
+.fabric-collections .sourcing-references .reference-evidence { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; margin-top: 40px; }
+.fabric-collections .reference-evidence h3 { font-size: 16px; font-weight: 550; margin-bottom: 12px; }
+.fabric-collections .reference-evidence p { font-size: 14px; color: var(--muted); line-height: 1.8; margin-top: 10px; }
+@media (max-width: 560px) { .fabric-collections .sourcing-references .reference-evidence { grid-template-columns: 1fr; } }
+/* Match the approved collection header while retaining the existing focus/navigation contracts. */
+.gn-collection { background: #f7f5f0; border-bottom: 1px solid #d9d4cb; box-shadow: none; backdrop-filter: none; }
+.gn-collection .gn-inner { width: calc(100% - 112px); max-width: 1320px; padding-inline: 0; }
+.gn-collection .gn-name { font-weight: 500; font-size: 23px; letter-spacing: -.06em; color: #2c2722; }
+.gn-collection .gn-textile { font-weight: 400; }
+.gn-collection .gn-cart { gap: 10px; font-size: 12px; border-radius: 0; color: #2c2722; }
+.gn-collection .gn-count, .gn-collection-count { position: static; display: inline-flex; align-items: center; justify-content: center; min-width: 22px; min-height: 22px; border: 1px solid #d9d4cb; border-radius: 50%; color: #9c4a2e; background: transparent; font-size: 11px; font-weight: 400; box-shadow: none; }
+.gn-collection .gn-cta { display: none; }
+.gn-collection .gn-quote { gap: 8px; padding: 0; background: transparent; color: #2c2722; font-size: 12px; font-weight: 400; border-radius: 0; }
+.gn-collection .dn-trigger, .gn-collection .dn-link { font-weight: 400; color: #2c2722; border-radius: 0; }
+.gn-collection .dn-line { background: #9c4a2e; height: 1px; }
+.gn-collection .dn-panel { width: 350px; padding: 8px 24px; border-radius: 0; background: #fffefa; border-color: #d9d4cb; box-shadow: 0 16px 32px #2c272217; transition-duration: 240ms; }
+.gn-collection .dn-item { padding: 18px 0; border-radius: 0; font-weight: 400; border-bottom: 1px solid #d9d4cb; }
+.gn-collection .dn-item:last-child { border: 0; }
+.gn-collection .dn-item-current { background: transparent; color: #9c4a2e; }
+@media (max-width: 1279px) { .gn-collection .gn-inner { width: calc(100% - 48px); } }
+@media (max-width: 560px) {
+  .gn-collection .gn-inner { width: calc(100% - 32px); }
+  .gn-collection .gn-name { font-size: 20px; }
+  .gn-collection .gn-textile { display: none; }
+  .gn-collection .gn-brand { gap: 4px; }
+  .gn-collection .gn-mark { width: 27px; height: 27px; }
+}
+@media (prefers-reduced-motion: reduce) { .gn-collection .dn-panel { transition: none; } }

@@ -154,15 +154,19 @@ test("catalogue guides render lightweight semantic evidence snapshots", async ()
 });
 
 test("fabric catalogue exposes every public category through crawlable links", async () => {
-  const fabricsPage = await readSource("app/fabrics/page.tsx");
+  const [fabricsPage, collections] = await Promise.all([
+    readSource("app/fabrics/page.tsx"),
+    readSource("components/collections/FabricCollections.tsx"),
+  ]);
 
-  assert.match(fabricsPage, /getPublicFabricCategories/);
-  assert.match(fabricsPage, /publicCategories\.map/);
-  assert.match(
-    fabricsPage,
-    /href=\{`\/fabrics\/\$\{category\.slug\}`\}/
-  );
-  assert.match(fabricsPage, /category\.description/);
+  assert.match(fabricsPage, /getPublicFabricCategories\(\)\.map/);
+  assert.match(fabricsPage, /href:\s*`\/fabrics\/\$\{category\.slug\}`/);
+  assert.match(fabricsPage, /label:\s*category\.name/);
+  assert.match(fabricsPage, /<FabricCollections\b[^>]*sourcingLinks=\{sourcingLinks\}/);
+  assert.match(collections, /<details\b[^>]*className="sourcing-references"[^>]*><summary>/);
+  assert.match(collections, /sourcingLinks\.map\(\(link\)\s*=>\s*<Link\b[^>]*href=\{link\.href\}/);
+  assert.match(collections, /\{link\.label\}/);
+  assert.doesNotMatch(collections, /ssr:\s*false|fetch\(/);
 });
 
 test("legacy fabric categories carry route-specific sourcing depth", async () => {
@@ -997,37 +1001,67 @@ test("ready-stock page provides a second crawlable entry to legacy categories", 
   assert.match(landing, /href=\{`\/fabrics\/\$\{category\.slug\}`\}/);
 });
 
-test("catalogue routes bound the server payload and hydrate the complete catalogue", async () => {
-  const catalogue = await readSource("lib/public-catalog.ts");
-  const fabricsPage = await readSource("app/fabrics/page.tsx");
-  const readyStockPage = await readSource(
-    "app/ready-stock-knit-fabrics/page.tsx"
-  );
-  const catalogComponent = await readSource("components/FabricsCatalog.tsx");
+test("collections render a bounded first page from the complete local catalogue", async () => {
+  const [fabricsPage, collections, model, { publicFabrics }] = await Promise.all([
+    readSource("app/fabrics/page.tsx"),
+    readSource("components/collections/FabricCollections.tsx"),
+    readSource("lib/fabric-collections.ts"),
+    loadPublicCatalog(),
+  ]);
+  const { filterCollectionFabrics } = await import("../lib/fabric-collections.ts");
+  assert.match(fabricsPage, /export const dynamic = "force-static"/);
+  assert.match(fabricsPage, /<FabricCollections\b[^>]*fabrics=\{publicFabrics\}/);
+  assert.match(collections, /const pageSize = 8/);
+  assert.match(collections, /useState\(initialFilters\)/);
+  assert.match(collections, /initialFilters:\s*Filters\s*=\s*\{\s*collection:\s*"all"[\s\S]*?page:\s*1\s*\}/);
+  assert.match(collections, /const matches = filterCollectionFabrics\(fabrics, normalizedFilters\)/);
+  assert.match(collections, /const visible = matches\.slice\(\(page - 1\) \* pageSize, page \* pageSize\)/);
+  assert.match(collections, /\{visible\.map\(\(fabric\)\s*=>/);
+  assert.match(collections, /<article\b[^>]*className="article-row"/);
+  for (const component of [fabricsPage, collections, model]) {
+    assert.doesNotMatch(component, /fetch\(|\/api\/fabrics|ssr:\s*false/);
+  }
+  assert.equal(publicFabrics.length, 104);
+  const firstPage = filterCollectionFabrics(publicFabrics).slice(0, 8);
+  assert.equal(firstPage.length, 8);
+  assert.equal(new Set(firstPage.map((fabric) => fabric.series)).size, 8);
+});
 
+test("ready-stock keeps its bounded initial payload and later catalogue hydration", async () => {
+  const [catalogue, readyStockPage, catalogComponent, publicCatalog] = await Promise.all([
+    readSource("lib/public-catalog.ts"),
+    readSource("app/ready-stock-knit-fabrics/page.tsx"),
+    readSource("components/FabricsCatalog.tsx"),
+    loadPublicCatalog(),
+  ]);
   assert.match(catalogue, /INITIAL_CATALOGUE_SIZE\s*=\s*4/);
-  assert.match(catalogue, /getInitialPublicFabrics/);
-  assert.match(catalogue, /getPublicFabricCount/);
-  assert.match(fabricsPage, /getInitialPublicFabrics/);
-  assert.match(fabricsPage, /getPublicFabricCount/);
-  assert.doesNotMatch(fabricsPage, /const fabrics = getPublicFabrics\(\)/);
   assert.match(readyStockPage, /getInitialPublicFabrics/);
   assert.match(readyStockPage, /getPublicFabricCount/);
+  assert.match(readyStockPage, /fabrics=\{getInitialPublicFabrics\(\)\}/);
+  assert.match(readyStockPage, /totalFabricCount=\{getPublicFabricCount\(\)\}/);
   assert.match(catalogComponent, /fetch\("\/api\/fabrics"/);
   assert.match(catalogComponent, /totalFabricCount/);
+  assert.equal(publicCatalog.getInitialPublicFabrics().length, 4);
+  assert.equal(publicCatalog.getPublicFabricCount(), 104);
 });
 
 test("catalogue landing routes publish page-specific sourcing evidence", async () => {
-  const fabricsPage = await readSource("app/fabrics/page.tsx");
-  const readyStockLanding = await readSource(
-    "components/landing/ReadyStockLanding.tsx"
-  );
+  const [fabricsPage, collections, sourcingEvidence, readyStockLanding] = await Promise.all([
+    readSource("app/fabrics/page.tsx"),
+    readSource("components/collections/FabricCollections.tsx"),
+    readSource("components/collections/SourcingEvidence.tsx"),
+    readSource("components/landing/ReadyStockLanding.tsx"),
+  ]);
 
-  assert.match(fabricsPage, /What the catalogue confirms/);
-  assert.match(fabricsPage, /What still requires sample approval/);
-  assert.match(fabricsPage, /What makes an RFQ actionable/);
-  assert.match(fabricsPage, /How to shortlist a finished knit fabric/);
-  assert.match(fabricsPage, /Build an approval record/);
+  assert.match(fabricsPage, /import\s*\{\s*SourcingEvidence\s*\}\s*from/);
+  assert.match(fabricsPage, /sourcingContent=\{<SourcingEvidence\s*\/>\}/);
+  assert.match(collections, /<details\b[^>]*>[\s\S]*?<summary>[\s\S]*?<\/summary>[\s\S]*?\{sourcingContent\}[\s\S]*?<\/details>/);
+  assert.doesNotMatch(sourcingEvidence, /["']use client["']|fetch\(/);
+  assert.match(sourcingEvidence, /What the catalogue confirms/);
+  assert.match(sourcingEvidence, /What still requires sample approval/);
+  assert.match(sourcingEvidence, /What makes an RFQ actionable/);
+  assert.match(sourcingEvidence, /How to shortlist a finished knit fabric/);
+  assert.match(sourcingEvidence, /Build an approval record/);
   assert.match(readyStockLanding, /How availability is confirmed/);
   assert.match(readyStockLanding, /Article match/);
   assert.match(readyStockLanding, /Commercial confirmation/);

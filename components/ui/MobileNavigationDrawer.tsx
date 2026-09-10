@@ -16,6 +16,7 @@ type MobileNavigationDrawerProps = {
   open: boolean;
   onClose: () => void;
   pathname: string;
+  search?: string;
   totalCount: number;
   triggerRef: RefObject<HTMLButtonElement>;
   desktopFallbackRef: RefObject<HTMLAnchorElement>;
@@ -25,6 +26,7 @@ export function MobileNavigationDrawer({
   open,
   onClose,
   pathname,
+  search = "",
   totalCount,
   triggerRef,
   desktopFallbackRef,
@@ -37,10 +39,11 @@ export function MobileNavigationDrawer({
   });
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousPathRef = useRef(pathname);
+  const route = `${pathname}?${search}`;
+  const previousRouteRef = useRef(route);
   const activeNavigationId = getActiveNavigationId(pathname);
   const currentNavigationItemId =
-    getCurrentNavigationItemId(pathname);
+    getCurrentNavigationItemId(pathname, search);
 
   const closeAndRestoreFocus = useCallback(() => {
     onClose();
@@ -58,13 +61,13 @@ export function MobileNavigationDrawer({
   };
 
   useEffect(() => {
-    if (previousPathRef.current !== pathname) {
-      previousPathRef.current = pathname;
+    if (previousRouteRef.current !== route) {
+      previousRouteRef.current = route;
       if (open) {
         onClose();
       }
     }
-  }, [onClose, open, pathname]);
+  }, [onClose, open, route]);
 
   useEffect(() => {
     if (!open) return;

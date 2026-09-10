@@ -15,6 +15,7 @@ export type CartItem = {
   name: string;
   composition: string;
   weight: number;
+  weightLabel?: string;
   stockStatus: string;
   quantity: number;
   notionPageId?: string;
@@ -40,6 +41,7 @@ function fabricToCartItem(fabric: Fabric): CartItem {
     name: fabric.name,
     composition: fabric.composition,
     weight: fabric.weight,
+    weightLabel: fabric.weightLabel,
     stockStatus: fabric.stockStatus?.trim() || "In stock",
     quantity: DEFAULT_METERS,
     notionPageId: fabric.notionPageId,

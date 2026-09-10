@@ -531,9 +531,11 @@ export function InquiryBar({
           ...(item.composition.trim()
             ? { composition: item.composition.trim() }
             : {}),
-          ...(Number.isFinite(item.weight)
-            ? { weight: `${item.weight} gsm` }
-            : {}),
+          ...(item.weightLabel?.trim()
+            ? { weight: item.weightLabel.trim() }
+            : Number.isFinite(item.weight) && item.weight > 0
+              ? { weight: `${item.weight} gsm` }
+              : {}),
           ...(item.stockStatus.trim()
             ? { stockStatus: item.stockStatus.trim() }
             : {}),
@@ -663,7 +665,10 @@ export function InquiryBar({
                       <div className="min-w-0">
                         <p className="font-medium text-gray-900">{item.name}</p>
                         <p className="text-xs text-gray-500">
-                          {item.composition} | {item.weight}g
+                          {item.composition} | {item.weightLabel?.trim() ||
+                            (Number.isFinite(item.weight) && item.weight > 0
+                              ? `${item.weight} GSM`
+                              : "Confirm GSM")}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

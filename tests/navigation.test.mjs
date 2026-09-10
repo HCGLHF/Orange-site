@@ -77,12 +77,9 @@ test("buyer-journey navigation exposes the approved groups and order", async () 
         id: "products",
         label: "Products",
         items: [
-          ["Ready Stock", "/ready-stock-knit-fabrics"],
-          ["Finished Knit Fabrics", "/fabrics"],
-          ["Double-Knit Manufacturing", "/finished-double-knit-fabrics"],
-          ["Interlock Fabric", "/fabrics/interlock-fabric"],
-          ["Ponte Roma Fabric", "/fabrics/ponte-roma-fabric"],
-          ["Rib Knit Fabric", "/fabrics/rib-knit-fabric"],
+          ["Air-Layer & Structured Knits", "/fabrics?collection=structured"],
+          ["Soft-Touch & Wool-Blend Knits", "/fabrics?collection=soft-touch"],
+          ["Textured & Brushed Knits", "/fabrics?collection=textured"],
           ["View All Fabrics", "/fabrics"],
         ],
       },
@@ -123,7 +120,7 @@ test("every navigation destination resolves to a registered public page", async 
   const publicPaths = new Set(publicPages.map((page) => page.path));
 
   assert.equal(INQUIRY_HREF, "/fabrics#inquiry-form");
-  assert.ok(NAVIGATION_DISCOVERY_HREFS.includes(INQUIRY_HREF));
+  assert.ok(!NAVIGATION_DISCOVERY_HREFS.includes(INQUIRY_HREF), "dialog actions are verified by inquiry interaction tests, not crawlable-link discovery");
   assert.equal(
     new Set(NAVIGATION_DISCOVERY_HREFS).size,
     NAVIGATION_DISCOVERY_HREFS.length
@@ -133,12 +130,12 @@ test("every navigation destination resolves to a registered public page", async 
   assert.equal(publicPaths.size, publicPages.length);
 
   for (const href of NAVIGATION_DISCOVERY_HREFS) {
-    const pathname = href.split("#")[0];
+    const pathname = new URL(href, "https://orangetextiles.com").pathname;
     assert.ok(publicPaths.has(pathname), `${href} must resolve publicly`);
   }
 });
 
-test("only the documented catalogue destination is duplicated", async () => {
+test("each navigation destination has one unambiguous link", async () => {
   const { PRIMARY_NAVIGATION } = await loadNavigation();
   const hrefs = PRIMARY_NAVIGATION.flatMap((section) =>
     section.kind === "group"
@@ -151,10 +148,10 @@ test("only the documented catalogue destination is duplicated", async () => {
     ),
   ];
 
-  assert.deepEqual(duplicates, ["/fabrics"]);
+  assert.deepEqual(duplicates, []);
   assert.equal(
     hrefs.filter((href) => href === "/fabrics").length,
-    2
+    1
   );
 });
 
@@ -194,28 +191,27 @@ test("current navigation item resolver selects exact canonical destinations", as
   assert.equal(getCurrentNavigationItemId("/"), "home");
   assert.equal(
     getCurrentNavigationItemId("/ready-stock-knit-fabrics"),
-    "ready-stock"
+    null
   );
   assert.equal(
     getCurrentNavigationItemId("/finished-double-knit-fabrics"),
-    "double-knit-manufacturing"
+    null
   );
   assert.equal(
     getCurrentNavigationItemId("/fabrics"),
-    "finished-knit-fabrics",
-    "the duplicated catalogue URL must resolve to its canonical item"
+    "view-all-fabrics"
   );
   assert.equal(
     getCurrentNavigationItemId("/fabrics/interlock-fabric"),
-    "interlock-fabric"
+    null
   );
   assert.equal(
     getCurrentNavigationItemId("/fabrics/ponte-roma-fabric"),
-    "ponte-roma-fabric"
+    null
   );
   assert.equal(
     getCurrentNavigationItemId("/fabrics/rib-knit-fabric"),
-    "rib-knit-fabric"
+    null
   );
   assert.equal(
     getCurrentNavigationItemId("/blog/what-is-double-knit-fabric"),
@@ -248,11 +244,21 @@ test("current navigation item resolver selects exact canonical destinations", as
   assert.equal(getCurrentNavigationItemId("/unknown"), null);
 });
 
+test("catalogue navigation follows the selected collection and ignores other filters", async () => {
+  const { getCurrentNavigationItemId } = await loadNavigation();
+  for (const id of ["structured", "soft-touch", "textured"]) {
+    assert.equal(getCurrentNavigationItemId("/fabrics", `?collection=${id}&q=wool`), id);
+  }
+  assert.equal(getCurrentNavigationItemId("/fabrics", "collection=unknown"), "view-all-fabrics");
+  assert.equal(getCurrentNavigationItemId("/fabrics", "q=wool"), "view-all-fabrics");
+  assert.equal(getCurrentNavigationItemId("/blog", "collection=textured"), "view-all-guides");
+});
+
 const assertItemCurrentContract = (source) => {
   assert.match(source, /getCurrentNavigationItemId/);
   assert.match(
     source,
-    /const\s+currentNavigationItemId\s*=\s*getCurrentNavigationItemId\s*\(\s*pathname\s*\)/
+    /const\s+currentNavigationItemId\s*=\s*getCurrentNavigationItemId\s*\(\s*pathname\s*,\s*search\s*\)/
   );
   assert.match(
     source,
@@ -461,7 +467,7 @@ test("desktop navigation implements the shared accessible menu contract", async 
 
   assert.match(
     source,
-    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*setOpenGroup\s*\(\s*null\s*\)\s*;\s*\}\s*,\s*\[\s*pathname\s*\]\s*\)/
+    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{\s*setOpenGroup\s*\(\s*null\s*\)\s*;\s*\}\s*,\s*\[\s*pathname\s*,\s*search\s*\]\s*\)/
   );
   assert.match(
     source,
@@ -510,7 +516,7 @@ test("global header composes the buyer-journey desktop and mobile navigation", a
     source,
     /import\s*\{\s*RequestQuoteButton\s*\}\s*from\s*["']@\/components\/RequestQuoteButton["']/
   );
-  assert.match(source, /<DesktopNavigation\s+pathname=\{pathname\}\s*\/>/);
+  assert.match(source, /<DesktopNavigation\s+pathname=\{pathname\}\s+search=\{search\}\s*\/>/);
   assert.match(
     source,
     /<MobileNavigationDrawer[\s\S]{0,600}?open=\{drawerOpen\}[\s\S]{0,120}?onClose=\{closeDrawer\}[\s\S]{0,120}?pathname=\{pathname\}[\s\S]{0,120}?totalCount=\{totalCount\}[\s\S]{0,120}?triggerRef=\{menuButtonRef\}[\s\S]{0,120}?desktopFallbackRef=\{brandLinkRef\}/
@@ -563,8 +569,8 @@ test("global header exposes one accessible responsive row", async () => {
     /onClick=\{\(\)\s*=>\s*setDrawerOpen\(true\)\}/
   );
   assert.match(navbarSource, /<OrangeMark\b/);
-  assert.match(navbarSource, />\s*O&apos;range Textile\s*</);
-  assert.match(navbarSource, />\s*Quote\s*</);
+  assert.match(navbarSource, /O&apos;range<span className="gn-textile"> Textile<\/span>/);
+  assert.match(navbarSource, /Sample selection[\s\S]*?: "Quote"/);
   assert.match(navbarSource, /className=["']gn-menu["']/);
   assert.match(navbarSource, /className=["']gn-actions["']/);
   assert.match(
@@ -575,11 +581,11 @@ test("global header exposes one accessible responsive row", async () => {
     styles,
     /\.gn-actions\s*\{[\s\S]*?@apply\s+hidden[\s\S]*?\bxl:flex\b/
   );
-  assert.match(navbarSource, /totalCount\s*>\s*0\s*\?/);
+  assert.match(navbarSource, /totalCount\s*>\s*0\s*\|\|\s*pathname\s*===\s*"\/fabrics"\s*\?/);
   assert.match(navbarSource, /\{\s*totalCount\s*\}/);
   assert.match(
     navbarSource,
-    /aria-label=\{`Inquiry cart:\s*\$\{totalCount\}\s*\$\{\s*totalCount\s*===\s*1\s*\?\s*["']item["']\s*:\s*["']items["']\s*\}\s*`\}/
+    /aria-label=\{`\$\{pathname === "\/fabrics" \? "Sample selection" : "Inquiry cart"\}:\s*\$\{totalCount\}\s*\$\{\s*totalCount\s*===\s*1\s*\?\s*["']item["']\s*:\s*["']items["']\s*\}\s*`\}/
   );
   assert.match(navbarSource, /\{\s*t\(["']navCtaInquiry["']\)\s*\}/);
   assert.match(styles, /\.gn-menu[\s\S]*?focus-visible:ring-2/);
@@ -829,12 +835,12 @@ const assertMobileDrawerFocusContract = (source) => {
   assert.match(source, /document\.body\.style\.overflow\s*=\s*["']hidden["']/);
   assert.match(source, /document\.body\.style\.overflow\s*=\s*previousOverflow/);
 
-  assert.match(source, /const\s+previousPathRef\s*=\s*useRef\s*\(\s*pathname\s*\)/);
-  assert.match(source, /previousPathRef\.current\s*!==\s*pathname/);
-  assert.match(source, /previousPathRef\.current\s*=\s*pathname/);
+  assert.match(source, /const\s+previousRouteRef\s*=\s*useRef\s*\(\s*route\s*\)/);
+  assert.match(source, /previousRouteRef\.current\s*!==\s*route/);
+  assert.match(source, /previousRouteRef\.current\s*=\s*route/);
   assert.match(
     source,
-    /previousPathRef\.current\s*!==\s*pathname[\s\S]{0,220}if\s*\(\s*open\s*\)\s*\{[\s\S]{0,100}onClose\s*\(\s*\)/
+    /previousRouteRef\.current\s*!==\s*route[\s\S]{0,220}if\s*\(\s*open\s*\)\s*\{[\s\S]{0,100}onClose\s*\(\s*\)/
   );
 };
 

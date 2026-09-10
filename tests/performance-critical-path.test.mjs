@@ -471,14 +471,26 @@ function isOpenTrueNullGate(context) {
 
 function isStickyTrueNullGate(context) {
   const condition = unwrappedExpression(context.conditional.condition);
+  if (
+    !ts.isBinaryExpression(condition) ||
+    condition.operatorToken.kind !== ts.SyntaxKind.AmpersandAmpersandToken
+  ) return false;
+  const count = unwrappedExpression(condition.left);
+  const route = unwrappedExpression(condition.right);
   return (
     context.branch === "true" &&
-    ts.isBinaryExpression(condition) &&
-    condition.operatorToken.kind === ts.SyntaxKind.GreaterThanToken &&
-    ts.isIdentifier(unwrappedExpression(condition.left)) &&
-    unwrappedExpression(condition.left).text === "totalCount" &&
-    ts.isNumericLiteral(unwrappedExpression(condition.right)) &&
-    unwrappedExpression(condition.right).text === "0" &&
+    ts.isBinaryExpression(count) &&
+    count.operatorToken.kind === ts.SyntaxKind.GreaterThanToken &&
+    ts.isIdentifier(unwrappedExpression(count.left)) &&
+    unwrappedExpression(count.left).text === "totalCount" &&
+    ts.isNumericLiteral(unwrappedExpression(count.right)) &&
+    unwrappedExpression(count.right).text === "0" &&
+    ts.isBinaryExpression(route) &&
+    route.operatorToken.kind === ts.SyntaxKind.ExclamationEqualsEqualsToken &&
+    ts.isIdentifier(unwrappedExpression(route.left)) &&
+    unwrappedExpression(route.left).text === "pathname" &&
+    ts.isStringLiteralLike(unwrappedExpression(route.right)) &&
+    unwrappedExpression(route.right).text === "/fabrics" &&
     isNullExpression(context.conditional.whenFalse)
   );
 }
@@ -686,6 +698,18 @@ test("deferred sticky inquiry bar loads from a lazy client-only chunk", async ()
   );
 
   assertStickyInquiryBarStaysLazy(stickyGate);
+  for (const mutation of [
+    stickyGate.replace('totalCount > 0 && pathname !== "/fabrics"', "totalCount > 0"),
+    stickyGate.replace("totalCount > 0 &&", "totalCount > 0 ||"),
+    stickyGate.replace('pathname !== "/fabrics"', 'pathname === "/fabrics"'),
+    stickyGate.replace('pathname !== "/fabrics"', 'pathname !== "/ready-stock-knit-fabrics"'),
+  ]) {
+    assert.throws(
+      () => assertStickyInquiryBarStaysLazy(mutation),
+      /required true branch/,
+      "only a populated cart outside the collections route may load the sticky bar"
+    );
+  }
 });
 
 test("global batch inquiry overlay loads from a deferred lazy client-only chunk", async () => {
